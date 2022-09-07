@@ -1,0 +1,60 @@
+===============================================================================
+EXTENSION NAME : linecounter
+EXTENSION VERSION : 0.2.7
+-------------------------------------------------------------------------------
+count time : 2022-09-07 11:50:23
+count workspace : c:\Users\44773\Documents\Coding\Projects\etym_tree_python
+total files : 37
+total code lines : 516
+total comment lines : 29
+total blank lines : 136
+
+    statistics
+   |      extension|     total code|  total comment|    total blank|percent|
+   -------------------------------------------------------------------------
+   |            .py|            310|             28|            100|     60|
+   |          .data|              1|              0|              0|   0.19|
+   |           .ini|              2|              0|              0|   0.39|
+   |            .md|            100|              0|             19|     19|
+   |               |             78|              0|             15|     15|
+   |           .yml|             21|              0|              2|    4.1|
+   |           .TAG|              4|              1|              0|   0.78|
+   -------------------------------------------------------------------------
+.github\workflows\pylint.yml, code is 21, comment is 0, blank is 2.
+.gitignore, code is 75, comment is 0, blank is 15.
+.pytest_cache\.gitignore, code is 2, comment is 0, blank is 0.
+.pytest_cache\CACHEDIR.TAG, code is 4, comment is 1, blank is 0.
+.pytest_cache\README.md, code is 2, comment is 0, blank is 1.
+.pytest_cache\v\cache\stepwise, code is 1, comment is 0, blank is 0.
+__init__.py, code is 0, comment is 0, blank is 0.
+__pycache__\__init__.cpython-310.pyc, it is a binary file.
+etym_tree_python.py, code is 15, comment is 1, blank is 5.
+lib\__init__.py, code is 0, comment is 0, blank is 0.
+lib\__pycache__\__init__.cpython-310.pyc, it is a binary file.
+lib\__pycache__\core.cpython-310.pyc, it is a binary file.
+lib\core.py, code is 19, comment is 1, blank is 10.
+lib\managers\__init__.py, code is 0, comment is 0, blank is 0.
+lib\managers\__pycache__\__init__.cpython-310.pyc, it is a binary file.
+lib\managers\__pycache__\configurationmanager.cpython-310.pyc, it is a binary file.
+lib\managers\configurationmanager.py, code is 22, comment is 0, blank is 6.
+lib\services\__pycache__\configurationservice.cpython-310.pyc, it is a binary file.
+lib\services\__pycache__\io_service.cpython-310.pyc, it is a binary file.
+lib\services\configurationservice.py, code is 10, comment is 0, blank is 3.
+lib\services\io_service.py, code is 61, comment is 6, blank is 21.
+pytest.ini, code is 2, comment is 0, blank is 0.
+README.md, code is 98, comment is 0, blank is 18.
+testobject.data, code is 1, comment is 0, blank is 0.
+tests\__init__.py, code is 0, comment is 0, blank is 0.
+tests\__pycache__\__init__.cpython-310.pyc, it is a binary file.
+tests\__pycache__\test_ConfigurationManager.cpython-310-pytest-7.1.2.pyc, it is a binary file.
+tests\__pycache__\test_ConfigurationService.cpython-310-pytest-7.1.2.pyc, it is a binary file.
+tests\__pycache__\test_Deserialiser.cpython-310-pytest-7.1.2.pyc, it is a binary file.
+tests\__pycache__\test_IOService.cpython-310-pytest-7.1.2.pyc, it is a binary file.
+tests\test_ConfigurationManager.py, code is 34, comment is 9, blank is 12.
+tests\test_ConfigurationService.py, code is 16, comment is 0, blank is 4.
+tests\test_Deserialiser.py, code is 34, comment is 5, blank is 9.
+tests\test_IOService.py, code is 72, comment is 5, blank is 22.
+ui\__pycache__\splash.cpython-310.pyc, it is a binary file.
+ui\splash.py, code is 27, comment is 1, blank is 8.
+UserConfig.data, code is 0, comment is 0, blank is 0.
+===============================================================================

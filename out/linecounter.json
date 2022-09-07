@@ -1,0 +1,289 @@
+{
+    "extension": "linecounter",
+    "version": "0.2.7",
+    "workspace": "c:\\Users\\44773\\Documents\\Coding\\Projects\\etym_tree_python",
+    "linecount": [
+        {
+            "version": "0.2.7",
+            "counttime": "2022-09-07 11:50:23",
+            "filesum": 37,
+            "codesum": 516,
+            "commentsum": 29,
+            "blanksum": 136,
+            "statistics": {
+                ".py": {
+                    "code": 310,
+                    "comment": 28,
+                    "blank": 100
+                },
+                ".data": {
+                    "code": 1,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".ini": {
+                    "code": 2,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".md": {
+                    "code": 100,
+                    "comment": 0,
+                    "blank": 19
+                },
+                "": {
+                    "code": 78,
+                    "comment": 0,
+                    "blank": 15
+                },
+                ".yml": {
+                    "code": 21,
+                    "comment": 0,
+                    "blank": 2
+                },
+                ".TAG": {
+                    "code": 4,
+                    "comment": 1,
+                    "blank": 0
+                }
+            },
+            "filelist": [
+                {
+                    "blank": 2,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": ".github\\workflows\\pylint.yml"
+                },
+                {
+                    "blank": 15,
+                    "code": 75,
+                    "comment": 0,
+                    "filename": ".gitignore"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": ".pytest_cache\\.gitignore"
+                },
+                {
+                    "blank": 0,
+                    "code": 4,
+                    "comment": 1,
+                    "filename": ".pytest_cache\\CACHEDIR.TAG"
+                },
+                {
+                    "blank": 1,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": ".pytest_cache\\README.md"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": ".pytest_cache\\v\\cache\\stepwise"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "__init__.py"
+                },
+                {
+                    "filename": "__pycache__\\__init__.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 5,
+                    "code": 15,
+                    "comment": 1,
+                    "filename": "etym_tree_python.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "lib\\__init__.py"
+                },
+                {
+                    "filename": "lib\\__pycache__\\__init__.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "lib\\__pycache__\\core.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 10,
+                    "code": 19,
+                    "comment": 1,
+                    "filename": "lib\\core.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "lib\\managers\\__init__.py"
+                },
+                {
+                    "filename": "lib\\managers\\__pycache__\\__init__.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "lib\\managers\\__pycache__\\configurationmanager.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 6,
+                    "code": 22,
+                    "comment": 0,
+                    "filename": "lib\\managers\\configurationmanager.py"
+                },
+                {
+                    "filename": "lib\\services\\__pycache__\\configurationservice.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "lib\\services\\__pycache__\\io_service.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 3,
+                    "code": 10,
+                    "comment": 0,
+                    "filename": "lib\\services\\configurationservice.py"
+                },
+                {
+                    "blank": 21,
+                    "code": 61,
+                    "comment": 6,
+                    "filename": "lib\\services\\io_service.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "pytest.ini"
+                },
+                {
+                    "blank": 18,
+                    "code": 98,
+                    "comment": 0,
+                    "filename": "README.md"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "testobject.data"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "tests\\__init__.py"
+                },
+                {
+                    "filename": "tests\\__pycache__\\__init__.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "tests\\__pycache__\\test_ConfigurationManager.cpython-310-pytest-7.1.2.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "tests\\__pycache__\\test_ConfigurationService.cpython-310-pytest-7.1.2.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "tests\\__pycache__\\test_Deserialiser.cpython-310-pytest-7.1.2.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "tests\\__pycache__\\test_IOService.cpython-310-pytest-7.1.2.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 12,
+                    "code": 34,
+                    "comment": 9,
+                    "filename": "tests\\test_ConfigurationManager.py"
+                },
+                {
+                    "blank": 4,
+                    "code": 16,
+                    "comment": 0,
+                    "filename": "tests\\test_ConfigurationService.py"
+                },
+                {
+                    "blank": 9,
+                    "code": 34,
+                    "comment": 5,
+                    "filename": "tests\\test_Deserialiser.py"
+                },
+                {
+                    "blank": 22,
+                    "code": 72,
+                    "comment": 5,
+                    "filename": "tests\\test_IOService.py"
+                },
+                {
+                    "filename": "ui\\__pycache__\\splash.cpython-310.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 8,
+                    "code": 27,
+                    "comment": 1,
+                    "filename": "ui\\splash.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "UserConfig.data"
+                }
+            ]
+        }
+    ]
+}
