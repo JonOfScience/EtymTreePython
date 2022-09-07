@@ -1,7 +1,7 @@
 <style>.mermaid svg { height: auto; }</style>
 
 # EtymTreePython
-A python designed to allow input, display, and tracking of the vocabulary of a constructed language.
+A python project designed to allow input, display, and tracking of the vocabulary of a constructed language.
 
 ## Configuration
 ```mermaid
@@ -17,7 +17,7 @@ sequenceDiagram
     Config->>ConfigManager: import_config() CM_IC_0
     end
 
-    rect rgb(200, 200, 200)
+    rect rgb(200, 255, 150)
     ConfigManager->>ConfigService: import_config() CM_IC_1
     end
 
@@ -64,13 +64,13 @@ sequenceDiagram
     ConfigService->>ConfigManager: return dict CM_IC_10
     end
 
-    rect rgb(200, 200, 200)
+    rect rgb(200, 255, 150)
     activate ConfigManager
-    ConfigManager->>ConfigManager: integrate_config_dict() CM_IC_11
+    ConfigManager->>ConfigManager: integrate_config() CM_IC_11
     end
     deactivate ConfigManager
     
-    rect rgb(200, 200, 200)
+    rect rgb(200, 255, 150)
     ConfigManager ->> Config: UPDATED CM_IC_12
     end
 ```
@@ -79,7 +79,8 @@ sequenceDiagram
 |-|-|
 | CM_IC_0 | 
 | |
-| CM_IC_1 |
+| **CM_IC_1** | GivenANewConfigManager
+| | CM_IC_1_TheManagerCallsImportConfigOnTheService
 | |
 | **CM_IC_2** | GivenANewConfigService:
 | | CM_IC_2_AServiceWillCallDeserialiseStoredOnImport
@@ -105,8 +106,11 @@ sequenceDiagram
 | **CM_IC_9** | GivenANewConfigService:
 | | CM_IC_9_AServiceReturnADeserialisedObjectOnImport
 | |
-| CM_IC_10 |
+| **CM_IC_10** | GivenANewConfigManager
+| | CM_IC_10_ImportConfigReturnsAConfigDictionary
 | |
-| CM_IC_11 |
+| **CM_IC_11** | GivenANewConfigManager:
+| | CM_IC_11_TheManagerCallsIntegrateConfig
 | |
-| CM_IC_12 |
+| **CM_IC_12** | GivenAManagerWithBaseConfig
+| | CM_IC_12_WhenLoadingAUserConfigFromAFile_ThenBaseOptionsAreOverwritten
