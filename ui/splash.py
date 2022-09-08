@@ -7,11 +7,11 @@ from PyQt5.QtWidgets import (
     QWidget)
 
 # Replace this with an interface
-from lib.managers.configurationmanager import ConfigurationManager
+from lib.configuration.settings import Settings
 
 
 class SplashWindow(QWidget):
-    def __init__(self, configuration: ConfigurationManager) -> None:
+    def __init__(self, configuration: Settings) -> None:
         super().__init__()
         self.setWindowTitle("EtymTree - Splash")
         self.setGeometry(0, 0, 800, 500)

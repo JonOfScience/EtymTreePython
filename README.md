@@ -7,18 +7,18 @@ A python project designed to allow input, display, and tracking of the vocabular
 ```mermaid
 sequenceDiagram
     actor Config
-    Participant ConfigManager
+    Participant Settings
     participant ConfigService
     participant IOService
     participant Deserialiser
     participant TypeDeserialiser
     
     rect rgb(200, 200, 200)
-    Config->>ConfigManager: import_config() CM_IC_0
+    Config->>Settings: import_config() CM_IC_0
     end
 
     rect rgb(200, 255, 150)
-    ConfigManager->>ConfigService: import_config() CM_IC_1
+    Settings->>ConfigService: import_config() CM_IC_1
     end
 
     rect rgb(200, 255, 150)
@@ -61,17 +61,17 @@ sequenceDiagram
     end
 
     rect rgb(200, 200, 200)
-    ConfigService->>ConfigManager: return dict CM_IC_10
+    ConfigService->>Settings: return dict CM_IC_10
     end
 
     rect rgb(200, 255, 150)
-    activate ConfigManager
-    ConfigManager->>ConfigManager: integrate_config() CM_IC_11
+    activate Settings
+    Settings->>Settings: integrate_config() CM_IC_11
     end
-    deactivate ConfigManager
+    deactivate Settings
     
     rect rgb(200, 255, 150)
-    ConfigManager ->> Config: UPDATED CM_IC_12
+    Settings ->> Config: UPDATED CM_IC_12
     end
 ```
 
@@ -79,10 +79,10 @@ sequenceDiagram
 |-|-|
 | CM_IC_0 | 
 | |
-| **CM_IC_1** | GivenANewConfigManager
-| | CM_IC_1_TheManagerCallsImportConfigOnTheService
+| **CM_IC_1** | GivenEmptySettings
+| | cm_ic_1_a_request_to_import_configuration_options_is_passed_on
 | |
-| **CM_IC_2** | GivenANewConfigService:
+| **CM_IC_2** | GivenANewConfigService
 | | CM_IC_2_AServiceWillCallDeserialiseStoredOnImport
 | |
 | **CM_IC_3** | GivenANewIOService
@@ -109,8 +109,8 @@ sequenceDiagram
 | **CM_IC_10** | GivenANewConfigManager
 | | CM_IC_10_ImportConfigReturnsAConfigDictionary
 | |
-| **CM_IC_11** | GivenANewConfigManager:
-| | CM_IC_11_TheManagerCallsIntegrateConfig
+| **CM_IC_11** | GivenEmptySettings
+| | test_when_a_valid_id_is_specified_then_the_expected_setting_value_is_returned
 | |
-| **CM_IC_12** | GivenAManagerWithBaseConfig
-| | CM_IC_12_WhenLoadingAUserConfigFromAFile_ThenBaseOptionsAreOverwritten
+| **CM_IC_12** | GivenAnExistingConfiguration
+| | cm_ic_12_base_entries_are_overwritten_when_importing_config

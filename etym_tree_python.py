@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import (QApplication)
 from ui.splash import SplashWindow
-from lib.managers.configurationmanager import ConfigurationManager
+from lib.configuration.settings import Settings
 
 # BASE CONFIG IS HARDCODED - USER CONFIG IS IN FILES (i.e. can start without user config if need be)
 BASE_CONFIG = {
@@ -11,7 +11,7 @@ BASE_CONFIG = {
 
 if __name__ == '__main__':
 
-    configuration = ConfigurationManager(BASE_CONFIG)
+    configuration = Settings(BASE_CONFIG)
     configuration.import_config(BASE_CONFIG["DefaultUserConfig"])
 
     app = QApplication(sys.argv)
