@@ -1,13 +1,13 @@
-from lib.services.configurationservice import ConfigurationService
+from lib.services.settings_io_service import SettingsIOService
 from lib.core import DataFormat
 
 from lib.services.io_service import IOService
 
 
-class Test_GivenANewConfigService:
+class TestGivenANewSettingsIOService:
     def test_CM_IC_2_AServiceWillCallDeserialiseStoredOnImport(self, mocker):
         m = mocker.patch("lib.services.io_service.IOService.deserialise_stored", return_value="")
-        new_config_service = ConfigurationService(IOService(DataFormat.JSON))
+        new_config_service = SettingsIOService(IOService(DataFormat.JSON))
         _ = new_config_service.import_config("TestConfig")
         m.assert_called_once()
 
@@ -15,6 +15,6 @@ class Test_GivenANewConfigService:
         _ = mocker.patch(
             "lib.services.io_service.IOService.deserialise_stored",
             return_value={"A": "B", "C": 1})
-        new_config_service = ConfigurationService(IOService(DataFormat.JSON))
+        new_config_service = SettingsIOService(IOService(DataFormat.JSON))
         config_object = new_config_service.import_config("TestConfig")
         assert config_object == {"A": "B", "C": 1}

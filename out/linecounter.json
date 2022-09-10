@@ -156,7 +156,7 @@
                     "filename": "lib\\managers\\settings.py"
                 },
                 {
-                    "filename": "lib\\services\\__pycache__\\configurationservice.cpython-310.pyc",
+                    "filename": "lib\\services\\__pycache__\\settings_io_service.cpython-310.pyc",
                     "isbinaryfile": true,
                     "blank": 0,
                     "code": 0,
@@ -173,7 +173,7 @@
                     "blank": 3,
                     "code": 10,
                     "comment": 0,
-                    "filename": "lib\\services\\configurationservice.py"
+                    "filename": "lib\\services\\settings_io_service.py"
                 },
                 {
                     "blank": 21,
@@ -220,7 +220,7 @@
                     "comment": 0
                 },
                 {
-                    "filename": "tests\\__pycache__\\test_ConfigurationService.cpython-310-pytest-7.1.2.pyc",
+                    "filename": "tests\\__pycache__\\test_SettingsIOService.cpython-310-pytest-7.1.2.pyc",
                     "isbinaryfile": true,
                     "blank": 0,
                     "code": 0,
@@ -250,7 +250,7 @@
                     "blank": 4,
                     "code": 16,
                     "comment": 0,
-                    "filename": "tests\\test_ConfigurationService.py"
+                    "filename": "tests\\test_SettingsIOService.py"
                 },
                 {
                     "blank": 9,

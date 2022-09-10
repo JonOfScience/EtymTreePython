@@ -37,9 +37,9 @@ lib\managers\__init__.py, code is 0, comment is 0, blank is 0.
 lib\managers\__pycache__\__init__.cpython-310.pyc, it is a binary file.
 lib\managers\__pycache__\settings.cpython-310.pyc, it is a binary file.
 lib\managers\settings.py, code is 22, comment is 0, blank is 6.
-lib\services\__pycache__\configurationservice.cpython-310.pyc, it is a binary file.
+lib\services\__pycache__\settings_io_service.cpython-310.pyc, it is a binary file.
 lib\services\__pycache__\io_service.cpython-310.pyc, it is a binary file.
-lib\services\configurationservice.py, code is 10, comment is 0, blank is 3.
+lib\services\settings_io_service.py, code is 10, comment is 0, blank is 3.
 lib\services\io_service.py, code is 61, comment is 6, blank is 21.
 pytest.ini, code is 2, comment is 0, blank is 0.
 README.md, code is 98, comment is 0, blank is 18.
@@ -47,11 +47,11 @@ testobject.data, code is 1, comment is 0, blank is 0.
 tests\__init__.py, code is 0, comment is 0, blank is 0.
 tests\__pycache__\__init__.cpython-310.pyc, it is a binary file.
 tests\__pycache__\test_Settings.cpython-310-pytest-7.1.2.pyc, it is a binary file.
-tests\__pycache__\test_ConfigurationService.cpython-310-pytest-7.1.2.pyc, it is a binary file.
+tests\__pycache__\test_SettingsIOService.cpython-310-pytest-7.1.2.pyc, it is a binary file.
 tests\__pycache__\test_Deserialiser.cpython-310-pytest-7.1.2.pyc, it is a binary file.
 tests\__pycache__\test_IOService.cpython-310-pytest-7.1.2.pyc, it is a binary file.
 tests\test_Settings.py, code is 34, comment is 9, blank is 12.
-tests\test_ConfigurationService.py, code is 16, comment is 0, blank is 4.
+tests\test_SettingsIOService.py, code is 16, comment is 0, blank is 4.
 tests\test_Deserialiser.py, code is 34, comment is 5, blank is 9.
 tests\test_IOService.py, code is 72, comment is 5, blank is 22.
 ui\__pycache__\splash.cpython-310.pyc, it is a binary file.
