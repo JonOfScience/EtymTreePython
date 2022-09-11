@@ -1,8 +1,7 @@
 """Tests for deserialisers for converting strings to various formats."""
 import pytest
-from ..lib.core import DataFormat
-from ..lib.services.io_service import Deserialiser
-
+from lib.core import DataFormat
+from services.io_service import Deserialiser
 
 class TestGivenADeserialiserWithInvalidSettings:
     """Test operations for a deserialiser initialised with invalid format"""
@@ -32,7 +31,7 @@ class TestGivenADeserialiserInJSONFormat:
         """Calls to deserialise will call the JSON method"""
         # Behavioural test
         mock_deserialise = mocker.patch(
-            "lib.services.io_service.JSONDeserialiser.deserialise",
+            "services.io_service.JSONDeserialiser.deserialise",
             return_data={"A": "B", "C": 1})
         deserialiser = Deserialiser(DataFormat.JSON)
         teststring = '{"A": "B", "C": 1}'
