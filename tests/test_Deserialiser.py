@@ -4,13 +4,19 @@ from lib.core import DataFormat
 from lib.services.io_service import Deserialiser
 
 
-class TestGivenAnUndefinedDeserialiser:
-    """Test operations for a serialiser without a defined format"""
+class TestGivenADeserialiserWithInvalidSettings:
+    """Test operations for a deserialiser initialised with invalid format"""
     def test_empty_instantiation_will_throw(self):
         """Instantiation requires a format to be specified """
         with pytest.raises(Exception) as e_info:
             Deserialiser()
         assert e_info.type == TypeError
+
+    def test_deserialiser_will_throw_on_deserialise(self):
+        """Deserialiser will throw as it cannot find the format for the specified string"""
+        with pytest.raises(Exception) as e_info:
+            Deserialiser("ThisIsNotAFormat").deserialise('{"Any": "String}')
+        assert e_info.type == KeyError
 
 
 class TestGivenAValidDeserialiserFormat:
@@ -20,16 +26,7 @@ class TestGivenAValidDeserialiserFormat:
         assert Deserialiser(DataFormat.JSON)
 
 
-class TestGivenAnInvalidDeserialiserFormat:
-    """Misidentified formats do not throw on instantiation, but when deserialise is called"""
-    def test_deserialiser_will_throw_on_deserialise(self):
-        """Deserialiser will throw as it cannot find the format for the specified string"""
-        with pytest.raises(Exception) as e_info:
-            Deserialiser("ThisIsNotAFormat").deserialise('{"Any": "String}')
-        assert e_info.type == KeyError
-
-
-class Test_GivenADeserialiserInJSONFormat:
+class TestGivenADeserialiserInJSONFormat:
     """Operations for a deserialiser in JSON format"""
     def test_cm_ic_6_a_json_deserialise_method_is_called(self, mocker):
         """Calls to deserialise will call the JSON method"""
@@ -56,4 +53,4 @@ class Test_GivenADeserialiserInJSONFormat:
         json_deserialiser = Deserialiser(DataFormat.JSON)
         teststring = None
         deserialised_object = json_deserialiser.deserialise(teststring)
-        assert deserialised_object == dict()
+        assert deserialised_object == {}

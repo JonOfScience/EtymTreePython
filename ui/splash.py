@@ -1,3 +1,4 @@
+"""Splash screen shown on load"""
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QListView,
@@ -11,12 +12,14 @@ from lib.configuration.settings import Settings
 
 
 class SplashWindow(QWidget):
+    """Window to display project entry options to the user"""
     def __init__(self, configuration: Settings) -> None:
         super().__init__()
+        self._configuration = configuration
         self.setWindowTitle("EtymTree - Splash")
         self.setGeometry(0, 0, 800, 500)
-        cp = QDesktopWidget().availableGeometry().center()
-        self.move(cp.x() - 400, cp.y() - 250)
+        center_point = QDesktopWidget().availableGeometry().center()
+        self.move(center_point.x() - 400, center_point.y() - 250)
 
         layout = QHBoxLayout()
 
@@ -32,5 +35,7 @@ class SplashWindow(QWidget):
         options_buttons.addWidget(open_project, 1)
         exit_program = QPushButton("Exit Program")
         options_buttons.addWidget(exit_program, 1)
+        user_settings = QPushButton("User Settings")
+        options_buttons.addWidget(user_settings, 1)
 
         self.setLayout(layout)

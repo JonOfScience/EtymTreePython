@@ -12,7 +12,6 @@ BASE_CONFIG = {
     "DefaultUserConfig": "UserConfig"}
 
 if __name__ == '__main__':
-
     configuration = Settings(BASE_CONFIG)
     configuration.import_config(BASE_CONFIG["DefaultUserConfig"])
 
