@@ -1,7 +1,7 @@
 """Tests for deserialisers for converting strings to various formats."""
 import pytest
-from lib.core import DataFormat
-from lib.services.io_service import Deserialiser
+from ..lib.core import DataFormat
+from ..lib.services.io_service import Deserialiser
 
 
 class TestGivenADeserialiserWithInvalidSettings:

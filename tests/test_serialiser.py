@@ -1,7 +1,7 @@
 """Tests for serialisers for objects to strings in various formats."""
 import pytest
-from lib.core import DataFormat
-from lib.services.io_service import Serialiser
+from ..lib.core import DataFormat
+from ..lib.services.io_service import Serialiser
 
 
 class TestGivenASerialiserWithInvalidSettings:

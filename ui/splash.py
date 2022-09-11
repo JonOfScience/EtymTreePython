@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QWidget)
 
 # Replace this with an interface
-from lib.configuration.settings import Settings
+from ..lib.configuration.settings import Settings
 
 
 class SplashWindow(QWidget):

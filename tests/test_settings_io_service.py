@@ -1,8 +1,7 @@
 """Tests for service layer between configuration settings and IO operations"""
-from lib.services.settings_io_service import SettingsIOService
-from lib.core import DataFormat
-
-from lib.services.io_service import IOService
+from ..lib.services.settings_io_service import SettingsIOService
+from ..lib.core import DataFormat
+from ..lib.services.io_service import IOService
 
 
 class TestGivenANewSettingsIOService:

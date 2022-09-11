@@ -1,6 +1,6 @@
 """Tests for low level file i/o operations"""
-from lib.core import DataFormat
-from lib.services.io_service import IOService
+from ..lib.core import DataFormat
+from ..lib.services.io_service import IOService
 
 
 class TestGivenANewIOService:
@@ -65,7 +65,7 @@ class TestGivenAnIOServiceInJSONFormat:
         mock = mocker.patch("lib.services.io_service.IOService.store")
         json_io_service = IOService(DataFormat.JSON)
         testobject = {"A": "B", "C": 1}
-        _ = json_io_service.serialise_and_store(testobject, "testobject")
+        json_io_service.serialise_and_store(testobject, "testobject")
         mock.assert_called_once_with("testobject.data", '{"A": "B", "C": 1}')
 
     def test_the_service_will_write_a_string_to_a_file(self, mocker):
@@ -73,7 +73,7 @@ class TestGivenAnIOServiceInJSONFormat:
         mock = mocker.patch("builtins.open")
         json_io_service = IOService(DataFormat.JSON)
         testobject = {"A": "B", "C": 1}
-        _ = json_io_service.serialise_and_store(testobject, "testobject")
+        json_io_service.serialise_and_store(testobject, "testobject")
         mock.assert_called_once_with("testobject.data", "w", encoding="UTF-8")
 
     def test_cm_ic_8_a_stored_string_can_be_deserialised(self, mocker):

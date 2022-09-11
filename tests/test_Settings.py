@@ -1,5 +1,5 @@
 """Tests for configuration Settings."""
-from lib.configuration.settings import Settings
+from ..lib.configuration.settings import Settings
 
 
 class TestGivenEmptySettings:
