@@ -9,7 +9,7 @@ class TestGivenASerialiserWithInvalidSettings:
     def test_empty_instantiation_will_throw(self):
         """A serialiser cannot exist without a specified format"""
         with pytest.raises(Exception) as e_info:
-            Serialiser()
+            Serialiser() # pylint: disable=no-value-for-parameter
         assert e_info.type == TypeError
 
     def test_serialiser_will_throw_on_deserialise(self):

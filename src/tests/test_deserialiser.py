@@ -8,7 +8,7 @@ class TestGivenADeserialiserWithInvalidSettings:
     def test_empty_instantiation_will_throw(self):
         """Instantiation requires a format to be specified """
         with pytest.raises(Exception) as e_info:
-            Deserialiser()
+            Deserialiser() # pylint: disable=no-value-for-parameter
         assert e_info.type == TypeError
 
     def test_deserialiser_will_throw_on_deserialise(self):

@@ -1,6 +1,6 @@
 """Application configuration settings"""
-from services.settings_io_service import SettingsIOService
 from lib.core import DataFormat
+from services.settings_io_service import SettingsIOService
 
 
 class Settings:
@@ -9,7 +9,7 @@ class Settings:
         if configuration is not None:
             self._config_data = configuration
         else:
-            self._config_data = dict()
+            self._config_data = {}
 
         if context is not None:
             self._context = context

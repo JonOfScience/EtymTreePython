@@ -55,7 +55,7 @@ class JSONDeserialiser(DeserialiserInterface):
         """Returns a JSON deserialised object from an input string, or an empty dictionary"""
         if string_to_deserialise:
             return json.loads(string_to_deserialise)
-        return dict()
+        return {}
 
 
 class IOService:
