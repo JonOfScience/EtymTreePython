@@ -38,6 +38,18 @@ class TestGivenEmptySettings:
         empty_settings.import_config("testconfig")
         mock_service.assert_called_once()
 
+    def test_when_item_is_specified_then_the_value_is_created(self):
+        """The Settings object should now contain the id"""
+        new_settings = Settings()
+        new_settings.set_option_to("ABCDE","FGHIJ")
+        assert new_settings.find_by_id("ABCDE")
+
+    def test_when_an_item_created_then_the_value_is_correct(self):
+        """The value of the specified key should be correct"""
+        new_settings = Settings()
+        new_settings.set_option_to("ABCDE","FGHIJ")
+        assert new_settings.find_by_id("ABCDE") == "FGHIJ"
+
 
 class TestGivenAnExistingConfiguration:
     """Test if configuration options can be read and (over)written."""

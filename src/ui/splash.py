@@ -9,6 +9,8 @@ from PyQt5.QtWidgets import (
 
 # Replace this with an interface
 from configuration.settings import Settings
+from ui.interfaces import EtymWindow
+from lib.core import ProjectStatus
 
 
 class SplashWindow(QWidget):
@@ -16,6 +18,7 @@ class SplashWindow(QWidget):
     def __init__(self, configuration: Settings) -> None:
         super().__init__()
         self._configuration = configuration
+        self.options = Settings()
         self.setWindowTitle("EtymTree - Splash")
         self.setGeometry(0, 0, 800, 500)
         center_point = QDesktopWidget().availableGeometry().center()
@@ -31,6 +34,7 @@ class SplashWindow(QWidget):
 
         new_project = QPushButton("New Project")
         options_buttons.addWidget(new_project, 1)
+        new_project.clicked.connect(self._click_on_new_project)
         open_project = QPushButton("Open Project")
         options_buttons.addWidget(open_project, 1)
         exit_program = QPushButton("Exit Program")
@@ -39,3 +43,10 @@ class SplashWindow(QWidget):
         options_buttons.addWidget(user_settings, 1)
 
         self.setLayout(layout)
+
+    def _click_on_new_project(self):
+        project_overview_window: EtymWindow = self._configuration.find_by_id("MainWindow")
+        project_overview_window.options.set_option_to("ProjectStatus", ProjectStatus.NEW)
+        project_overview_window.options.set_option_to("IsLaunching", True)
+        project_overview_window.showMaximized()
+        self.close()
