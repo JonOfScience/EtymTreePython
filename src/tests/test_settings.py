@@ -41,13 +41,13 @@ class TestGivenEmptySettings:
     def test_when_item_is_specified_then_the_value_is_created(self):
         """The Settings object should now contain the id"""
         new_settings = Settings()
-        new_settings.set_option_to("ABCDE","FGHIJ")
+        new_settings.set_option_to("ABCDE", "FGHIJ")
         assert new_settings.find_by_id("ABCDE")
 
     def test_when_an_item_created_then_the_value_is_correct(self):
         """The value of the specified key should be correct"""
         new_settings = Settings()
-        new_settings.set_option_to("ABCDE","FGHIJ")
+        new_settings.set_option_to("ABCDE", "FGHIJ")
         assert new_settings.find_by_id("ABCDE") == "FGHIJ"
 
 

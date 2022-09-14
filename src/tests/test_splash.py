@@ -2,6 +2,7 @@
 from configuration.settings import Settings
 from ui.splash import SplashWindow
 
+
 class TestGivenANewSplashWindow:
     """Tests for a newly instantiated window"""
     def test_it_has_an_attribute_called_options(self, qtbot):

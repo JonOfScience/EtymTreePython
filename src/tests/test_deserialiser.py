@@ -3,12 +3,13 @@ import pytest
 from lib.core import DataFormat
 from services.io_service import Deserialiser
 
+
 class TestGivenADeserialiserWithInvalidSettings:
     """Test operations for a deserialiser initialised with invalid format"""
     def test_empty_instantiation_will_throw(self):
         """Instantiation requires a format to be specified """
         with pytest.raises(Exception) as e_info:
-            Deserialiser() # pylint: disable=no-value-for-parameter
+            Deserialiser()  # pylint: disable=no-value-for-parameter
         assert e_info.type == TypeError
 
     def test_deserialiser_will_throw_on_deserialise(self):

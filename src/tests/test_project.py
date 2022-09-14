@@ -2,6 +2,7 @@
 from configuration.settings import Settings
 from ui.project import ProjectWindow
 
+
 class TestGivenANewProjectWindow:
     """Tests for a newly instantiated Project window"""
     def test_it_has_an_attribute_called_options(self, qtbot):
