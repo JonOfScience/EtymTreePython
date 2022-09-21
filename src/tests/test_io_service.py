@@ -1,6 +1,6 @@
 """Tests for low level file i/o operations"""
-from lib.core import DataFormat
-from services.io_service import IOService
+from src.lib.core import DataFormat
+from src.services.io_service import IOService
 
 
 class TestGivenANewIOService:
@@ -18,9 +18,9 @@ class TestGivenAnIOServiceInAnyFormat:
     """Test format independent operations for any IO Service"""
     def test_cm_ic_3_will_call_read_on_deserialise_stored(self, mocker):
         """IOService will read from a file"""
-        mock = mocker.patch("services.io_service.IOService.read", return_value="")
+        mock = mocker.patch("src.services.io_service.IOService.read", return_value="")
         _ = mocker.patch(
-            "services.io_service.IOService.deserialise_string_to_obj",
+            "src.services.io_service.IOService.deserialise_string_to_obj",
             return_value="")
         json_io_service = IOService(DataFormat.JSON)
         _ = json_io_service.deserialise_stored("NotAFileName")
@@ -28,9 +28,9 @@ class TestGivenAnIOServiceInAnyFormat:
 
     def test_cm_ic_4_will_call_deserialise_string_to_object_on_deserialise(self, mocker):
         """IOService will attempt to deserialise a read string"""
-        _ = mocker.patch("services.io_service.IOService.read", return_value="")
+        _ = mocker.patch("src.services.io_service.IOService.read", return_value="")
         mock = mocker.patch(
-            "services.io_service.IOService.deserialise_string_to_obj",
+            "src.services.io_service.IOService.deserialise_string_to_obj",
             return_value="")
         json_io_service = IOService(DataFormat.JSON)
         _ = json_io_service.deserialise_stored("NotAFileName")
@@ -46,7 +46,7 @@ class TestGivenAnIOServiceInJSONFormat:
 
     def test_the_serialise_method_on_the_serialiser_is_called(self, mocker):
         """The calls are passed through to subordinate serialiser objects correctly"""
-        mock = mocker.patch("services.io_service.Serialiser.serialise", return_value="")
+        mock = mocker.patch("src.services.io_service.Serialiser.serialise", return_value="")
         json_io_service = IOService(DataFormat.JSON)
         testobject = {"A": "B", "C": 1}
         _ = json_io_service.serialise_obj_to_string(testobject)
@@ -54,7 +54,7 @@ class TestGivenAnIOServiceInJSONFormat:
 
     def test_cm_ic_5_the_deserialise_method_on_the_deserialiser_is_called(self, mocker):
         """Behaviour Test: Calls are passed to subordinate deserialiser objects correctly"""
-        mock = mocker.patch("services.io_service.Deserialiser.deserialise", return_value="")
+        mock = mocker.patch("src.services.io_service.Deserialiser.deserialise", return_value="")
         json_io_service = IOService(DataFormat.JSON)
         teststring = '{"A": "B", "C": 1}'
         _ = json_io_service.deserialise_string_to_obj(teststring)
@@ -62,7 +62,7 @@ class TestGivenAnIOServiceInJSONFormat:
 
     def test_serialise_and_store_will_call_store_on_the_service(self, mocker):
         """Behaviour Test: Subordinate methods are called"""
-        mock = mocker.patch("services.io_service.IOService.store")
+        mock = mocker.patch("src.services.io_service.IOService.store")
         json_io_service = IOService(DataFormat.JSON)
         testobject = {"A": "B", "C": 1}
         json_io_service.serialise_and_store(testobject, "testobject")
@@ -79,7 +79,7 @@ class TestGivenAnIOServiceInJSONFormat:
     def test_cm_ic_8_a_stored_string_can_be_deserialised(self, mocker):
         """Behaviour: Test: File read operations are carried out"""
         _ = mocker.patch(
-            "services.io_service.IOService.read",
+            "src.services.io_service.IOService.read",
             return_value='{"A": "B", "C": 1}')
         json_io_service = IOService(DataFormat.JSON)
         deserialised_object = json_io_service.deserialise_stored("NotAFileName")

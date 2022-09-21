@@ -1,6 +1,6 @@
 """Service Layer between Settings and IOService"""
 from lib.core import DataFormat
-from services.io_service import IOService
+from .io_service import IOService
 
 
 class SettingsIOService:

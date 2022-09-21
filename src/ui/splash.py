@@ -1,4 +1,5 @@
 """Splash screen shown on load"""
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QListView,
@@ -27,6 +28,10 @@ class SplashWindow(QWidget):
         layout = QHBoxLayout()
 
         past_projects = QListView()
+        past_projects.setObjectName("past_projects")
+        past_projects_model = QStandardItemModel()
+        past_projects.setModel(past_projects_model)
+        past_projects_model.appendRow(QStandardItem("No Projects Available"))
         layout.addWidget(past_projects)
 
         options_buttons = QVBoxLayout()

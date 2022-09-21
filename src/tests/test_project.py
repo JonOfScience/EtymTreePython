@@ -1,6 +1,6 @@
 """Test properties and methods of the ProjectWindow UI class"""
-from configuration.settings import Settings
-from ui.project import ProjectWindow
+from src.configuration.settings import Settings
+from src.ui.project import ProjectWindow
 
 
 class TestGivenANewProjectWindow:
@@ -16,3 +16,10 @@ class TestGivenANewProjectWindow:
         new_window = ProjectWindow(Settings())
         qtbot.addWidget(new_window)
         assert isinstance(new_window.options, Settings)
+
+
+class TestGivenAProjectWindowForANewProject:
+    """Tests for the project overview window after a new Lexicon has been constructed"""
+    def test_window_title_is_set(self, qtbot):
+        """The window should always have a title that isn't 'Undefined'"""
+        pass

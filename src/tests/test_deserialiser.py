@@ -1,7 +1,8 @@
 """Tests for deserialisers for converting strings to various formats."""
+from enum import Enum
 import pytest
-from lib.core import DataFormat
-from services.io_service import Deserialiser
+from src.lib.core import DataFormat
+from src.services.io_service import Deserialiser
 
 
 class TestGivenADeserialiserWithInvalidSettings:
@@ -14,8 +15,10 @@ class TestGivenADeserialiserWithInvalidSettings:
 
     def test_deserialiser_will_throw_on_deserialise(self):
         """Deserialiser will throw as it cannot find the format for the specified string"""
+        class NotAFormat(Enum):
+            NOTAFORMAT = "NotAFormat"
         with pytest.raises(Exception) as e_info:
-            Deserialiser("ThisIsNotAFormat").deserialise('{"Any": "String}')
+            Deserialiser(NotAFormat.NOTAFORMAT).deserialise('{"Any": "String}')
         assert e_info.type == KeyError
 
 
@@ -28,11 +31,11 @@ class TestGivenAValidDeserialiserFormat:
 
 class TestGivenADeserialiserInJSONFormat:
     """Operations for a deserialiser in JSON format"""
+    # Behavioural test - Brittle - What if we change the name of "deserialise?"
     def test_cm_ic_6_a_json_deserialise_method_is_called(self, mocker):
         """Calls to deserialise will call the JSON method"""
-        # Behavioural test
         mock_deserialise = mocker.patch(
-            "services.io_service.JSONDeserialiser.deserialise",
+            "src.services.io_service.JSONDeserialiser.deserialise",
             return_data={"A": "B", "C": 1})
         deserialiser = Deserialiser(DataFormat.JSON)
         teststring = '{"A": "B", "C": 1}'

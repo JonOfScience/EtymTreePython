@@ -3,7 +3,7 @@
 # EtymTreePython
 A python project designed to allow input, display, and tracking of the vocabulary of a constructed language.
 
-## Configuration
+## Configuration (V1)
 ```mermaid
 sequenceDiagram
     actor Config
@@ -114,3 +114,96 @@ sequenceDiagram
 | |
 | **CM_IC_12** | GivenAnExistingConfiguration
 | | cm_ic_12_base_entries_are_overwritten_when_importing_config
+
+
+## IOService Tests: IOS (./tests/test_io_service.py)
+
+### IOService Read Tests: IOS-RDF
+```mermaid
+sequenceDiagram
+    actor Test
+    participant IOService
+    Test->>IOService: read(filename: str)
+    rect rgb(200, 200, 200)
+    IOService->>Test: file_data
+    end
+```
+
+| Label | Path | Description | Include? | Complete
+|-|-|-|-|-|
+| IOS-RDF-00 | Happy | Reads data from file in UTF-8 | :heavy_check_mark: | No
+| IOS-RDF-01 | Sad | File doesn't exist | :heavy_check_mark: | No
+| IOS-RDF-02 | Bad | Incorrect file format | :x:
+
+
+## Configuration
+```mermaid
+sequenceDiagram
+    actor Config
+    Participant Settings
+    participant ConfigService
+    participant IOService
+    participant Deserialiser
+    participant TypeDeserialiser
+    
+    rect rgb(200, 200, 200)
+    Config->>Settings: import_config()
+    end
+
+    rect rgb(200, 255, 150)
+    Settings->>ConfigService: import_config()
+    end
+
+    rect rgb(200, 255, 150)
+    ConfigService->>IOService: des  erialise_stored()
+    end
+
+    activate IOService
+    
+    rect rgb(200, 255, 150)
+    IOService->>IOService: read() data from file
+    end
+    
+    rect rgb(200, 255, 150)
+    IOService->>IOService: deserialise_string_to_obj(data)
+    end
+    
+    rect rgb(200, 255, 150)
+    IOService->>Deserialiser: deserialise(data)
+    end
+    
+    deactivate IOService
+    
+    rect rgb(200, 255, 150)
+    Deserialiser->>TypeDeserialiser: deserialise(data)
+    end
+
+    rect rgb(200, 255, 150)
+    activate TypeDeserialiser
+    Note over TypeDeserialiser: data to dict
+    TypeDeserialiser->>Deserialiser: return dict
+    end
+    deactivate TypeDeserialiser
+
+    rect rgb(200, 255, 150)
+    Deserialiser->>IOService: return dict
+    end
+
+    rect rgb(200, 255, 150)
+    IOService->>ConfigService: return dict
+    end
+
+    rect rgb(200, 200, 200)
+    ConfigService->>Settings: return dict
+    end
+
+    rect rgb(200, 255, 150)
+    activate Settings
+    Settings->>Settings: integrate_config()
+    end
+    deactivate Settings
+    
+    rect rgb(200, 255, 150)
+    Settings ->> Config: UPDATED
+    end
+```

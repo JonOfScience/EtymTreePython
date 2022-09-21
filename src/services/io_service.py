@@ -13,8 +13,8 @@ class Serialiser():
         self._serialiser = self._get_serialiser(data_format)
 
     def _get_serialiser(self, data_format: DataFormat):
-        serialisers = {DataFormat.JSON: JSONSerialiser}
-        return serialisers[data_format]
+        serialisers = {'json': JSONSerialiser}
+        return serialisers[data_format.value]
 
     def serialise(self, object_to_serialise: object):
         """Returns serialised strings in specified formats using factory created serialiser"""
@@ -28,8 +28,8 @@ class Deserialiser():
         self._deserialser = self._get_deserialiser(data_format)
 
     def _get_deserialiser(self, data_format: DataFormat):
-        deserialisers = {DataFormat.JSON: JSONDeserialiser}
-        return deserialisers[data_format]
+        deserialisers = {'json': JSONDeserialiser}
+        return deserialisers[data_format.value]
 
     def deserialise(self, string_to_deserialise: str):
         """Returns deserialised from formatted strings using factory created serialiser"""

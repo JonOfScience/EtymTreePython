@@ -1,5 +1,5 @@
 """Tests for configuration Settings."""
-from configuration.settings import Settings
+from src.configuration.settings import Settings
 
 
 class TestGivenEmptySettings:
@@ -12,7 +12,7 @@ class TestGivenEmptySettings:
     def test_cm_ic_1_a_request_to_import_configuration_options_is_passed_on(self, mocker):
         """Behvaiour Test"""
         mock_service = mocker.patch(
-            "services.settings_io_service.SettingsIOService.import_config",
+            "src.services.settings_io_service.SettingsIOService.import_config",
             return_value={"ABCDE": "Updated", "FGHIJ": "Added"})
         empty_settings = Settings()
         empty_settings.import_config("testconfig")
@@ -29,10 +29,10 @@ class TestGivenEmptySettings:
     def test_cm_ic_11_the_manager_calls_integrate_config(self, mocker):
         """Behaviour Test"""
         _ = mocker.patch(
-            "services.settings_io_service.SettingsIOService.import_config",
+            "src.services.settings_io_service.SettingsIOService.import_config",
             return_value={"ABCDE": "Updated", "FGHIJ": "Added"})
         mock_service = mocker.patch(
-            "configuration.settings.Settings.integrate_config",
+            "src.configuration.settings.Settings.integrate_config",
             return_value=True)
         empty_settings = Settings()
         empty_settings.import_config("testconfig")
@@ -61,7 +61,7 @@ class TestGivenAnExistingConfiguration:
     def test_cm_ic_12_base_entries_are_overwritten_when_importing_config(self, mocker):
         """Behaviour Test"""
         _ = mocker.patch(
-            "services.settings_io_service.SettingsIOService.import_config",
+            "src.services.settings_io_service.SettingsIOService.import_config",
             return_value={"ABCDE": "Updated", "FGHIJ": "Added"})
         config = Settings({"ABCDE": "Pass"})
         config.import_config("testconfig")

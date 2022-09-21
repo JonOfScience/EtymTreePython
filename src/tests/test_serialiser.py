@@ -1,7 +1,8 @@
 """Tests for serialisers for objects to strings in various formats."""
+from enum import Enum
 import pytest
-from lib.core import DataFormat
-from services.io_service import Serialiser
+from src.lib.core import DataFormat
+from src.services.io_service import Serialiser
 
 
 class TestGivenASerialiserWithInvalidSettings:
@@ -14,8 +15,10 @@ class TestGivenASerialiserWithInvalidSettings:
 
     def test_serialiser_will_throw_on_deserialise(self):
         """Serialiser will throw as it cannot find the format for the specified string"""
+        class NotAFormat(Enum):
+            NOTAFORMAT = "NotAFormat"
         with pytest.raises(Exception) as e_info:
-            Serialiser("ThisIsNotAFormat").serialise('{"Any": "String}')
+            Serialiser(NotAFormat.NOTAFORMAT).serialise('{"Any": "String}')
         assert e_info.type == KeyError
 
 
