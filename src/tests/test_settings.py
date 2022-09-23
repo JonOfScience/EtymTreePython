@@ -1,17 +1,17 @@
 """Tests for configuration Settings."""
 import sys
 import pytest
+from lib.core import DataFormat
 from src.configuration.settings import Settings
 from src.services.settings_io_service import SettingsIOService
-from lib.core import DataFormat
 
 
 def _write_testdata_data_file():
     parts = sys.path[0].split(sep="\\")
     parts.extend(["src", "tests", "data"])
     testdatapath = "/".join(parts)
-    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as fp:
-        fp.writelines(['{"A": "B", "C": 1}'])
+    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as file:
+        file.writelines(['{"A": "B", "C": 1}'])
     return testdatapath
 
 
@@ -106,7 +106,7 @@ class TestGivenAnExistingConfiguration:
         assert empty_settings.find_by_id("A") == "B"
         assert empty_settings.find_by_id("C") == "D"
 
-    def test_set_imc_00_base_entries_are_overwritten_when_importing_config(self, mocker):
+    def test_set_imc_00_base_entries_are_overwritten_when_importing_config(self):
         """State Test"""
         testdatapath = _write_testdata_data_file()
         config = Settings({"A": "Pass"})

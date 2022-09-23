@@ -54,7 +54,7 @@ class TestGivenADeserialiserInJSONFormat:
         Integration Test: Deserialiser <- to/from -> JSON_Deserialiser"""
         assert Deserialiser(DataFormat.JSON).deserialise('') == {}
 
-    def test_des_des_03_an_input_of_None_throws(self):
+    def test_des_des_03_an_input_of_none_throws(self):
         """State test
         Integration Test: Deserialiser <- to/from -> JSON_Deserialiser"""
         with pytest.raises(Exception) as e_info:

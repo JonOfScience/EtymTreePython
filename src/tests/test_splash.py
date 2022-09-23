@@ -1,9 +1,9 @@
 """Test properties and methods of the SplashWindow UI class"""
-from src.configuration.settings import Settings
-from src.ui.splash import SplashWindow
 from PyQt5.QtWidgets import QListView
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtCore import QModelIndex
+from src.configuration.settings import Settings
+from src.ui.splash import SplashWindow
 
 
 class TestGivenANewSplashWindow:

@@ -9,8 +9,8 @@ def _write_testdata_data_file():
     parts = sys.path[0].split(sep="\\")
     parts.extend(["src", "tests", "data"])
     testdatapath = "/".join(parts)
-    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as fp:
-        fp.writelines(['{"A": "B", "C": 1}'])
+    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as file:
+        file.writelines(['{"A": "B", "C": 1}'])
     return testdatapath
 
 
@@ -50,22 +50,26 @@ class TestGivenAnIOServiceInJSONFormat:
         assert json_io_service.data_format == DataFormat.JSON
 
     def test_iso_sto_00_deserialises_a_valid_json_string(self):
+        """State Test"""
         json_io_service = IOService(DataFormat.JSON)
         teststring = '{"A": "B", "C": 1}'
         assert json_io_service.deserialise_string_to_obj(teststring) == {"A": "B", "C": 1}
 
     def test_iso_sto_01_returns_empty_for_an_empty_string(self):
+        """State Test"""
         json_io_service = IOService(DataFormat.JSON)
         teststring = ''
         assert json_io_service.deserialise_string_to_obj(teststring) == {}
 
-    def test_iso_sto_02_throws_with_None_argument(self):
+    def test_iso_sto_02_throws_with_none_argument(self):
+        """State Test"""
         json_io_service = IOService(DataFormat.JSON)
         with pytest.raises(Exception) as e_info:
             json_io_service.deserialise_string_to_obj(None)
         assert e_info.type == TypeError
 
     def test_ios_dss_00_returns_deserialised_object_from_json_file(self):
+        """State Test"""
         testdatapath = _write_testdata_data_file()
         json_io_service = IOService(DataFormat.JSON)
         deserialised_object = json_io_service.deserialise_stored(f"{testdatapath}/testdata")

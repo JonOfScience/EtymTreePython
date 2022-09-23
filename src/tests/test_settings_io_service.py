@@ -32,9 +32,10 @@ class TestGivenANewSettingsIOService:
         """Returns deserialised objects in expected format"""
         with pytest.raises(Exception) as e_info:
             SettingsIOService()
-        assert e_info.type == TypeError
+        assert e_info.type == ValueError
 
     def test_sio_imc_00_returns_deserialised_object_in_expected_format_for_valid_filename(self):
+        """Import from stored source"""
         new_config_service = SettingsIOService(IOService(DataFormat.JSON))
         testdatapath = _write_testdata_data_file()
         config_object = new_config_service.import_config(f"{testdatapath}/testdata")
