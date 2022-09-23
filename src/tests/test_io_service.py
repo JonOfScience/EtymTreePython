@@ -1,40 +1,45 @@
 """Tests for low level file i/o operations"""
+import sys
+import pytest
 from src.lib.core import DataFormat
 from src.services.io_service import IOService
 
 
+def _write_testdata_data_file():
+    parts = sys.path[0].split(sep="\\")
+    parts.extend(["src", "tests", "data"])
+    testdatapath = "/".join(parts)
+    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as fp:
+        fp.writelines(['{"A": "B", "C": 1}'])
+    return testdatapath
+
+
 class TestGivenANewIOService:
     """Test instantiation operations for an IO Service"""
-    def test_an_empty_io_service_can_be_constructed(self):
+    def test_ios_ist_00_an_empty_io_service_can_be_constructed(self):
         """IOService can have the data format specified after instantiation"""
         assert IOService()
 
-    def test_a_json_io_service_can_be_constructed(self):
+    def test_ios_ist_01_a_json_io_service_can_be_constructed(self):
         """IOService can have valid data formats specified on instantiation"""
         assert IOService(DataFormat.JSON)
 
 
 class TestGivenAnIOServiceInAnyFormat:
     """Test format independent operations for any IO Service"""
-    def test_cm_ic_3_will_call_read_on_deserialise_stored(self, mocker):
-        """IOService will read from a file"""
-        mock = mocker.patch("src.services.io_service.IOService.read", return_value="")
-        _ = mocker.patch(
-            "src.services.io_service.IOService.deserialise_string_to_obj",
-            return_value="")
-        json_io_service = IOService(DataFormat.JSON)
-        _ = json_io_service.deserialise_stored("NotAFileName")
-        mock.assert_called_once()
 
-    def test_cm_ic_4_will_call_deserialise_string_to_object_on_deserialise(self, mocker):
-        """IOService will attempt to deserialise a read string"""
-        _ = mocker.patch("src.services.io_service.IOService.read", return_value="")
-        mock = mocker.patch(
-            "src.services.io_service.IOService.deserialise_string_to_obj",
-            return_value="")
+    def test_ios_rdf_00_data_can_be_read_from_a_correctly_formatted_file(self):
+        """IOService will read from a UTF-8 file"""
+        testdatapath = _write_testdata_data_file()
         json_io_service = IOService(DataFormat.JSON)
-        _ = json_io_service.deserialise_stored("NotAFileName")
-        mock.assert_called_once()
+        assert json_io_service.read(f"{testdatapath}/testdata.data") == '{"A": "B", "C": 1}'
+
+    def test_ios_rdf_01_reading_from_a_nonexistant_file_will_throw(self):
+        """IOService can't read from a nonexistent file"""
+        json_io_service = IOService(DataFormat.JSON)
+        with pytest.raises(Exception) as e_info:
+            json_io_service.read("NotAFile.NotAFile")
+        assert e_info.type == FileNotFoundError
 
 
 class TestGivenAnIOServiceInJSONFormat:
@@ -44,29 +49,27 @@ class TestGivenAnIOServiceInJSONFormat:
         json_io_service = IOService(DataFormat.JSON)
         assert json_io_service.data_format == DataFormat.JSON
 
-    def test_the_serialise_method_on_the_serialiser_is_called(self, mocker):
-        """The calls are passed through to subordinate serialiser objects correctly"""
-        mock = mocker.patch("src.services.io_service.Serialiser.serialise", return_value="")
-        json_io_service = IOService(DataFormat.JSON)
-        testobject = {"A": "B", "C": 1}
-        _ = json_io_service.serialise_obj_to_string(testobject)
-        mock.assert_called_once()
-
-    def test_cm_ic_5_the_deserialise_method_on_the_deserialiser_is_called(self, mocker):
-        """Behaviour Test: Calls are passed to subordinate deserialiser objects correctly"""
-        mock = mocker.patch("src.services.io_service.Deserialiser.deserialise", return_value="")
+    def test_iso_sto_00_deserialises_a_valid_json_string(self):
         json_io_service = IOService(DataFormat.JSON)
         teststring = '{"A": "B", "C": 1}'
-        _ = json_io_service.deserialise_string_to_obj(teststring)
-        mock.assert_called_once()
+        assert json_io_service.deserialise_string_to_obj(teststring) == {"A": "B", "C": 1}
 
-    def test_serialise_and_store_will_call_store_on_the_service(self, mocker):
-        """Behaviour Test: Subordinate methods are called"""
-        mock = mocker.patch("src.services.io_service.IOService.store")
+    def test_iso_sto_01_returns_empty_for_an_empty_string(self):
         json_io_service = IOService(DataFormat.JSON)
-        testobject = {"A": "B", "C": 1}
-        json_io_service.serialise_and_store(testobject, "testobject")
-        mock.assert_called_once_with("testobject.data", '{"A": "B", "C": 1}')
+        teststring = ''
+        assert json_io_service.deserialise_string_to_obj(teststring) == {}
+
+    def test_iso_sto_02_throws_with_None_argument(self):
+        json_io_service = IOService(DataFormat.JSON)
+        with pytest.raises(Exception) as e_info:
+            json_io_service.deserialise_string_to_obj(None)
+        assert e_info.type == TypeError
+
+    def test_ios_dss_00_returns_deserialised_object_from_json_file(self):
+        testdatapath = _write_testdata_data_file()
+        json_io_service = IOService(DataFormat.JSON)
+        deserialised_object = json_io_service.deserialise_stored(f"{testdatapath}/testdata")
+        assert deserialised_object == {"A": "B", "C": 1}
 
     def test_the_service_will_write_a_string_to_a_file(self, mocker):
         """Behaviour Test: File write operations are carried out"""
@@ -75,15 +78,6 @@ class TestGivenAnIOServiceInJSONFormat:
         testobject = {"A": "B", "C": 1}
         json_io_service.serialise_and_store(testobject, "testobject")
         mock.assert_called_once_with("testobject.data", "w", encoding="UTF-8")
-
-    def test_cm_ic_8_a_stored_string_can_be_deserialised(self, mocker):
-        """Behaviour: Test: File read operations are carried out"""
-        _ = mocker.patch(
-            "src.services.io_service.IOService.read",
-            return_value='{"A": "B", "C": 1}')
-        json_io_service = IOService(DataFormat.JSON)
-        deserialised_object = json_io_service.deserialise_stored("NotAFileName")
-        assert deserialised_object == {"A": "B", "C": 1}
 
 # Serialize object to JSON? XML? YAML?
 

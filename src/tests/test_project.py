@@ -11,11 +11,11 @@ class TestGivenANewProjectWindow:
         qtbot.addWidget(new_window)
         assert hasattr(new_window, "options")
 
-    def test_the_options_attribute_is_a_settings_object(self, qtbot):
-        """The options is a window-level Settings object"""
-        new_window = ProjectWindow(Settings())
-        qtbot.addWidget(new_window)
-        assert isinstance(new_window.options, Settings)
+    # def test_the_options_attribute_is_a_settings_object(self, qtbot):
+    #     """The options is a window-level Settings object"""
+    #     new_window = ProjectWindow(Settings())
+    #     qtbot.addWidget(new_window)
+    #     assert isinstance(new_window.options, Settings)
 
 
 class TestGivenAProjectWindowForANewProject:

@@ -51,9 +51,11 @@ class JSONSerialiser(SerialiserInterface):
 class JSONDeserialiser(DeserialiserInterface):
     """Deserialiser for objects in JSON format"""
     @staticmethod
-    def deserialise(string_to_deserialise):
+    def deserialise(string_to_deserialise: str):
         """Returns a JSON deserialised object from an input string, or an empty dictionary"""
-        if string_to_deserialise:
+        if not isinstance(string_to_deserialise, str):
+            raise TypeError("Input must be a string to deserialise.")
+        if len(string_to_deserialise) > 0:
             return json.loads(string_to_deserialise)
         return {}
 
@@ -82,14 +84,9 @@ class IOService:
 
     def read(self, filename):
         """Returns data from the specified UTF-8 file."""
-        try:
-            with open(filename, "r", encoding='UTF-8') as file_ref:
-                data = file_ref.read()
-            return data
-        except FileNotFoundError:
-            with open(filename, "w", encoding='UTF-8') as file_ref:
-                file_ref.write("")
-            return None
+        with open(filename, "r", encoding='UTF-8') as file_ref:
+            data = file_ref.read()
+        return data
 
     def store(self, filename, data):
         """Stores input data in a specified UTF-8 file."""

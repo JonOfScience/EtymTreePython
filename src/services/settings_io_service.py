@@ -1,4 +1,5 @@
 """Service Layer between Settings and IOService"""
+from argparse import ArgumentError
 from lib.core import DataFormat
 from .io_service import IOService
 
@@ -8,8 +9,10 @@ class SettingsIOService:
     def __init__(self, io_service: IOService = None, data_format: DataFormat = None) -> None:
         if io_service is not None:
             self._io_service = io_service
-        else:
+        elif data_format is not None:
             self._io_service = IOService(data_format=data_format)
+        else:
+            raise ArgumentError("Either IOService or a DataFormat must be provided.")
 
     def import_config(self, file_id):
         """Request and return object deserialised from file storage"""
