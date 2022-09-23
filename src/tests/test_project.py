@@ -22,4 +22,5 @@ class TestGivenAProjectWindowForANewProject:
     """Tests for the project overview window after a new Lexicon has been constructed"""
     def test_window_title_is_set(self, qtbot):
         """The window should always have a title that isn't 'Undefined'"""
-        pass
+        new_window = ProjectWindow(Settings())
+        qtbot.addWidget(new_window)

@@ -10,8 +10,8 @@ from PyQt5.QtWidgets import (
     QWidget)
 
 # Replace this with an interface
-from lib.core import ProjectStatus, double_clickable, Lexicon
 import networkx as nx
+from lib.core import ProjectStatus, double_clickable, Lexicon
 from configuration.settings import Settings
 # import matplotlib.pyplot as plt
 
@@ -62,7 +62,7 @@ class ProjectWindow(QWidget):
     def _tree_overview_update(self, lexicon: Lexicon):
         lex_graph = nx.Graph()
         for word in lexicon.get_all_words():
-            lex_graph.add_node("BORK")
+            lex_graph.add_node(word.translated_word)
 
         self.lexicon_overview.setText(f"Lexicon contains {len(lexicon.members)} entries")
         if lexicon.members:
