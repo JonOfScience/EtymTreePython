@@ -1,7 +1,7 @@
 """Tests for low level file i/o operations"""
 import sys
 import pytest
-from src.lib.core import DataFormat
+from lib.core import DataFormat
 from src.services.io_service import IOService
 
 

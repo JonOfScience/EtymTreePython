@@ -1,7 +1,7 @@
 """Tests for deserialisers for converting strings to various formats."""
 from enum import Enum
 import pytest
-from src.lib.core import DataFormat
+from lib.core import DataFormat
 from src.services.io_service import Deserialiser
 
 

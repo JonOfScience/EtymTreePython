@@ -1,7 +1,7 @@
 """Tests for service layer between configuration settings and IO operations"""
 import sys
 import pytest
-from src.lib.core import DataFormat
+from lib.core import DataFormat
 from src.services.settings_io_service import SettingsIOService
 from src.services.io_service import IOService
 
@@ -10,8 +10,8 @@ def _write_testdata_data_file():
     parts = sys.path[0].split(sep="\\")
     parts.extend(["src", "tests", "data"])
     testdatapath = "/".join(parts)
-    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as fp:
-        fp.writelines(['{"A": "B", "C": 1}'])
+    with open(f"{testdatapath}/testdata.data", 'w', encoding='UTF-8') as file:
+        file.writelines(['{"A": "B", "C": 1}'])
     return testdatapath
 
 
