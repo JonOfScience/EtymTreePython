@@ -1,19 +1,19 @@
 """Project screen showing project overview"""
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QLayout,
     QPushButton,
+    QTreeView,
     QVBoxLayout,
     QWidget)
 
+from lib.core import ProjectStatus, Lexicon, Word
 # Replace this with an interface
-import networkx as nx
-from lib.core import ProjectStatus, double_clickable, Lexicon
 from configuration.settings import Settings
-# import matplotlib.pyplot as plt
 
 
 class ProjectWindow(QWidget):
@@ -24,6 +24,10 @@ class ProjectWindow(QWidget):
         self.options = Settings()
         self.lexicon_overview = None
         self.setWindowTitle("EtymTree - Project Overview - (Undefined)")
+        self.lastclick = ()
+
+        self._selected_item = None
+        self._selected_node = None
 
         layout = QHBoxLayout()
         layout = self._add_tree_overview(layout)
@@ -34,39 +38,63 @@ class ProjectWindow(QWidget):
 
     def _add_tree_overview(self, layout: QLayout):
         tree_group = QGroupBox("Tree Overview")
-        tree_layout = QVBoxLayout()
+        tree_layout = QHBoxLayout()
         tree_group.setLayout(tree_layout)
         layout.addWidget(tree_group)
 
-        tree_overview = QLabel("Empty")
-        self.lexicon_overview = tree_overview
-        double_clickable(tree_overview).connect(self._tree_overview_double_clicked)
-        # tree_overview.clicked.connect(self._tree_overview_double_clicked)
+        self._tree_overview = QTreeView()
+        self._tree_overview.clicked.connect(self._tree_overview_selection_changed)
+        # self._tree_overview.doubleClicked.connect(self._tree_overview_double_clicked)
+        self._tree_model = QStandardItemModel()
+        self._tree_overview.setModel(self._tree_model)
+        tree_layout.addWidget(self._tree_overview)
 
-        tree_layout.addWidget(tree_overview)
-        # layout.addWidget(tree_overview)
+        details_group = QGroupBox("Word Details")
+        details_group.setMinimumWidth(500)
+        details_layout = QVBoxLayout()
+
+        word_label_layout = QHBoxLayout()
+        translated_word_label = QLabel(text="Translated Word")
+        word_label_layout.addWidget(translated_word_label)
+        translated_word_data = QLabel(text="No Word Selected")
+        word_label_layout.addWidget(translated_word_data)
+        details_layout.addLayout(word_label_layout)
+
+        self._details = {"translated_word": translated_word_data}
+        details_group.setLayout(details_layout)
+        layout.addWidget(details_group)
+
         return layout
 
     def _add_side_panel(self, layout: QLayout):
         side_panel = QVBoxLayout()
         new_project = QPushButton("New Project")
+        new_word = QPushButton("New Word")
+        new_word.clicked.connect(self._tree_overview_double_clicked)
         side_panel.addWidget(new_project, 1)
+        side_panel.addWidget(new_word, 1)
         layout.addLayout(side_panel)
         return layout
 
     def _tree_overview_double_clicked(self):
         lexicon = self.options.find_by_id("CurrentProject")
         lexicon.create_entry()
+        print(lexicon)
         self._window_update()
 
-    def _tree_overview_update(self, lexicon: Lexicon):
-        lex_graph = nx.Graph()
-        for word in lexicon.get_all_words():
-            lex_graph.add_node(word.translated_word)
+    def _tree_overview_selection_changed(self):
+        selected_cell = self._tree_overview.selectionModel().selectedIndexes()[0]
+        self._selected_item = self._tree_model.itemFromIndex(selected_cell)
+        self._selected_node: Word = self._selected_item.data()
+        self._details["translated_word"].setText(self._selected_node.translated_word)
+        print(self._selected_node)
 
-        self.lexicon_overview.setText(f"Lexicon contains {len(lexicon.members)} entries")
-        if lexicon.members:
-            print(lexicon.members[0])
+    def _tree_overview_update(self, lexicon: Lexicon):
+        self._tree_model.clear()
+        for word in lexicon.members:
+            new_item = QStandardItem(word.translated_word)
+            new_item.setData(word)
+            self._tree_model.appendRow(new_item)
 
     def _check_focus(self):
         if self.isActiveWindow():

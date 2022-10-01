@@ -3,6 +3,20 @@
 # EtymTreePython
 A python project designed to allow input, display, and tracking of the vocabulary of a constructed language.
 
+## Installation
+
+### Conda Environment Package Installation
+At a prompt in which the (empty) environment has been created:
+```
+conda install python
+pip install pylama[all]
+conda install matplotlib
+conda install networkx
+conda install pytest
+pip install pytest-qt
+conda install pytest-mock
+```
+
 [TOC]
 
 ## Configuration Flow and Test Coverage

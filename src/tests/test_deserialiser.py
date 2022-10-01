@@ -31,17 +31,6 @@ class TestGivenAValidDeserialiserFormat:
 
 class TestGivenADeserialiserInJSONFormat:
     """Operations for a deserialiser in JSON format"""
-    # Behavioural test - Brittle - What if we change the name of "deserialise?"
-    def test_cm_ic_6_a_json_deserialise_method_is_called(self, mocker):
-        """Calls to deserialise will call the JSON method"""
-        mock_deserialise = mocker.patch(
-            "src.services.io_service.JSONDeserialiser.deserialise",
-            return_data={"A": "B", "C": 1})
-        deserialiser = Deserialiser(DataFormat.JSON)
-        teststring = '{"A": "B", "C": 1}'
-        _ = deserialiser.deserialise(teststring)
-        mock_deserialise.assert_called_once()
-
     def test_des_des_01_a_valid_string_will_deserialise(self):
         """State test
         Integration Test: Deserialiser <- to/from -> JSON_Deserialiser"""
