@@ -29,7 +29,7 @@ class TestANewControlsInstance():
 class TestAFilledControlsInstance():
     """An instance of the Controls class with items should be able to..."""
     def test_locates_the_correct_control_by_id(self):
-        """Controls are registered using <QObject>.ObjectName. Element can be retrieved isomg this"""
+        """Controls are registered using ObjectName. Element can be retrieved from this"""
         win_controls = Controls()
         new_obj = QObject()
         new_obj.setObjectName("TestObject")
