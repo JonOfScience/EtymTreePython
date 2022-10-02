@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
 from lib.core import ProjectStatus, Lexicon, Word
 # Replace this with an interface
 from configuration.settings import Settings
+from ui.interfaces import Controls
 
 
 class ProjectWindow(QWidget):
@@ -22,9 +23,8 @@ class ProjectWindow(QWidget):
         super().__init__()
         self._configuration = configuration
         self.options = Settings()
-        self.lexicon_overview = None
+        self.controls = Controls()
         self.setWindowTitle("EtymTree - Project Overview - (Undefined)")
-        self.lastclick = ()
 
         self._selected_item = None
         self._selected_node = None
@@ -42,12 +42,15 @@ class ProjectWindow(QWidget):
         tree_group.setLayout(tree_layout)
         layout.addWidget(tree_group)
 
-        self._tree_overview = QTreeView()
-        self._tree_overview.clicked.connect(self._tree_overview_selection_changed)
+        _tree_overview = QTreeView()
+        _tree_overview.setObjectName("LexiconOverview")
+        _tree_overview.clicked.connect(self._tree_overview_selection_changed)
         # self._tree_overview.doubleClicked.connect(self._tree_overview_double_clicked)
-        self._tree_model = QStandardItemModel()
-        self._tree_overview.setModel(self._tree_model)
-        tree_layout.addWidget(self._tree_overview)
+        _tree_model = QStandardItemModel()
+        _tree_overview.setModel(_tree_model)
+        tree_layout.addWidget(_tree_overview)
+
+        self.controls.register_control(_tree_overview)
 
         details_group = QGroupBox("Word Details")
         details_group.setMinimumWidth(500)
@@ -83,18 +86,20 @@ class ProjectWindow(QWidget):
         self._window_update()
 
     def _tree_overview_selection_changed(self):
-        selected_cell = self._tree_overview.selectionModel().selectedIndexes()[0]
-        self._selected_item = self._tree_model.itemFromIndex(selected_cell)
+        _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
+        selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
+        self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
         self._selected_node: Word = self._selected_item.data()
         self._details["translated_word"].setText(self._selected_node.translated_word)
         print(self._selected_node)
 
     def _tree_overview_update(self, lexicon: Lexicon):
-        self._tree_model.clear()
+        _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
+        _tree_model: QStandardItemModel = _tree_overview.model()
         for word in lexicon.members:
             new_item = QStandardItem(word.translated_word)
             new_item.setData(word)
-            self._tree_model.appendRow(new_item)
+            _tree_model.appendRow(new_item)
 
     def _check_focus(self):
         if self.isActiveWindow():
