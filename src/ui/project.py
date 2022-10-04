@@ -4,7 +4,6 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
-    QLabel,
     QLayout,
     QPushButton,
     QTreeView,
@@ -15,6 +14,7 @@ from lib.core import ProjectStatus, Lexicon, Word
 # Replace this with an interface
 from configuration.settings import Settings
 from ui.interfaces import Controls
+from ui.project_word_details import WordDetails
 
 
 class ProjectWindow(QWidget):
@@ -52,20 +52,9 @@ class ProjectWindow(QWidget):
 
         self.controls.register_control(_tree_overview)
 
-        details_group = QGroupBox("Word Details")
-        details_group.setMinimumWidth(500)
-        details_layout = QVBoxLayout()
-
-        word_label_layout = QHBoxLayout()
-        translated_word_label = QLabel(text="Translated Word")
-        word_label_layout.addWidget(translated_word_label)
-        translated_word_data = QLabel(text="No Word Selected")
-        word_label_layout.addWidget(translated_word_data)
-        details_layout.addLayout(word_label_layout)
-
-        self._details = {"translated_word": translated_word_data}
-        details_group.setLayout(details_layout)
-        layout.addWidget(details_group)
+        _word_details = WordDetails()
+        layout.addWidget(_word_details.get_layout())
+        self.controls.merge_controls_from(_word_details.get_controls())
 
         return layout
 
@@ -90,7 +79,10 @@ class ProjectWindow(QWidget):
         selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
         self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
         self._selected_node: Word = self._selected_item.data()
-        self._details["translated_word"].setText(self._selected_node.translated_word)
+        self.controls.control_from_id("translated_word").setPlainText(
+            self._selected_node.translated_word)
+        self.controls.control_from_id("translated_word_components").setPlainText(
+            self._selected_node.translated_word_components)
         print(self._selected_node)
 
     def _tree_overview_update(self, lexicon: Lexicon):

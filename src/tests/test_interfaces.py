@@ -28,6 +28,14 @@ class TestANewControlsInstance():
 
 class TestAFilledControlsInstance():
     """An instance of the Controls class with items should be able to..."""
+    def test_lists_all_registered_controls(self):
+        """Return as a List without named identifiers"""
+        win_controls = Controls()
+        new_obj = QObject()
+        new_obj.setObjectName("TestObject")
+        win_controls.register_control(new_obj)
+        assert win_controls.controls_registered() == [new_obj]
+
     def test_locates_the_correct_control_by_id(self):
         """Controls are registered using ObjectName. Element can be retrieved from this"""
         win_controls = Controls()
@@ -35,3 +43,13 @@ class TestAFilledControlsInstance():
         new_obj.setObjectName("TestObject")
         win_controls.register_control(new_obj)
         assert win_controls.control_from_id("TestObject") == new_obj
+
+    def test_merges_in_elements_from_another_controls_class(self):
+        """A Controls class should be able to register elements from another instance"""
+        main_win_controls = Controls()
+        sub_win_controls = Controls()
+        sub_obj = QObject()
+        sub_obj.setObjectName("TestObject")
+        sub_win_controls.register_control(sub_obj)
+        main_win_controls.merge_controls_from(sub_win_controls)
+        assert main_win_controls.control_from_id("TestObject") == sub_obj
