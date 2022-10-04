@@ -11,6 +11,7 @@ from ui.interfaces import Controls
 
 
 class DisplayAndEditElement:
+    """Generic paired elements for labelling and displaying a data element"""
     def __init__(self,
             label_text: str,
             object_name: str,
@@ -26,10 +27,12 @@ class DisplayAndEditElement:
 
     @property
     def layout(self):
+        """The filled QHBoxLayout for this pair of elements"""
         return self._layout
 
     @property
     def control(self):
+        """The reference to the data field"""
         return self._data
 
 
