@@ -78,7 +78,6 @@ class ProjectWindow(QWidget):
         side_panel = QVBoxLayout()
         new_project = QPushButton("New Project")
         new_word = QPushButton("New Word")
-        new_word.clicked.connect(self._tree_overview_double_clicked)
         side_panel.addWidget(new_project, 1)
         side_panel.addWidget(new_word, 1)
         layout.addLayout(side_panel)
