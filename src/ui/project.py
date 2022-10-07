@@ -4,8 +4,10 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
     QLayout,
     QPushButton,
+    QTableView,
     QTreeView,
     QVBoxLayout,
     QWidget)
@@ -55,6 +57,20 @@ class ProjectWindow(QWidget):
         _word_details = WordDetails()
         layout.addWidget(_word_details.get_layout())
         self.controls.merge_controls_from(_word_details.get_controls())
+        self._col_info = {
+            "Translated Word": Word.translated_word,
+            "Translated Word Components": Word.translated_word_components,
+            "In Language Components": Word.in_language_components,
+            "Etymological Symbology": Word.etymological_symbology,
+            "Compiled Symbology": Word.compiled_symbology,
+            "Symbol Mapping": Word.symbol_mapping,
+            "Symbol Selection": Word.symbol_selection,
+            "Symbol Pattern Selected": Word.symbol_pattern_selected,
+            "Rules Applied": Word.rules_applied,
+            "In Language Word": Word.in_language_word,
+            "Version History": Word.version_history,
+            "Has Been Modified Since Last Resolve": Word.has_been_modified_since_last_resolve,
+            "Has Modified Ancestor": Word.has_modified_ancestor}
 
         return layout
 
@@ -74,16 +90,51 @@ class ProjectWindow(QWidget):
         print(lexicon)
         self._window_update()
 
+    def _tree_overview_selection_changed_old(self):
+        _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
+        selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
+        self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
+        self._selected_node: Word = self._selected_item.data()
+        # The data formatting & field selection needs to be in a controller (MVC)
+        # Don't pass OUT a control, pass IN the text that needs to be set.
+        self.controls.control_from_id("translated_word").setPlainText(
+            self._selected_node.translated_word)
+        self.controls.control_from_id("translated_components").setPlainText(
+            self._selected_node.translated_word_components)
+        self.controls.control_from_id("in_language_components").setPlainText(
+            self._selected_node.in_language_components)
+        self.controls.control_from_id("etymological_symbology").setPlainText(
+            self._selected_node.etymological_symbology)
+        self.controls.control_from_id("compiled_symbology").setPlainText(
+            self._selected_node.compiled_symbology)
+        self.controls.control_from_id("symbol_mapping").setPlainText(
+            self._selected_node.symbol_mapping)
+        self.controls.control_from_id("symbol_selection").setPlainText(
+            self._selected_node.symbol_selection)
+        self.controls.control_from_id("symbol_pattern_selected").setPlainText(
+            self._selected_node.symbol_pattern_selected)
+
     def _tree_overview_selection_changed(self):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
         self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
         self._selected_node: Word = self._selected_item.data()
-        self.controls.control_from_id("translated_word").setPlainText(
-            self._selected_node.translated_word)
-        self.controls.control_from_id("translated_word_components").setPlainText(
-            self._selected_node.translated_word_components)
-        print(self._selected_node)
+        this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+        # The data formatting & field selection needs to be in a controller (MVC)
+        # Don't pass OUT a control, pass IN the text that needs to be set.
+        word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
+        word_details_model: QStandardItemModel = word_details_table.model()
+        title_item = QStandardItem(self._selected_node.translated_word)
+        word_details_model.setItem(0, 1, title_item)
+        for idx, (col_title, _) in enumerate(self._col_info.items()):
+            item_string = this_lexicon.get_field_for_word(
+                col_title,
+                self._selected_node.translated_word)
+            # print(col_title, col_function)
+            # item_string = col_function(self._selected_node)
+            new_item = QStandardItem(item_string)
+            word_details_model.setItem(idx, 1, new_item)
+
 
     def _tree_overview_update(self, lexicon: Lexicon):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
@@ -92,6 +143,22 @@ class ProjectWindow(QWidget):
             new_item = QStandardItem(word.translated_word)
             new_item.setData(word)
             _tree_model.appendRow(new_item)
+
+    def _word_details_table_update(self):
+        word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
+        word_details_table.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch
+        )
+        word_details_table.verticalHeader().setSectionResizeMode(
+            QHeaderView.ResizeToContents
+        )
+        word_details_model: QStandardItemModel = word_details_table.model()
+        word_details_model.clear()
+        for idx, (row_label, row_function) in enumerate(self._col_info.items()):
+            label_item = QStandardItem(row_label)
+            word_details_model.setItem(idx, 0, label_item)
+            data_item = QStandardItem(row_function)
+            word_details_model.setItem(idx, 1, data_item)
 
     def _check_focus(self):
         if self.isActiveWindow():
@@ -109,6 +176,7 @@ class ProjectWindow(QWidget):
     def _window_update(self):
         this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
         self._tree_overview_update(this_lexicon)
+        self._word_details_table_update()
 
     def _create_new_project(self):
         self.options.set_option_to("ProjectStatus", ProjectStatus.EMPTY)
