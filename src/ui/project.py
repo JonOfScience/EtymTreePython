@@ -78,6 +78,7 @@ class ProjectWindow(QWidget):
         side_panel = QVBoxLayout()
         new_project = QPushButton("New Project")
         new_word = QPushButton("New Word")
+        new_word.clicked.connect(self._new_word_clicked)
         side_panel.addWidget(new_project, 1)
         side_panel.addWidget(new_word, 1)
         layout.addLayout(side_panel)
@@ -103,6 +104,11 @@ class ProjectWindow(QWidget):
             # item_string = col_function(self._selected_node)
             new_item = QStandardItem(item_string)
             word_details_model.setItem(idx, 1, new_item)
+
+    def _new_word_clicked(self):
+        lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+        lexicon.create_entry()
+        self._window_update()
 
     def _tree_overview_update(self, lexicon: Lexicon):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
