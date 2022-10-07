@@ -58,3 +58,29 @@ class TestGivenPopulatedLexicon:
         with pytest.raises(Exception) as e_info:
             new_lexicon.get_field_for_word("translated_word", "NotAWord")
         assert e_info.type == KeyError
+
+    def test_can_set_valid_field_for_extant_word(self):
+        """State Test"""
+        new_lexicon = Lexicon()
+        new_word = Word()
+        new_lexicon.add_entry(new_word)
+        new_value = "ThisIsAWord"
+        new_lexicon.set_field_to_value("translated word", new_word.translated_word, new_value)
+        field_data = new_lexicon.get_field_for_word("translated word", new_word.translated_word)
+        assert field_data == new_value
+
+    # def test_get_invalid_field_for_extant_word_throws(self):
+    #     """State Test"""
+    #     new_lexicon = Lexicon()
+    #     new_word = Word()
+    #     new_lexicon.add_entry(new_word)
+    #     with pytest.raises(Exception) as e_info:
+    #         new_lexicon.get_field_for_word("NotAField", new_word.translated_word)
+    #     assert e_info.type == ValueError
+
+    # def test_get_valid_field_for_non_existant_word_throws(self):
+    #     """State Test"""
+    #     new_lexicon = Lexicon()
+    #     with pytest.raises(Exception) as e_info:
+    #         new_lexicon.get_field_for_word("translated_word", "NotAWord")
+    #     assert e_info.type == KeyError

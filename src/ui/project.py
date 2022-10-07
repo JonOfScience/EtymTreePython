@@ -128,11 +128,9 @@ class ProjectWindow(QWidget):
         )
         word_details_model: QStandardItemModel = word_details_table.model()
         word_details_model.clear()
-        for idx, (row_label, row_function) in enumerate(self._col_info.items()):
+        for idx, (row_label,_) in enumerate(self._col_info.items()):
             label_item = QStandardItem(row_label)
             word_details_model.setItem(idx, 0, label_item)
-            data_item = QStandardItem(row_function)
-            word_details_model.setItem(idx, 1, data_item)
 
     def _check_focus(self):
         if self.isActiveWindow():
