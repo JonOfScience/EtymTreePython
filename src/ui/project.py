@@ -84,36 +84,6 @@ class ProjectWindow(QWidget):
         layout.addLayout(side_panel)
         return layout
 
-    def _tree_overview_double_clicked(self):
-        lexicon = self.options.find_by_id("CurrentProject")
-        lexicon.create_entry()
-        print(lexicon)
-        self._window_update()
-
-    def _tree_overview_selection_changed_old(self):
-        _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
-        selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
-        self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
-        self._selected_node: Word = self._selected_item.data()
-        # The data formatting & field selection needs to be in a controller (MVC)
-        # Don't pass OUT a control, pass IN the text that needs to be set.
-        self.controls.control_from_id("translated_word").setPlainText(
-            self._selected_node.translated_word)
-        self.controls.control_from_id("translated_components").setPlainText(
-            self._selected_node.translated_word_components)
-        self.controls.control_from_id("in_language_components").setPlainText(
-            self._selected_node.in_language_components)
-        self.controls.control_from_id("etymological_symbology").setPlainText(
-            self._selected_node.etymological_symbology)
-        self.controls.control_from_id("compiled_symbology").setPlainText(
-            self._selected_node.compiled_symbology)
-        self.controls.control_from_id("symbol_mapping").setPlainText(
-            self._selected_node.symbol_mapping)
-        self.controls.control_from_id("symbol_selection").setPlainText(
-            self._selected_node.symbol_selection)
-        self.controls.control_from_id("symbol_pattern_selected").setPlainText(
-            self._selected_node.symbol_pattern_selected)
-
     def _tree_overview_selection_changed(self):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
@@ -134,7 +104,6 @@ class ProjectWindow(QWidget):
             # item_string = col_function(self._selected_node)
             new_item = QStandardItem(item_string)
             word_details_model.setItem(idx, 1, new_item)
-
 
     def _tree_overview_update(self, lexicon: Lexicon):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
