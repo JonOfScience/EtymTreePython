@@ -76,6 +76,7 @@ class TestGivenEmptyLexicon:
         new_lexicon.add_entry(new_word)
         assert new_lexicon.get_all_words() == [new_word]
 
+
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
     def test_when_all_words_are_requested_then_a_list_of_the_items_is_returned(self):
@@ -96,8 +97,8 @@ class TestAPopulatedLexiconShould:
         new_lexicon.add_entry(first_new_word)
         new_lexicon.add_entry(second_new_word)
         export_data = new_lexicon.retrieve_export_data_for()
-        assert first_new_word._data in export_data #pylint: disable=protected-access
-        assert second_new_word._data in export_data #pylint: disable=protected-access
+        assert first_new_word._data in export_data  # pylint: disable=protected-access
+        assert second_new_word._data in export_data  # pylint: disable=protected-access
 
     def test__lex_mio_00__passes_data_from_selected_words(self, mocker):
         """Placeholder: Behaviour Test"""
@@ -110,15 +111,15 @@ class TestAPopulatedLexiconShould:
         new_lexicon.add_entry(first_new_word)
         new_lexicon.add_entry(second_new_word)
         new_lexicon.store_to("NotAFile")
-        mock_service.assert_called_once() # pylint: disable=protected-access
+        mock_service.assert_called_once()  # pylint: disable=protected-access
 
     def test_get_valid_field_for_extant_word_is_accurate(self):
         """State Test"""
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        field_data = new_lexicon.get_field_for_word("translated word", new_word.translated_word)
-        assert field_data == new_word.translated_word
+        field_data = new_lexicon.get_field_for_word("translated word", new_word)
+        assert field_data == new_word.find_data_on("translated_word")
 
     def test_get_invalid_field_for_extant_word_throws(self):
         """State Test"""
@@ -126,7 +127,7 @@ class TestAPopulatedLexiconShould:
         new_word = Word()
         new_lexicon.add_entry(new_word)
         with pytest.raises(Exception) as e_info:
-            new_lexicon.get_field_for_word("NotAField", new_word.translated_word)
+            new_lexicon.get_field_for_word("NotAField", new_word)
         assert e_info.type == ValueError
 
     def test_get_valid_field_for_non_existant_word_throws(self):
@@ -142,8 +143,8 @@ class TestAPopulatedLexiconShould:
         new_word = Word()
         new_lexicon.add_entry(new_word)
         new_value = "ThisIsAWord"
-        new_lexicon.set_field_to_value("translated word", new_word.translated_word, new_value)
-        field_data = new_lexicon.get_field_for_word("translated word", new_word.translated_word)
+        new_lexicon.set_field_to_value("translated word", new_word, new_value)
+        field_data = new_lexicon.get_field_for_word("translated word", new_word)
         assert field_data == new_value
 
     def test_it_can_be_stored_locally(self):
@@ -170,11 +171,11 @@ class TestAPopulatedLexiconShould:
         lexicon_to_store.store_to("TestLexicon")
         print(f"Lexicon after store: {lexicon_to_store.members}")
         for word in lexicon_to_store.members:
-            print(f"Words Stored   : {word.translated_word}")
+            print(f"Words Stored   : {word.find_data_on('translated_word')}")
         read_lexicon = Lexicon()
         print(f"Empty Read Lexicon : {read_lexicon.members}")
         read_lexicon.load_from("TestLexicon")
         print(f"Read Lexicon After : {read_lexicon.members}")
         for word in read_lexicon.members:
-            print(f"Words Unpacked  : {word.translated_word}")
+            print(f"Words Unpacked  : {word.find_data_on('translated_word')}")
         assert read_lexicon.get_all_words() == [storeable_word]
