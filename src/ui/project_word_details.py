@@ -15,10 +15,10 @@ from ui.interfaces import Controls
 class DisplayAndEditElement:
     """Generic paired elements for labelling and displaying a data element"""
     def __init__(self,
-            label_text: str,
-            object_name: str,
-            element_class,
-            element_set_method) -> None:
+                 label_text: str,
+                 object_name: str,
+                 element_class,
+                 element_set_method) -> None:
         self._layout = QHBoxLayout()
         self._label = QLabel(text=label_text)
         self._layout.addWidget(self._label)

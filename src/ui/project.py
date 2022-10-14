@@ -92,7 +92,7 @@ class ProjectWindow(QWidget):
     def _tree_overview_selection_changed(self):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
-        self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
+        self._selected_item = _tree_overview.model().itemFromIndex(selected_cell)
         self._selected_node: Word = self._selected_item.data()
         # The data formatting & field selection needs to be in a controller (MVC)
         # Don't pass OUT a control, pass IN the text that needs to be set.
@@ -135,7 +135,7 @@ class ProjectWindow(QWidget):
         word_details_model: QStandardItemModel = word_details_table.model()
         # word_details_model.clear()
         word_details_model.setVerticalHeaderLabels(
-            [row_label for (row_label,_) in self._col_info.items()])
+            [row_label for (row_label, _) in self._col_info.items()])
 
     def _word_details_table_populate(self):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
@@ -151,7 +151,7 @@ class ProjectWindow(QWidget):
                 # item_string = col_function(self._selected_node)
                 new_item = QStandardItem(item_string)
                 new_item.setData(self._selected_node)
-                word_details_model.setItem(idx, 0, new_item)            
+                word_details_model.setItem(idx, 0, new_item)
         # word_details_model.blockSignals(False)
 
     def _check_focus(self):
