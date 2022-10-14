@@ -63,19 +63,19 @@ class ProjectWindow(QWidget):
         details_model: QStandardItemModel = details_table.model()
         details_model.itemChanged.connect(self._details_model_data_changed)
         self._col_info = {
-            "Translated Word": Word.translated_word,
-            "Translated Word Components": Word.translated_word_components,
-            "In Language Components": Word.in_language_components,
-            "Etymological Symbology": Word.etymological_symbology,
-            "Compiled Symbology": Word.compiled_symbology,
-            "Symbol Mapping": Word.symbol_mapping,
-            "Symbol Selection": Word.symbol_selection,
-            "Symbol Pattern Selected": Word.symbol_pattern_selected,
-            "Rules Applied": Word.rules_applied,
-            "In Language Word": Word.in_language_word,
-            "Version History": Word.version_history,
-            "Has Been Modified Since Last Resolve": Word.has_been_modified_since_last_resolve,
-            "Has Modified Ancestor": Word.has_modified_ancestor}
+            "Translated Word": None,
+            "Translated Word Components": None,
+            "In Language Components": None,
+            "Etymological Symbology": None,
+            "Compiled Symbology": None,
+            "Symbol Mapping": None,
+            "Symbol Selection": None,
+            "Symbol Pattern Selected": None,
+            "Rules Applied": None,
+            "In Language Word": None,
+            "Version History": None,
+            "Has Been Modified Since Last Resolve": None,
+            "Has Modified Ancestor": None}
 
         return layout
 
@@ -104,7 +104,7 @@ class ProjectWindow(QWidget):
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
         this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
-        this_lexicon.set_field_to_value(field_label, associated_word.translated_word, item.text())
+        this_lexicon.set_field_to_value(field_label, associated_word, item.text())
         self._word_details_table_update()
         self._tree_overview_update(this_lexicon)
 
@@ -118,7 +118,7 @@ class ProjectWindow(QWidget):
         _tree_model: QStandardItemModel = _tree_overview.model()
         _tree_model.clear()
         for word in lexicon.members:
-            new_item = QStandardItem(word.translated_word)
+            new_item = QStandardItem(lexicon.get_field_for_word("Translated Word", word))
             new_item.setData(word)
             _tree_model.appendRow(new_item)
 
@@ -146,7 +146,7 @@ class ProjectWindow(QWidget):
             for idx, (col_title, _) in enumerate(self._col_info.items()):
                 item_string = this_lexicon.get_field_for_word(
                     col_title,
-                    self._selected_node.translated_word)
+                    self._selected_node)
                 # print(col_title, col_function)
                 # item_string = col_function(self._selected_node)
                 new_item = QStandardItem(item_string)
