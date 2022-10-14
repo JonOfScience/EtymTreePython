@@ -49,6 +49,25 @@ class TestGivenAnIOServiceInJSONFormat:
         json_io_service = IOService(DataFormat.JSON)
         assert json_io_service.data_format == DataFormat.JSON
 
+    def test__iso_ots_00__serialises_an_object_to_a_valid_json_string(self):
+        """Placeholder: State Test"""
+        json_io_service = IOService(DataFormat.JSON)
+        testobject = {"A": "B", "C": 1}
+        assert json_io_service.serialise_obj_to_string(testobject) == '{"A": "B", "C": 1}'
+
+    def test__iso_ots_01__returns_empty_string_for_an_empty_object(self):
+        """Placeholder: State Test"""
+        json_io_service = IOService(DataFormat.JSON)
+        testobject = {}
+        assert json_io_service.serialise_obj_to_string(testobject) == ''
+
+    def test__iso_ots_02__throws_with_none_argument(self):
+        """Placeholder: State Test"""
+        json_io_service = IOService(DataFormat.JSON)
+        with pytest.raises(Exception) as e_info:
+            json_io_service.serialise_obj_to_string(None)
+        assert e_info.type == ValueError
+
     def test_iso_sto_00_deserialises_a_valid_json_string(self):
         """State Test"""
         json_io_service = IOService(DataFormat.JSON)

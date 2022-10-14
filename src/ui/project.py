@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget)
 
-from lib.core import ProjectStatus, Lexicon, Word
+from lib.core import ProjectStatus
+from lib.lexicon import Lexicon, Word
 # Replace this with an interface
 from configuration.settings import Settings
 from ui.interfaces import Controls
@@ -46,7 +47,8 @@ class ProjectWindow(QWidget):
 
         _tree_overview = QTreeView()
         _tree_overview.setObjectName("LexiconOverview")
-        _tree_overview.clicked.connect(self._tree_overview_selection_changed)
+        _tree_overview.clicked.connect(
+            self._tree_overview_selection_changed)
         # self._tree_overview.doubleClicked.connect(self._tree_overview_double_clicked)
         _tree_model = QStandardItemModel()
         _tree_overview.setModel(_tree_model)
@@ -57,6 +59,9 @@ class ProjectWindow(QWidget):
         _word_details = WordDetails()
         layout.addWidget(_word_details.get_layout())
         self.controls.merge_controls_from(_word_details.get_controls())
+        details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
+        details_model: QStandardItemModel = details_table.model()
+        details_model.itemChanged.connect(self._details_model_data_changed)
         self._col_info = {
             "Translated Word": Word.translated_word,
             "Translated Word Components": Word.translated_word_components,
@@ -89,21 +94,19 @@ class ProjectWindow(QWidget):
         selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
         self._selected_item =  _tree_overview.model().itemFromIndex(selected_cell)
         self._selected_node: Word = self._selected_item.data()
-        this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
         # The data formatting & field selection needs to be in a controller (MVC)
         # Don't pass OUT a control, pass IN the text that needs to be set.
-        word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
-        word_details_model: QStandardItemModel = word_details_table.model()
-        title_item = QStandardItem(self._selected_node.translated_word)
-        word_details_model.setItem(0, 1, title_item)
-        for idx, (col_title, _) in enumerate(self._col_info.items()):
-            item_string = this_lexicon.get_field_for_word(
-                col_title,
-                self._selected_node.translated_word)
-            # print(col_title, col_function)
-            # item_string = col_function(self._selected_node)
-            new_item = QStandardItem(item_string)
-            word_details_model.setItem(idx, 1, new_item)
+        self._word_details_table_populate()
+
+    def _details_model_data_changed(self, item):
+        details_table: QTreeView = self.controls.control_from_id("WordDetailsTable")
+        details_model: QStandardItemModel = details_table.model()
+        field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
+        associated_word: Word = item.data()
+        this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+        this_lexicon.set_field_to_value(field_label, associated_word.translated_word, item.text())
+        self._word_details_table_update()
+        self._tree_overview_update(this_lexicon)
 
     def _new_word_clicked(self):
         lexicon: Lexicon = self.options.find_by_id("CurrentProject")
@@ -113,6 +116,7 @@ class ProjectWindow(QWidget):
     def _tree_overview_update(self, lexicon: Lexicon):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
+        _tree_model.clear()
         for word in lexicon.members:
             new_item = QStandardItem(word.translated_word)
             new_item.setData(word)
@@ -120,17 +124,35 @@ class ProjectWindow(QWidget):
 
     def _word_details_table_update(self):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
+        word_details_table.horizontalHeader().setHidden(True)
         word_details_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.Stretch
         )
         word_details_table.verticalHeader().setSectionResizeMode(
-            QHeaderView.ResizeToContents
+            # QHeaderView.ResizeToContents
+            QHeaderView.Stretch
         )
         word_details_model: QStandardItemModel = word_details_table.model()
-        word_details_model.clear()
-        for idx, (row_label,_) in enumerate(self._col_info.items()):
-            label_item = QStandardItem(row_label)
-            word_details_model.setItem(idx, 0, label_item)
+        # word_details_model.clear()
+        word_details_model.setVerticalHeaderLabels(
+            [row_label for (row_label,_) in self._col_info.items()])
+
+    def _word_details_table_populate(self):
+        word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
+        word_details_model: QStandardItemModel = word_details_table.model()
+        # word_details_model.blockSignals(True)
+        if self._selected_node:
+            this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+            for idx, (col_title, _) in enumerate(self._col_info.items()):
+                item_string = this_lexicon.get_field_for_word(
+                    col_title,
+                    self._selected_node.translated_word)
+                # print(col_title, col_function)
+                # item_string = col_function(self._selected_node)
+                new_item = QStandardItem(item_string)
+                new_item.setData(self._selected_node)
+                word_details_model.setItem(idx, 0, new_item)            
+        # word_details_model.blockSignals(False)
 
     def _check_focus(self):
         if self.isActiveWindow():

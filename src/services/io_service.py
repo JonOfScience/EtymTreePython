@@ -43,7 +43,11 @@ class JSONSerialiser(SerialiserInterface):
     @staticmethod
     def serialise(object_to_serialise):
         """Returns a JSON serialised string representing an input object"""
-        return json.dumps(object_to_serialise)
+        if object_to_serialise is None:
+            raise ValueError("Input must be a valid object to serialise")
+        if object_to_serialise:
+            return json.dumps(object_to_serialise)
+        return ''
 
 
 # JSON Deserializer
@@ -91,7 +95,10 @@ class IOService:
     def store(self, filename, data):
         """Stores input data in a specified UTF-8 file."""
         with open(filename, "w", encoding='UTF-8') as file_ref:
-            file_ref.write(data)
+            if isinstance(data, list):
+                file_ref.writelines(data)
+            else:
+                file_ref.write(data)
 
     def serialise_obj_to_string(self, obj: object):
         """Converts an input object into a serialised string in the specified data_format"""
