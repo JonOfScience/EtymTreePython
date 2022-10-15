@@ -61,7 +61,7 @@ class TestGivenEmptyLexicon:
     def test_when_all_words_are_requested_then_an_empty_list_is_returned(self):
         """State Test"""
         empty_lexicon = Lexicon()
-        assert empty_lexicon.get_all_words() == []
+        assert not empty_lexicon.get_all_words()
 
     def test_when_an_entry_is_created_all_words_returns_an_item(self):
         """State Test"""
