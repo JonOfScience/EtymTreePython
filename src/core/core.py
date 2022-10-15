@@ -60,9 +60,10 @@ def double_clickable(widget):
         """Permits double click on an element that doesn't have a Double Click slot"""
         clicked = pyqtSignal()
 
+        # pylint: disable-next=invalid-name
         def eventFilter(self,
                         obj: 'QObject',
-                        event: 'QEvent') -> bool:  # pylint: disable=invalid-name
+                        event: 'QEvent') -> bool:
             """Catch Dbl-Click if triggered within the bounds of the element"""
             if obj == widget:
                 if event.type() == QEvent.MouseButtonDblClick:

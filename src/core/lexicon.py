@@ -69,7 +69,7 @@ class Lexicon:
 
     def get_all_words(self) -> Sequence[Word]:
         """List all Words currently registered in the Lexicon"""
-        return [x for x in self.members]
+        return self.members
 
     def retrieve_export_data_for(self, words_selected: Sequence[Word] = None) -> Sequence[dict]:
         """Strip the internal data out of Word instances ready for export."""
