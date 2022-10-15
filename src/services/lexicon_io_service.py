@@ -1,6 +1,6 @@
 """Service Layer between Lexicon and IOService"""
 from typing import Sequence
-from lib.core import DataFormat
+from core.core import DataFormat
 from .io_service import IOService
 
 

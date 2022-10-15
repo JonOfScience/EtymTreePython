@@ -1,7 +1,7 @@
 """Tests for service layer between configuration settings and IO operations"""
 import sys
 import pytest
-from lib.core import DataFormat
+from core.core import DataFormat
 from src.services.settings_io_service import SettingsIOService
 from src.services.io_service import IOService
 

@@ -1,7 +1,7 @@
 """Tests for configuration Settings."""
 import sys
 import pytest
-from lib.core import DataFormat
+from core.core import DataFormat
 from src.configuration.settings import Settings
 from src.services.settings_io_service import SettingsIOService
 

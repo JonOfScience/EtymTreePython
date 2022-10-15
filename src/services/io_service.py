@@ -1,6 +1,6 @@
 """Low level IO operations involving (de)serialisation and file read/write"""
 import json
-from lib.core import (
+from core.core import (
     DataFormat,
     SerialiserInterface,
     DeserialiserInterface)

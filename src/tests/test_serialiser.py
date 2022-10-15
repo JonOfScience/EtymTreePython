@@ -1,7 +1,7 @@
 """Tests for serialisers for objects to strings in various formats."""
 from enum import Enum
 import pytest
-from lib.core import DataFormat
+from core.core import DataFormat
 from src.services.io_service import Serialiser
 
 

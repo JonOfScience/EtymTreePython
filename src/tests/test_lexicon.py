@@ -1,6 +1,6 @@
 """Tests for a Lexicon of Words."""
 import pytest
-from lib.lexicon import Lexicon, Word
+from core.lexicon import Lexicon, Word
 
 
 class TestAnEmptyWordShould:

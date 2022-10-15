@@ -12,8 +12,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget)
 
-from lib.core import ProjectStatus
-from lib.lexicon import Lexicon, Word
+from core.core import ProjectStatus
+from core.lexicon import Lexicon, Word
 # Replace this with an interface
 from configuration.settings import Settings
 from ui.interfaces import Controls

@@ -1,6 +1,6 @@
 """Application configuration settings"""
 from typing import Any
-from lib.core import DataFormat
+from core.core import DataFormat
 from services.settings_io_service import SettingsIOService
 
 

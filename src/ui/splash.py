@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
     QWidget)
 
 # Replace this with an interface
-from lib.core import ProjectStatus
+from core.core import ProjectStatus
 from configuration.settings import Settings
 from ui.interfaces import EtymWindow
 
