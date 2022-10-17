@@ -98,13 +98,14 @@ class ProjectWindow(QWidget):
         # Don't pass OUT a control, pass IN the text that needs to be set.
         self._word_details_table_populate()
 
-    def _details_model_data_changed(self, item):
+    def _details_model_data_changed(self, item: QStandardItem):
         details_table: QTreeView = self.controls.control_from_id("WordDetailsTable")
         details_model: QStandardItemModel = details_table.model()
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
         this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
         this_lexicon.set_field_to_value(field_label, associated_word, item.text())
+        this_lexicon.store_to(f"./data/{this_lexicon.uuid}")
         self._word_details_table_update()
         self._tree_overview_update(this_lexicon)
 
@@ -140,19 +141,15 @@ class ProjectWindow(QWidget):
     def _word_details_table_populate(self):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
         word_details_model: QStandardItemModel = word_details_table.model()
-        # word_details_model.blockSignals(True)
         if self._selected_node:
             this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
             for idx, (col_title, _) in enumerate(self._col_info.items()):
                 item_string = this_lexicon.get_field_for_word(
                     col_title,
                     self._selected_node)
-                # print(col_title, col_function)
-                # item_string = col_function(self._selected_node)
                 new_item = QStandardItem(item_string)
                 new_item.setData(self._selected_node)
                 word_details_model.setItem(idx, 0, new_item)
-        # word_details_model.blockSignals(False)
 
     def _check_focus(self):
         if self.isActiveWindow():

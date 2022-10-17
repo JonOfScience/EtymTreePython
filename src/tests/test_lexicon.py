@@ -51,19 +51,31 @@ class TestAPopulatedWordShould:
             assert returned_data[fieldname] == fieldvalue
 
 
-class TestGivenEmptyLexicon:
+class TestAnEmptyLexiconShould:
     """Test operations on an empty Lexicon (0 words)"""
-    def test_lex_ist_00_it_can_be_instantiated(self):
+    def test__lex_ist_00__be_able_to_be_instantiated(self):
         """State Test"""
         empty_lexicon = Lexicon()
         assert empty_lexicon
 
-    def test_when_all_words_are_requested_then_an_empty_list_is_returned(self):
+    def test_have_a_default_but_valid_title(self):
+        """Placeholder: State Test"""
+        empty_lexicon = Lexicon()
+        assert empty_lexicon.title
+
+    def test_have_a_default_unique_identifier(self):
+        """Placeholder: State Test"""
+        first_lexicon = Lexicon()
+        second_lexicon = Lexicon()
+        assert first_lexicon.uuid
+        assert first_lexicon.uuid != second_lexicon.uuid
+
+    def test_return_an_empty_list_when_all_words_are_requested(self):
         """State Test"""
         empty_lexicon = Lexicon()
         assert not empty_lexicon.get_all_words()
 
-    def test_when_an_entry_is_created_all_words_returns_an_item(self):
+    def test_return_an_item_when_an_entry_is_created_and_get_all_words(self):
         """State Test"""
         new_lexicon = Lexicon()
         new_lexicon.create_entry()
