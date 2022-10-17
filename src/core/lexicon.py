@@ -1,5 +1,6 @@
 """Library for Word and Lexicon level functionality."""
 from __future__ import annotations
+import uuid
 from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
@@ -52,10 +53,12 @@ class Word:
 
 class Lexicon:
     """Container to hold Words that comprise a language."""
+    uuid: str
     title: str
     members: list[Word]
 
     def __init__(self) -> None:
+        self.uuid = uuid.uuid4().hex
         self.title = "BlankProjectLexicon"
         self.members = []
         self.index_by_translated_word = {}
