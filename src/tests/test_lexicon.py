@@ -59,10 +59,12 @@ class TestAnEmptyLexiconShould:
         assert empty_lexicon
 
     def test_have_a_default_but_valid_title(self):
+        """Placeholder: State Test"""
         empty_lexicon = Lexicon()
         assert empty_lexicon.title
 
     def test_have_a_default_unique_identifier(self):
+        """Placeholder: State Test"""
         first_lexicon = Lexicon()
         second_lexicon = Lexicon()
         assert first_lexicon.uuid
