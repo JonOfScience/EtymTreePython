@@ -171,4 +171,7 @@ class ProjectWindow(QWidget):
 
     def _create_new_project(self):
         self.options.set_option_to("ProjectStatus", ProjectStatus.EMPTY)
+        # new_project = Settings()
+        # new_lexicon = Lexicon()
+        # new_project.set_option_to("Lexicons", {})
         self.options.set_option_to("CurrentProject", Lexicon())

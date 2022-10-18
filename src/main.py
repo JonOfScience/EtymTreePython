@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtWidgets import (QApplication)
 from configuration.settings import Settings
 from ui.splash import SplashWindow
-from ui.project import ProjectWindow
+from ui.project_ui import ProjectWindow
 
 # BASE CONFIG IS HARDCODED
 # USER CONFIG IS IN FILES (i.e. can start without user config if need be)

@@ -1,6 +1,6 @@
 """Test properties and methods of the ProjectWindow UI class"""
 from src.configuration.settings import Settings
-from src.ui.project import ProjectWindow
+from src.ui.project_ui import ProjectWindow
 
 
 class TestGivenANewProjectWindow:
