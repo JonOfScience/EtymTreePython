@@ -1,10 +1,11 @@
 """Library for Project level functionality"""
-from typing import Union
+from typing import Union, Sequence
 from configuration.settings import Settings
 from src.core.lexicon import Lexicon
 
 
 class Project:
+    """Class that contains Project level settings and Lexicons"""
     def __init__(self, settings: Union[dict, Settings] = None) -> None:
         self._settings = Settings(
             {"Name": "ANewProject",
@@ -18,13 +19,15 @@ class Project:
 
     @property
     def name(self) -> str:
+        """The descriptive name of the project"""
         return self._settings.find_by_id("Name")
 
     @property
     def filename(self) -> str:
+        """The non-extension file name to which the Project will be saved"""
         return self._settings.find_by_id("Filename")
 
-    def list_lexicons(self) -> list[Lexicon]:
+    def list_lexicons(self) -> Sequence[Lexicon]:
         """A list of all registered Lexicons"""
         return [x for (_, x) in self._lexicons.items()]
 
