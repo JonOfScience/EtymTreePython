@@ -1,7 +1,7 @@
 """Library for Project level functionality"""
 from typing import Union, Sequence
 from configuration.settings import Settings
-from src.core.lexicon import Lexicon
+from core.lexicon import Lexicon
 
 
 class Project:
