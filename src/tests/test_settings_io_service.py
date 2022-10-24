@@ -40,3 +40,22 @@ class TestGivenANewSettingsIOService:
         testdatapath = _write_testdata_data_file()
         config_object = new_config_service.import_config(f"{testdatapath}/testdata")
         assert config_object == {"A": "B", "C": 1}
+
+    def test__sio_exc_00__when_settings_is_populated_writes_expected_string_to_file(self, mocker):
+        """Component: Combined IO Services - Capacity to Write"""
+        new_config_service = SettingsIOService(IOService(DataFormat.JSON))
+        settings_data_for_export = {"A": "b", "C": 1}
+        mock = mocker.patch("builtins.open", mocker.mock_open())
+        new_config_service.export_config("SettingsData", settings_data_for_export)
+        mock.assert_called_with("SettingsData.data", "w", encoding="UTF-8")
+        handle = mock()
+        handle.write.assert_called_once_with('{"A": "b", "C": 1}')
+
+    def test__sio_exc_01__when_settings_is_empty_writes_an_empty_file(self, mocker):
+        """Component: Combined IO Services - Writes and Empty object to an empty file"""
+        new_config_service = SettingsIOService(IOService(DataFormat.JSON))
+        settings_data_for_export = {}
+        mock_method = mocker.patch("builtins.open", mocker.mock_open())
+        new_config_service.export_config("SettingsData", settings_data_for_export)
+        handle = mock_method()
+        handle.write.assert_called_once_with('')

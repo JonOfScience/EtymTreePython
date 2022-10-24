@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
     QWidget)
 
 from core.core import ProjectStatus
+from core.project import Project
 from core.lexicon import Lexicon, Word
 # Replace this with an interface
 from configuration.settings import Settings
@@ -27,7 +28,6 @@ class ProjectWindow(QWidget):
         self._configuration = configuration
         self.options = Settings()
         self.controls = Controls()
-        self.setWindowTitle("EtymTree - Project Overview - (Undefined)")
 
         self._selected_item = None
         self._selected_node = None
@@ -103,14 +103,16 @@ class ProjectWindow(QWidget):
         details_model: QStandardItemModel = details_table.model()
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
-        this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+        this_project: Project = self.options.find_by_id("CurrentProject")
+        this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         this_lexicon.set_field_to_value(field_label, associated_word, item.text())
-        this_lexicon.store_to(f"./data/{this_lexicon.uuid}")
+        this_project.store()
+        # this_lexicon.store_to(f"{this_lexicon.uuid}")
         self._word_details_table_update()
         self._tree_overview_update(this_lexicon)
 
     def _new_word_clicked(self):
-        lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+        lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         lexicon.create_entry()
         self._window_update()
 
@@ -142,7 +144,7 @@ class ProjectWindow(QWidget):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
         word_details_model: QStandardItemModel = word_details_table.model()
         if self._selected_node:
-            this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+            this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
             for idx, (col_title, _) in enumerate(self._col_info.items()):
                 item_string = this_lexicon.get_field_for_word(
                     col_title,
@@ -165,10 +167,19 @@ class ProjectWindow(QWidget):
         _behaviour_refs[project_status]()
 
     def _window_update(self):
-        this_lexicon: Lexicon = self.options.find_by_id("CurrentProject")
+        project_title = "Undefined"
+        this_project: Project = self.options.find_by_id("CurrentProject")
+        if this_project:
+            project_title = this_project.name
+        self.setWindowTitle("EtymTree - Project Overview - (" + project_title + ")")
+
+        this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         self._tree_overview_update(this_lexicon)
         self._word_details_table_update()
 
     def _create_new_project(self):
         self.options.set_option_to("ProjectStatus", ProjectStatus.EMPTY)
-        self.options.set_option_to("CurrentProject", Lexicon())
+        new_project = Project()
+        new_lexicon = new_project.find_lexicon_by_id(new_project.list_lexicons()[0].uuid)
+        self.options.set_option_to("CurrentProject", new_project)
+        self.options.set_option_to("CurrentLexicon", new_lexicon)
