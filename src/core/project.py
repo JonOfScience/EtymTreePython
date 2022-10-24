@@ -15,7 +15,7 @@ class Project:
         if isinstance(settings, Settings):
             self._settings = settings
         base_blank_lexicon = Lexicon()
-        self._lexicons: dict[str, Lexicon] = {base_blank_lexicon.uuid: base_blank_lexicon}
+        self._lexicons: Sequence[str, Lexicon] = {base_blank_lexicon.uuid: base_blank_lexicon}
         self._settings.set_option_to(
             "RegisteredLexicons",
             [lexicon_id for (lexicon_id, _) in self._lexicons.items()])
