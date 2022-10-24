@@ -103,9 +103,11 @@ class ProjectWindow(QWidget):
         details_model: QStandardItemModel = details_table.model()
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
+        this_project: Project = self.options.find_by_id("CurrentProject")
         this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         this_lexicon.set_field_to_value(field_label, associated_word, item.text())
-        this_lexicon.store_to(f"./data/{this_lexicon.uuid}")
+        this_project.store()
+        # this_lexicon.store_to(f"{this_lexicon.uuid}")
         self._word_details_table_update()
         self._tree_overview_update(this_lexicon)
 

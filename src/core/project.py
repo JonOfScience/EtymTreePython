@@ -15,7 +15,10 @@ class Project:
         if isinstance(settings, Settings):
             self._settings = settings
         base_blank_lexicon = Lexicon()
-        self._lexicons = {base_blank_lexicon.uuid: base_blank_lexicon}
+        self._lexicons: dict[str, Lexicon] = {base_blank_lexicon.uuid: base_blank_lexicon}
+        self._settings.set_option_to(
+            "RegisteredLexicons",
+            [lexicon_id for (lexicon_id, _) in self._lexicons.items()])
 
     @property
     def name(self) -> str:
@@ -34,3 +37,11 @@ class Project:
     def find_lexicon_by_id(self, identifier: str) -> Lexicon:
         """If identifier exists then a Lexicon is return, otherwise None"""
         return self._lexicons.get(identifier)
+
+    def store(self) -> None:
+        """Store Project Files and Included Lexicon Files (separately)"""
+        # Store Project Settings file "Proj-<ID>"
+        self._settings.export_config(f"data/PROJ-{self._settings.find_by_id('Filename')}")
+        # Store Project Lexicon files "Lex-<ID>"
+        for (id, lexicon) in self._lexicons.items():
+            lexicon.store_to(id)
