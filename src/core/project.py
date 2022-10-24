@@ -43,5 +43,5 @@ class Project:
         # Store Project Settings file "Proj-<ID>"
         self._settings.export_config(f"data/PROJ-{self._settings.find_by_id('Filename')}")
         # Store Project Lexicon files "Lex-<ID>"
-        for (id, lexicon) in self._lexicons.items():
-            lexicon.store_to(id)
+        for (lex_id, lexicon) in self._lexicons.items():
+            lexicon.store_to(lex_id)
