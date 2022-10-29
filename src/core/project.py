@@ -1,7 +1,31 @@
 """Library for Project level functionality"""
+from __future__ import annotations
+import os
+import json
 from typing import Union, Sequence
 from configuration.settings import Settings
 from core.lexicon import Lexicon
+
+
+class ProjectBuilder:
+    """Returns Project instances if provided with valid Project data file locations."""
+    @staticmethod
+    def projects_from_files(location_tree: dict):
+        proj_files_found = {}
+        for (path, directory_data) in location_tree.items():
+            for (directory_name, file_names) in directory_data.items():
+                for file_name in file_names:
+                    rebuilt_proj = ProjectBuilder.project_from_file(
+                        os.path.join(path, directory_name, file_name))
+                    proj_files_found[rebuilt_proj.name] = rebuilt_proj
+        return proj_files_found
+
+    @staticmethod
+    def project_from_file(file_location: str) -> Project:
+        # REFACTOR - Knows about JSON
+        with open(file_location, 'r') as proj_file:
+            proj_data = json.load(proj_file)
+        return Project(proj_data)
 
 
 class Project:
@@ -10,15 +34,25 @@ class Project:
         self._settings = Settings(
             {"Name": "ANewProject",
              "Filename": "ANewProjectFile"})
+        self._lexicons = {}
         if isinstance(settings, dict):
             self._settings = Settings(settings)
         if isinstance(settings, Settings):
             self._settings = settings
-        base_blank_lexicon = Lexicon()
-        self._lexicons: Sequence[str, Lexicon] = {base_blank_lexicon.uuid: base_blank_lexicon}
-        self._settings.set_option_to(
-            "RegisteredLexicons",
-            [lexicon_id for (lexicon_id, _) in self._lexicons.items()])
+        self._lexicons: Sequence[str, Lexicon] = {}
+        registered_lexicons = self._settings.find_by_id("RegisteredLexicons")
+        if not registered_lexicons:
+            base_blank_lexicon = Lexicon()
+            self._lexicons[base_blank_lexicon.uuid] = base_blank_lexicon
+            self._settings.set_option_to(
+                "RegisteredLexicons",
+                [lexicon_id for (lexicon_id, _) in self._lexicons.items()])
+        else:
+            for lexicon_id in registered_lexicons:
+                new_lexicon = Lexicon()
+                # IS IT DOING FILENAMES CORRECTLY?
+                new_lexicon.load_from(lexicon_id)
+                self._lexicons[lexicon_id] = new_lexicon
 
     @property
     def name(self) -> str:

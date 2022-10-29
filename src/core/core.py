@@ -1,5 +1,8 @@
 """Location for project-wide values and interfaces."""
+from typing import Callable, Sequence
+import os
 import uuid
+import logging
 from enum import Enum
 from abc import ABCMeta, abstractmethod
 from PyQt5.QtCore import QObject, pyqtSignal, QEvent
@@ -16,6 +19,7 @@ class DataFormat(Enum):
 class ProjectStatus(str, Enum):
     """Registered status for active projects."""
     EMPTY = "empty"
+    LOADING = "loading"
     MODIFIED = "modified"
     NEW = "new"
     SAVED = "saved"
@@ -74,3 +78,20 @@ def double_clickable(widget):
     dbl_filter = Filter(widget)
     widget.installEventFilter(dbl_filter)
     return dbl_filter.clicked
+
+
+def id_project_files_in(file_location: str, validator: Callable) -> Sequence:
+    """Collects data about Projects stored in the specified location."""
+    logger = logging.getLogger('etym_logger')
+    proj_files_found = {}
+    for path, dirnames, filenames in os.walk(file_location):
+        logger.debug(f"Path     : {path}")
+        logger.debug(f"Dirnames : {dirnames}")
+        logger.debug(f"Filenames: {filenames}")
+        proj_files_found[path] = {}
+        if dirnames:
+            for dirname in dirnames:
+                proj_files_found[path][dirname] = [x for x in filenames if validator(x)]
+        else:
+            proj_files_found[path][''] = [x for x in filenames if validator(x)]
+    return proj_files_found
