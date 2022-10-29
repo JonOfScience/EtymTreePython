@@ -85,9 +85,9 @@ def id_project_files_in(file_location: str, validator: Callable) -> Sequence:
     logger = logging.getLogger('etym_logger')
     proj_files_found = {}
     for path, dirnames, filenames in os.walk(file_location):
-        logger.debug(f"Path     : {path}")
-        logger.debug(f"Dirnames : {dirnames}")
-        logger.debug(f"Filenames: {filenames}")
+        logger.debug("Path     : %s", path)
+        logger.debug("Dirnames : %s", dirnames)
+        logger.debug("Filenames: %s", filenames)
         proj_files_found[path] = {}
         if dirnames:
             for dirname in dirnames:

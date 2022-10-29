@@ -11,6 +11,7 @@ class ProjectBuilder:
     """Returns Project instances if provided with valid Project data file locations."""
     @staticmethod
     def projects_from_files(location_tree: dict):
+        """Given a directory structure as a nested dictionary will return Project instances"""
         proj_files_found = {}
         for (path, directory_data) in location_tree.items():
             for (directory_name, file_names) in directory_data.items():
@@ -22,8 +23,9 @@ class ProjectBuilder:
 
     @staticmethod
     def project_from_file(file_location: str) -> Project:
+        """Given a Project file path will return an instance of that Project"""
         # REFACTOR - Knows about JSON
-        with open(file_location, 'r') as proj_file:
+        with open(file_location, 'r', encoding='UTF-8') as proj_file:
             proj_data = json.load(proj_file)
         return Project(proj_data)
 

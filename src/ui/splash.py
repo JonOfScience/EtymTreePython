@@ -76,13 +76,13 @@ class SplashWindow(QWidget):
     def _populate_past_projects(self):
         def _temp_validator(filename: str):
             project_file_prefix: str = self._configuration.find_by_id("ProjectFilePrefix")
-            self._logger.debug(f"Project File Prefix in Use: {project_file_prefix}")
-            self._logger.debug(f"Possible Project File     : {filename}")
+            self._logger.debug("Project File Prefix in Use: %s", project_file_prefix)
+            self._logger.debug("Possible Project File     : %s", filename)
             return filename.startswith(project_file_prefix)
         all_files = id_project_files_in("./data/", _temp_validator)
-        self._logger.info(f"All Files: {all_files}")
+        self._logger.info("All Files: %s", all_files)
         projects = ProjectBuilder.projects_from_files(all_files)
-        self._logger.info(f"Projects Reconstructed: {projects}")
+        self._logger.info("Projects Reconstructed: %s", projects)
         if projects:
             pp_model: QStandardItemModel = self._past_projects.model()
             pp_model.clear()
