@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QWidget)
 
 from core.core import ProjectStatus
-from core.project import Project
+from core.project import Project, ProjectBuilder
 from core.lexicon import Lexicon, Word
 # Replace this with an interface
 from configuration.settings import Settings
@@ -162,6 +162,7 @@ class ProjectWindow(QWidget):
 
     def _window_launch(self, project_status: ProjectStatus):
         _behaviour_refs = {
+            ProjectStatus.LOADING: self._load_existing_project,
             ProjectStatus.NEW: self._create_new_project
         }
         _behaviour_refs[project_status]()
@@ -183,3 +184,10 @@ class ProjectWindow(QWidget):
         new_lexicon = new_project.find_lexicon_by_id(new_project.list_lexicons()[0].uuid)
         self.options.set_option_to("CurrentProject", new_project)
         self.options.set_option_to("CurrentLexicon", new_lexicon)
+
+    def _load_existing_project(self):
+        self.options.set_option_to("ProjectStatus", ProjectStatus.SAVED)
+        loaded_project = ProjectBuilder.project_from_file(
+            self.options.find_by_id("CurrentProjectFile"))
+        self.options.set_option_to("CurrentProject", loaded_project)
+        self.options.set_option_to("CurrentLexicon", loaded_project.list_lexicons()[0])

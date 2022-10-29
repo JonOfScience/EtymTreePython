@@ -10,7 +10,7 @@ class TestGivenANewSplashWindow:
     """Tests for a newly instantiated window"""
     def test_it_has_an_attribute_called_options(self, qtbot):
         """Each window should have an options property on instantiation"""
-        new_window = SplashWindow(Settings())
+        new_window = SplashWindow(Settings({"ProjectFilePrefix": "TEST-"}))
         qtbot.addWidget(new_window)
         assert hasattr(new_window, "options")
 
@@ -19,7 +19,7 @@ class TestGivenAnEmptyProjectsListInASplashWindow:
     """Example cases for unpopulated Project lists"""
     def test_bork(self, qtbot):
         """1_2_1 - When there are no existing projects, display 'No Projects Available'"""
-        new_window = SplashWindow(Settings())
+        new_window = SplashWindow(Settings({"ProjectFilePrefix": "TEST-"}))
         qtbot.addWidget(new_window)
         project_list: QListView = new_window.findChild(QListView, "past_projects")
         project_index: QModelIndex = project_list.model().index(0, 0)
