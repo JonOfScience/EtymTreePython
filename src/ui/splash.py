@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 
 # Replace this with an interface
 from core.core import ProjectStatus, id_project_files_in
-from core.project import ProjectBuilder
+from core.project import ProjectBuilder, Project
 from configuration.settings import Settings
 from ui.interfaces import EtymWindow
 
@@ -38,6 +38,8 @@ class SplashWindow(QWidget):
         past_projects_model.appendRow(QStandardItem("No Projects Available"))
         self._past_projects = past_projects
         layout.addWidget(past_projects)
+        self._selected_project: Project = None
+        past_projects.clicked.connect(self._click_on_project_in_list)
 
         options_buttons = QVBoxLayout()
         layout.addLayout(options_buttons)
@@ -56,6 +58,11 @@ class SplashWindow(QWidget):
         self.setLayout(layout)
         self._populate_past_projects()
 
+    def _click_on_project_in_list(self, item):
+        projects_model: QStandardItemModel = self._past_projects.model()
+        project_item = projects_model.itemFromIndex(item)
+        self._selected_project = project_item.data()
+
     def _click_on_new_project(self):
         project_overview_window: EtymWindow = self._configuration.find_by_id("MainWindow")
         project_overview_window.options.set_option_to("ProjectStatus", ProjectStatus.NEW)
@@ -64,14 +71,18 @@ class SplashWindow(QWidget):
         self.close()
 
     def _click_on_open_project(self):
-        project_overview_window: EtymWindow = self._configuration.find_by_id("MainWindow")
-        project_overview_window.options.set_option_to("ProjectStatus", ProjectStatus.LOADING)
-        project_overview_window.options.set_option_to(
-            "CurrentProjectFile",
-            "./data/PROJ-ANewProjectFile.data")
-        project_overview_window.options.set_option_to("IsLaunching", True)
-        project_overview_window.showMaximized()
-        self.close()
+        if self._selected_project:
+            project_overview_window: EtymWindow = self._configuration.find_by_id("MainWindow")
+            project_overview_window.options.set_option_to("ProjectStatus", ProjectStatus.LOADING)
+            this_project = self._selected_project
+            project_overview_window.options.set_option_to(
+                "CurrentProjectFile",
+                f"./data/PROJ-{this_project.filename}.data")
+            project_overview_window.options.set_option_to("IsLaunching", True)
+            project_overview_window.showMaximized()
+            self.close()
+        else:
+            print("ERROR: No Project File Is Selected")
 
     def _populate_past_projects(self):
         def _temp_validator(filename: str):
