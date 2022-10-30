@@ -50,7 +50,7 @@ class ProjectWindow(QWidget):
         _tree_overview.clicked.connect(
             self._tree_overview_selection_changed)
         # self._tree_overview.doubleClicked.connect(self._tree_overview_double_clicked)
-        _tree_model = QStandardItemModel()
+        _tree_model = QStandardItemModel(_tree_overview)
         _tree_overview.setModel(_tree_model)
         tree_layout.addWidget(_tree_overview)
 
@@ -120,10 +120,14 @@ class ProjectWindow(QWidget):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
         _tree_model.clear()
+        _tree_overview.setHeaderHidden(True)
+        root = _tree_model.invisibleRootItem()
         for word in lexicon.members:
             new_item = QStandardItem(lexicon.get_field_for_word("Translated Word", word))
             new_item.setData(word)
-            _tree_model.appendRow(new_item)
+            root.appendRow(new_item)
+        _tree_overview.expandAll()
+        _tree_model.sort(0)
 
     def _word_details_table_update(self):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
