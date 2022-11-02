@@ -94,7 +94,7 @@ class ProjectWindow(QWidget):
         details_model.itemChanged.connect(self._details_model_data_changed)
         # COL INFO CONTAINS TYPE OF COLUMN
         # "Translated Word": ColType.FIELD  ->  A field of the Word object
-        # "Translated Word Component Status": ColType.INVIEW  ->  Calculated in the view (store a function?)
+        # "Translated Word Component Status": ColType.INVIEW  ->  Calculated in the view (a fn?)
         self._col_info = {
             "Translated Word": None,
             "Translated Word Components": None,
