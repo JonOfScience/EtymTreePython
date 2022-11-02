@@ -31,6 +31,10 @@ class ProjectUIController:
         excluded: default value [' ']
         separator: default value '+'
         """
+        if excluded is None:
+            excluded = [' ']
+        if not target:
+            return []
         target = target.lower()
         for character in excluded:
             target = target.replace(character, '')
@@ -56,7 +60,7 @@ class ProjectWindow(QWidget):
         self._selected_item = None
         self._selected_node = None
 
-        self._translated_component_mapping = None
+        self._translated_component_mapping = {}
 
         layout = QHBoxLayout()
         layout = self._add_tree_overview(layout)
@@ -88,6 +92,9 @@ class ProjectWindow(QWidget):
         details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
         details_model: QStandardItemModel = details_table.model()
         details_model.itemChanged.connect(self._details_model_data_changed)
+        # COL INFO CONTAINS TYPE OF COLUMN
+        # "Translated Word": ColType.FIELD  ->  A field of the Word object
+        # "Translated Word Component Status": ColType.INVIEW  ->  Calculated in the view (store a function?)
         self._col_info = {
             "Translated Word": None,
             "Translated Word Components": None,
@@ -133,6 +140,8 @@ class ProjectWindow(QWidget):
         this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         this_lexicon.set_field_to_value(field_label, associated_word, item.text())
         this_project.store()
+        if field_label == "Translated Word":
+            self._build_translated_component_mappings()
         if field_label == "Translated Word Components":
             self._translated_component_mapping = ProjectUIController.update_component_mapping(
                 mapping=self._translated_component_mapping,
@@ -140,21 +149,27 @@ class ProjectWindow(QWidget):
                 components=ProjectUIController.clean_and_split_string(target=item.text()))
 
         self._word_details_table_update()
-        self._tree_overview_update(this_lexicon)
+        self._tree_overview_update()
 
     def _new_word_clicked(self):
         lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         lexicon.create_entry()
+        self._build_translated_component_mappings()
         self._window_update()
 
-    def _tree_overview_update(self, lexicon: Lexicon):
+    def _tree_overview_update(self, lexicon: Lexicon = None):
+        if lexicon is None:
+            lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
         _tree_model.clear()
         _tree_overview.setHeaderHidden(True)
         root = _tree_model.invisibleRootItem()
         for word in lexicon.members:
-            new_item = QStandardItem(lexicon.get_field_for_word("Translated Word", word))
+            translated_word = lexicon.get_field_for_word("Translated Word", word)
+            word_components = self._translated_component_mapping[translated_word]
+            display_text = f"{translated_word} [{', '.join(word_components)}]"
+            new_item = QStandardItem(display_text)
             new_item.setData(word)
             root.appendRow(new_item)
         _tree_overview.expandAll()
@@ -195,12 +210,28 @@ class ProjectWindow(QWidget):
                 self._window_launch(self.options.find_by_id("ProjectStatus"))
                 self._window_update()
 
+    def _build_translated_component_mappings(self):
+        this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+        all_words = this_lexicon.get_all_words()
+        for word in all_words:
+            translated_word = this_lexicon.get_field_for_word("Translated Word", word)
+            translated_components = this_lexicon.get_field_for_word(
+                "Translated Word Components",
+                word)
+            components = ProjectUIController.clean_and_split_string(translated_components)
+            self._translated_component_mapping = ProjectUIController.update_component_mapping(
+                mapping=self._translated_component_mapping,
+                component_id=translated_word,
+                components=components)
+
     def _window_launch(self, project_status: ProjectStatus):
         _behaviour_refs = {
             ProjectStatus.LOADING: self._load_existing_project,
             ProjectStatus.NEW: self._create_new_project
         }
         _behaviour_refs[project_status]()
+
+        self._build_translated_component_mappings()
 
     def _window_update(self):
         project_title = "Undefined"

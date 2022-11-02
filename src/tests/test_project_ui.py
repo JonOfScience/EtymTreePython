@@ -30,6 +30,14 @@ class TestAProjectUIControllerShould:
             excluded=[' '],
             separator='+')
         assert components == ["test", "multiple", "fragments"]
+    
+    def test_return_an_empty_list_if_translated_word_components_is_none(self):
+        """For root words and new words translated word components will be none or empty"""
+        components = ProjectUIController.clean_and_split_string(
+            target=None,
+            excluded=[' '],
+            separator='+')
+        assert components == []
 
     def test_update_component_mappings(self):
         """Only existing components should be found"""
