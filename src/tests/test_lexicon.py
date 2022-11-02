@@ -101,6 +101,22 @@ class TestAPopulatedLexiconShould:
         assert first_new_word in new_lexicon.get_all_words()
         assert second_new_word in new_lexicon.get_all_words()
 
+    def test_retrieve_a_word_that_exists(self):
+        """Placeholder: State Test"""
+        lexicon = Lexicon()
+        new_word = Word()
+        new_word.set_field_to("translated_word", "ATestWord")
+        lexicon.add_entry(new_word)
+        retrieved_word = lexicon.retrieve("ATestWord")
+        assert new_word == retrieved_word
+
+    def test_return_none_for_a_word_that_doesnt_exist(self):
+        """Placeholder: State Test"""
+        lexicon = Lexicon()
+        new_word = Word()
+        lexicon.add_entry(new_word)
+        assert lexicon.retrieve("NotAValidEntry") is None
+
     def test__lex_cwd_00__accurately_retrieve_the_data_of_all_words_for_export(self):
         """Placeholder: State Test"""
         new_lexicon = Lexicon()

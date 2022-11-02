@@ -34,6 +34,8 @@ class Word:
             for (key, value) in self._data.items():
                 if value != __o.find_data_on(key):
                     return False
+        else:
+            return False
         return True
 
     def find_data_on(self, field_name: str) -> Union[Any, ValueError]:
@@ -69,6 +71,10 @@ class Lexicon:
             self.index_by_translated_word[self.get_field_for_word(
                 "translated word",
                 word=word)] = word
+
+    def retrieve(self, entry_id: str):
+        """Returns a Word with identifier entry_id if it has been registered. Otherwise None."""
+        return self.index_by_translated_word.get(entry_id)
 
     def get_all_words(self) -> Sequence[Word]:
         """List all Words currently registered in the Lexicon"""
