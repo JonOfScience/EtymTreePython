@@ -30,6 +30,26 @@ class TestAnEmptyWordShould:
         for (fieldname, fieldvalue) in init_data.items():
             assert word.find_data_on(fieldname) == fieldvalue
 
+    def test_return_true_when_validating_symbology_with_correct_characters(self):
+        """Return - True if the string only contains alphanumeric characters and '|', ']', '['."""
+        assert Word().validate_for_field(
+            "etymological_symbology",
+            "abcdefghijklmnopqrstuvwxyz|[]")
+
+    def test_return_false_when_validating_symbology_including_invalid_characters(self):
+        """Return - False if the string contains non-alphanumeric or non delimeters."""
+        invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
+        for test_character in invalid_characters:
+            assert not Word().validate_for_field(
+                "etymological_symbology",
+                f"abcdef{test_character}")
+
+    def test_return_none_when_validating_for_an_extant_field_with_no_validator(self):
+        """Return - None if the field has no validator."""
+        assert Word().validate_for_field(
+            field_name="translated_word",
+            to_validate="abcde") is None
+
 
 class TestAPopulatedWordShould:
     """Test operations for a Word with populated fields"""
@@ -87,6 +107,26 @@ class TestAnEmptyLexiconShould:
         new_word = Word()
         new_lexicon.add_entry(new_word)
         assert new_lexicon.get_all_words() == [new_word]
+
+    def test_return_true_when_validating_symbology_with_correct_characters(self):
+        """Return - True if the string only contains allowed characters for a Word."""
+        assert Lexicon().validate_for_word_field(
+            "etymological_symbology",
+            "abcdefghijklmnopqrstuvwxyz|[]")
+
+    def test_return_false_when_validating_symbology_including_invalid_characters(self):
+        """Return - False if the string contains non-alphanumeric or non delimeters."""
+        invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
+        for test_character in invalid_characters:
+            assert not Lexicon().validate_for_word_field(
+                "etymological_symbology",
+                f"abcdef{test_character}")
+
+    def test_return_none_when_validating_for_an_extant_word_field_with_no_validator(self):
+        """Return - None if the field has no validator."""
+        assert Lexicon().validate_for_word_field(
+            field_name="translated_word",
+            to_validate="abcde") is None
 
 
 class TestAPopulatedLexiconShould:
