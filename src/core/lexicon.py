@@ -10,6 +10,9 @@ from core.core import DataFormat, new_garbage_string
 
 class Word:
     """Smallest element of a Lexicon. A single translated word."""
+    _validators = {
+        "etymological_symbology": 'abcdefghijklmnopqrstuvwxyz|[]'
+    }
     def __init__(self, merge_data: dict = None) -> None:
         self._data = {
             "translated_word": new_garbage_string(),
@@ -46,7 +49,20 @@ class Word:
 
     def set_field_to(self, field_name: str, new_value: Any) -> None:
         """Sets data for field_name to new_value"""
+        if isinstance(new_garbage_string, str):
+            if self.validate_for_field(field_name=field_name, to_validate=new_value) is False:
+                print("Word: Error - Field cannot be set to invalid value.")
+                return
         self._data[field_name] = new_value
+
+    def validate_for_field(self, field_name: str, to_validate: str):
+        """Returns True if characters in to_validate are valid for field_name.
+            Otherwise returns False."""
+        if field_name not in Word._validators:
+            return None
+        acceptable = set(Word._validators[field_name])
+        characters = set(to_validate.lower())
+        return characters.issubset(acceptable)
 
     def data_for_export(self) -> dict:
         """Surfaces stored data for export"""
@@ -107,6 +123,12 @@ class Lexicon:
             word: Word = self.index_by_translated_word[word]
         this_field = self._map_label_to_field(field)
         return word.find_data_on(this_field)
+
+    def validate_for_word_field(self, field_name: str, to_validate: str):
+        """Returns True if Word validates to_validate"""
+        return Word().validate_for_field(
+            field_name=field_name,
+            to_validate=to_validate)
 
     def set_field_to_value(self, field: str, word: Union[Word, str], new_value: Any):
         """Set the value of the specified field for a supplied word"""
