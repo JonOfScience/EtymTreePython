@@ -30,25 +30,37 @@ class TestAnEmptyWordShould:
         for (fieldname, fieldvalue) in init_data.items():
             assert word.find_data_on(fieldname) == fieldvalue
 
-    def test_return_true_when_validating_symbology_with_correct_characters(self):
-        """Return - True if the string only contains alphanumeric characters and '|', ']', '['."""
-        assert Word().validate_for_field(
-            "etymological_symbology",
-            "abcdefghijklmnopqrstuvwxyz|[]")
-
-    def test_return_false_when_validating_symbology_including_invalid_characters(self):
-        """Return - False if the string contains non-alphanumeric or non delimeters."""
-        invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
-        for test_character in invalid_characters:
-            assert not Word().validate_for_field(
-                "etymological_symbology",
-                f"abcdef{test_character}")
-
     def test_return_none_when_validating_for_an_extant_field_with_no_validator(self):
         """Return - None if the field has no validator."""
         assert Word().validate_for_field(
             field_name="translated_word",
             to_validate="abcde") is None
+
+
+class TestAnEmptyWordValidatingFieldsShould:
+    """Test operations for an empty Word when validating field changes"""
+    def test_return_true_for_with_correct_characters_and_groups(self):
+        """Return - True if the string only contains alphanumeric characters and '|', ']', '['."""
+        assert Word().validate_for_field(
+            "etymological_symbology",
+            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|st|tu|th|v|w|x|y|z[]")
+        # TH WILL FAIL
+
+    def test_return_false_including_invalid_characters_in_valid_groups(self):
+        """Return - False if the string contains non-alphanumeric or non delimeters."""
+        invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
+        for test_character in invalid_characters:
+            assert Word().validate_for_field(
+                "etymological_symbology",
+                f"|aba|d{test_character}|") is False
+
+    def test_return_false_including_valid_characters_in_invalid_groups(self):
+        """Return - False if the string contains invalid group structures"""
+        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'aab', 'aaba', 'aabaa', 'bc']
+        for test_group in invalid_groups:
+            assert Word().validate_for_field(
+                field_name="etymological_symbology",
+                to_validate=f"|{test_group}|") is False
 
 
 class TestAPopulatedWordShould:
@@ -112,15 +124,23 @@ class TestAnEmptyLexiconShould:
         """Return - True if the string only contains allowed characters for a Word."""
         assert Lexicon().validate_for_word_field(
             "etymological_symbology",
-            "abcdefghijklmnopqrstuvwxyz|[]")
+            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|st|tu|th|v|w|x|y|z[]")
 
-    def test_return_false_when_validating_symbology_including_invalid_characters(self):
+    def test_return_false_when_validating_symbology_with_invalid_characters_in_valid_groups(self):
         """Return - False if the string contains non-alphanumeric or non delimeters."""
         invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
         for test_character in invalid_characters:
             assert not Lexicon().validate_for_word_field(
                 "etymological_symbology",
-                f"abcdef{test_character}")
+                f"|aba|d{test_character}|")
+
+    def test_return_false_including_valid_characters_in_invalid_groups(self):
+        """Return - False if the string contains invalid group structures"""
+        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'aab', 'aaba', 'aabaa', 'bc']
+        for test_group in invalid_groups:
+            assert Lexicon().validate_for_word_field(
+                field_name="etymological_symbology",
+                to_validate=f"|{test_group}|") is False
 
     def test_return_none_when_validating_for_an_extant_word_field_with_no_validator(self):
         """Return - None if the field has no validator."""
