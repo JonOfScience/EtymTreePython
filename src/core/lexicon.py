@@ -1,6 +1,7 @@
 """Library for Word and Lexicon level functionality."""
 from __future__ import annotations
 import uuid
+import re
 from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
@@ -10,9 +11,34 @@ from core.core import DataFormat, new_garbage_string
 
 class Word:
     """Smallest element of a Lexicon. A single translated word."""
-    _validators = {
-        "etymological_symbology": 'abcdefghijklmnopqrstuvwxyz|[]'
-    }
+    @staticmethod
+    def _split_string_into_groups(to_split: str):
+        # Split to_validate into groups
+        delimiter_processing_order = ['|', '][', '[', ']']
+        string_set = [to_split]
+        new_string_set = []
+        for delimeter in delimiter_processing_order:
+            for element in string_set:
+                new_string_set.extend(element.split(sep=delimeter))
+            string_set = new_string_set.copy()
+            new_string_set.clear()
+        return string_set
+
+    @staticmethod
+    def _structure_validator_etymological_symbology(to_validate: str):
+        string_set = Word._split_string_into_groups(to_validate)
+        # Check groups for non-conformity
+        for group in [x for x in string_set if x]:
+            single_consonants = re.match("^[aeiou]?[bcdfghjklmnpqrstvwxyz]{1}[aeiou]?$", group)
+            double_consonants = re.match("(^[aeiou]?(th|st){1}[aeiou]?$)", group)
+            if single_consonants is None and double_consonants is None:
+                return False
+        return True
+
+    _character_validators = {
+        "etymological_symbology": 'abcdefghijklmnopqrstuvwxyz|[]'}
+    _structure_validators = {
+        "etymological_symbology": _structure_validator_etymological_symbology}
     def __init__(self, merge_data: dict = None) -> None:
         self._data = {
             "translated_word": new_garbage_string(),
@@ -55,14 +81,28 @@ class Word:
                 return
         self._data[field_name] = new_value
 
+    def _validate_characters_for_field(self, field_name: str, to_validate: str):
+        if field_name not in Word._character_validators:
+            return None
+        acceptable_chars = set(Word._character_validators[field_name])
+        characters = set(to_validate.lower())
+        return characters.issubset(acceptable_chars)
+
+    def _validate_structure_for_field(self, field_name: str, to_validate: str):
+        return Word._structure_validators[field_name](to_validate)
+        # return True
+
     def validate_for_field(self, field_name: str, to_validate: str):
         """Returns True if characters in to_validate are valid for field_name.
             Otherwise returns False."""
-        if field_name not in Word._validators:
-            return None
-        acceptable = set(Word._validators[field_name])
-        characters = set(to_validate.lower())
-        return characters.issubset(acceptable)
+        validation_pipeline = [
+            self._validate_characters_for_field,
+            self._validate_structure_for_field]
+        for validation_stage in validation_pipeline:
+            stage_result = validation_stage(field_name, to_validate)
+            if stage_result is not True:
+                return stage_result
+        return True
 
     def data_for_export(self) -> dict:
         """Surfaces stored data for export"""
