@@ -40,10 +40,10 @@ class TestAnEmptyWordValidatingFieldsShould:
     """Test operations for an empty Word when validating field changes"""
     def test_return_true_for_with_correct_characters_and_groups(self):
         """Return - True if the string only contains alphanumeric characters and '|', ']', '['."""
-        assert Word().validate_for_field(
+        result = Word().validate_for_field(
             "etymological_symbology",
-            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|st|tu|th|v|w|x|y|z[]")
-        # TH WILL FAIL
+            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z[]")
+        assert result
 
     def test_return_false_including_invalid_characters_in_valid_groups(self):
         """Return - False if the string contains non-alphanumeric or non delimeters."""
@@ -60,6 +60,26 @@ class TestAnEmptyWordValidatingFieldsShould:
             assert Word().validate_for_field(
                 field_name="etymological_symbology",
                 to_validate=f"|{test_group}|") is False
+
+
+class TestModifyingFieldsShould:
+    """Test operations for an empty Word with linked changes when changing field values"""
+    def test__setting_a_field_successfully_sets_the_change_flag_to_true(self):
+        """Flag value is true and has changed after being successfully set"""
+        new_word = Word()
+        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
+        new_word.set_field_to("etymological_symbology", "|abu|da|")
+        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        assert status_after != status_before
+        assert status_after
+
+    def test__setting_a_field_unsuccessfully_does_not_change_the_flag(self):
+        """Flag value is true and has changed after being successfully set"""
+        new_word = Word()
+        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
+        new_word.set_field_to("etymological_symbology", "|abu!da|")
+        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        assert status_after == status_before
 
 
 class TestAPopulatedWordShould:
