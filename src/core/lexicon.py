@@ -30,7 +30,7 @@ class Word:
         # Check groups for non-conformity
         for group in [x for x in string_set if x]:
             single_consonants = re.match("^[aeiou]?[bcdfghjklmnpqrstvwxyz]{1}[aeiou]?$", group)
-            double_consonants = re.match("(^[aeiou]?(th|st){1}[aeiou]?$)", group)
+            double_consonants = re.match("(^[aeiou]?(th|sh){1}[aeiou]?$)", group)
             if single_consonants is None and double_consonants is None:
                 return False
         return True
@@ -75,7 +75,7 @@ class Word:
 
     def set_field_to(self, field_name: str, new_value: Any) -> None:
         """Sets data for field_name to new_value"""
-        if isinstance(new_garbage_string, str):
+        if isinstance(new_value, str):
             if self.validate_for_field(field_name=field_name, to_validate=new_value) is False:
                 print("Word: Error - Field cannot be set to invalid value.")
                 return

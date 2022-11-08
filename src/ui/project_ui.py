@@ -147,6 +147,8 @@ class ProjectWindow(QWidget):
                 mapping=self._translated_component_mapping,
                 component_id=this_lexicon.get_field_for_word("Translated Word", associated_word),
                 components=ProjectUIController.clean_and_split_string(target=item.text()))
+        if field_label == "Etymological Symbology":
+            item.setText(this_lexicon.get_field_for_word("Etymological Symbology", associated_word))
 
         self._word_details_table_update()
         self._tree_overview_update()
