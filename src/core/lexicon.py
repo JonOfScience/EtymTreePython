@@ -80,6 +80,7 @@ class Word:
                 print("Word: Error - Field cannot be set to invalid value.")
                 return
         self._data[field_name] = new_value
+        self._data["has_been_modified_since_last_resolve"] = True
 
     def _validate_characters_for_field(self, field_name: str, to_validate: str):
         if field_name not in Word._character_validators:

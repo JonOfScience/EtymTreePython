@@ -44,7 +44,7 @@ class TestAnEmptyLexiconShould:
         """Return - True if the string only contains allowed characters for a Word."""
         assert Lexicon().validate_for_word_field(
             "etymological_symbology",
-            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|st|tu|th|v|w|x|y|z[]")
+            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z[]")
 
     def test_return_false_when_validating_symbology_with_invalid_characters_in_valid_groups(self):
         """Return - False if the string contains non-alphanumeric or non delimeters."""
@@ -67,6 +67,30 @@ class TestAnEmptyLexiconShould:
         assert Lexicon().validate_for_word_field(
             field_name="translated_word",
             to_validate="abcde") is None
+
+
+class TestModifyingWordFieldsShould:
+    """Test operations for a Lexicon and the linked changes when changing field values"""
+    def test__setting_a_field_successfully_sets_the_word_change_flag_to_true(self):
+        """Flag value is true and has changed after being successfully set"""
+        new_lexicon = Lexicon()
+        new_word = Word()
+        new_lexicon.add_entry(new_word)
+        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
+        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu|da|")
+        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        assert status_after != status_before
+        assert status_after
+
+    def test__setting_a_field_unsuccessfully_does_not_change_the_word_flag(self):
+        """Flag value is true and has changed after being successfully set"""
+        new_lexicon = Lexicon()
+        new_word = Word()
+        new_lexicon.add_entry(new_word)
+        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
+        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu!da|")
+        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        assert status_after == status_before
 
 
 class TestAPopulatedLexiconShould:
