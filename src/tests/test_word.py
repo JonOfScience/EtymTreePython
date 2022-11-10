@@ -81,6 +81,33 @@ class TestModifyingFieldsShould:
         status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
         assert status_after == status_before
 
+    def test__setting_a_field_successfully_adds_to_the_version_history(self):
+        """Version History is longer after a field is successfully set"""
+        new_word = Word()
+        history_before = new_word.find_data_on("version_history")
+        new_word.set_field_to("etymological_symbology", "|abu|da|")
+        history_after = new_word.find_data_on("version_history")
+        assert len(history_before) < len(history_after)
+
+    def test__setting_a_field_twice_adds_to_the_version_history_each_time(self):
+        """Version History is longer after a field is successfully set"""
+        new_word = Word()
+        original_history = new_word.find_data_on("version_history")[:]
+        new_word.set_field_to("etymological_symbology", "|abu|da|")
+        history_first = new_word.find_data_on("version_history")[:]
+        new_word.set_field_to("etymological_symbology", "|ice|fu|")
+        history_second = new_word.find_data_on("version_history")[:]
+        assert len(original_history) < len(history_first)
+        assert len(history_first) < len(history_second)
+
+    def test__setting_a_field_unsuccessfully_does_not_add_to_the_version_history(self):
+        """Version History is the same length after a field is unsuccessfully set"""
+        new_word = Word()
+        history_before = new_word.find_data_on("version_history")
+        new_word.set_field_to("etymological_symbology", "|abu!da|")
+        history_after = new_word.find_data_on("version_history")
+        assert history_before == history_after
+
 
 class TestAPopulatedWordShould:
     """Test operations for a Word with populated fields"""

@@ -198,10 +198,12 @@ class ProjectWindow(QWidget):
         if self._selected_node:
             this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
             for idx, (col_title, _) in enumerate(self._col_info.items()):
-                item_string = this_lexicon.get_field_for_word(
+                item_data = this_lexicon.get_field_for_word(
                     col_title,
                     self._selected_node)
-                new_item = QStandardItem(item_string)
+                if isinstance(item_data, list):
+                    item_data = "\n".join(item_data)
+                new_item = QStandardItem(item_data)
                 new_item.setData(self._selected_node)
                 word_details_model.setItem(idx, 0, new_item)
 

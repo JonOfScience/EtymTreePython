@@ -92,6 +92,26 @@ class TestModifyingWordFieldsShould:
         status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
         assert status_after == status_before
 
+    def test__setting_a_field_successfully_adds_to_the_version_history(self):
+        """Version History is longer after a field is successfully set"""
+        new_lexicon = Lexicon()
+        new_word = Word()
+        new_lexicon.add_entry(new_word)
+        history_before = new_word.find_data_on("version_history")
+        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu|da|")
+        history_after = new_word.find_data_on("version_history")
+        assert len(history_before) < len(history_after)
+
+    def test__setting_a_field_unsuccessfully_does_not_add_to_the_version_history(self):
+        """Version History is the same length after a field is unsuccessfully set"""
+        new_lexicon = Lexicon()
+        new_word = Word()
+        new_lexicon.add_entry(new_word)
+        history_before = new_word.find_data_on("version_history")
+        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu!da|")
+        history_after = new_word.find_data_on("version_history")
+        assert history_before == history_after
+
 
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
