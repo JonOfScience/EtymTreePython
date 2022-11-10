@@ -51,7 +51,7 @@ class Word:
             "symbol_pattern_selected": None,
             "rules_applied": None,
             "in_language_word": None,
-            "version_history": None,
+            "version_history": [],
             "has_been_modified_since_last_resolve": None,  # "Ripple" resolution
             "has_modified_ancestor": None}
         if merge_data is not None:
@@ -75,12 +75,24 @@ class Word:
 
     def set_field_to(self, field_name: str, new_value: Any) -> None:
         """Sets data for field_name to new_value"""
+        if self._data[field_name] == new_value:
+            return
+        if field_name == "version_history":
+            return
         if isinstance(new_value, str):
             if self.validate_for_field(field_name=field_name, to_validate=new_value) is False:
                 print("Word: Error - Field cannot be set to invalid value.")
                 return
+        old_value = self._data[field_name]
         self._data[field_name] = new_value
         self._data["has_been_modified_since_last_resolve"] = True
+        self._add_version_history_entry(field_name, old_value, new_value)
+
+    def _add_version_history_entry(self, field_name: str, old_value: Any, new_value: Any):
+        if not self._data["version_history"]:
+            self._data["version_history"] = []
+        log_entry = f"{field_name} FROM {old_value} TO {new_value}"
+        self._data["version_history"].append(log_entry)
 
     def _validate_characters_for_field(self, field_name: str, to_validate: str):
         if field_name not in Word._character_validators:
