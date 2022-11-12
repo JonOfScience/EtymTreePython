@@ -1,7 +1,7 @@
 """Project screen showing project overview"""
 from typing import Sequence
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QBrush, QColor
 from PyQt5.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
@@ -61,6 +61,15 @@ class ProjectWindow(QWidget):
         self._selected_node = None
 
         self._translated_component_mapping = {}
+
+        modified_status_colours = {
+            True: QBrush(QColor(255, 0, 0)),
+            False: QBrush(QColor(255, 255, 255))}
+        ancestor_status_colours = {
+            True: QBrush(QColor(243, 207, 198)),
+            False: QBrush(QColor(255, 255, 255))}
+        self.options.set_option_to("ModStatusColours", modified_status_colours)
+        self.options.set_option_to("AncStatusColours", ancestor_status_colours)
 
         layout = QHBoxLayout()
         layout = self._add_tree_overview(layout)
@@ -172,6 +181,18 @@ class ProjectWindow(QWidget):
             word_components = self._translated_component_mapping[translated_word]
             display_text = f"{translated_word} [{', '.join(word_components)}]"
             new_item = QStandardItem(display_text)
+            modified_status = lexicon.get_field_for_word(
+                "Has Been Modified Since Last Resolve",
+                word)
+            foreground_colour = self.options.find_by_id("ModStatusColours").get(modified_status)
+            if foreground_colour is not None:
+                new_item.setForeground(foreground_colour)
+            ancestor_status = lexicon.get_field_for_word(
+                "Has Modified Ancestor",
+                word)
+            background_colour = self.options.find_by_id("AncStatusColours").get(ancestor_status)
+            if background_colour is not None:
+                new_item.setBackground(background_colour)
             new_item.setData(word)
             root.appendRow(new_item)
         _tree_overview.expandAll()
