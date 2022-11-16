@@ -1,5 +1,6 @@
 """Library for Word and Lexicon level functionality."""
 from __future__ import annotations
+from enum import Enum
 import uuid
 import re
 from typing import Any, Union
@@ -40,6 +41,24 @@ class Word:
     _structure_validators = {
         "etymological_symbology": _structure_validator_etymological_symbology}
     def __init__(self, merge_data: dict = None) -> None:
+        class Field(Enum):
+            """External constant mapping to internal structure"""
+            TRANSLATEDWORD = "translated_word"
+            TRANSLATEDCOMPONENTS = "translated_word_components"
+            INLANGUAGECOMPONENTS = "in_language_components"
+            ETYMOLOGICALSYMBOLOGY = "etymological_symbology"
+            COMPILEDSYMBOLOGY = "compiled_symbology"
+            SYMBOLMAPPING = "symbol_mapping"
+            SYMBOLSELECTION = "symbol_selection"
+            SYMBOLPATTERNSELECTED = "symbol_pattern_selected"
+            RULESAPPLIED = "rules_applied"
+            INLANGUAGEWORD = "in_language_word"
+            VERSIONHISTORY = "version_history"
+            HASBEENMODIFIED = "has_been_modified_since_last_resolve"
+            HASMODIFIEDANCESTOR = "has_modified_ancestor"
+
+        self.fields = Field
+
         self._data = {
             "translated_word": new_garbage_string(),
             "translated_word_components": None,
@@ -103,7 +122,6 @@ class Word:
 
     def _validate_structure_for_field(self, field_name: str, to_validate: str):
         return Word._structure_validators[field_name](to_validate)
-        # return True
 
     def validate_for_field(self, field_name: str, to_validate: str):
         """Returns True if characters in to_validate are valid for field_name.
@@ -176,6 +194,16 @@ class Lexicon:
             word: Word = self.index_by_translated_word[word]
         this_field = self._map_label_to_field(field)
         return word.find_data_on(this_field)
+
+    def get_parents_of_word(self, word: Word) -> Sequence[Word]:
+        """Return the Word objects for any extant Translated Word Components"""
+        parent_items = self.get_field_for_word("translated_word_components", word)
+        if parent_items is None:
+            return []
+        return [self.index_by_translated_word.get(x)
+                for x
+                in parent_items
+                if self.index_by_translated_word.get(x) is not None]
 
     def validate_for_word_field(self, field_name: str, to_validate: str):
         """Returns True if Word validates to_validate"""
