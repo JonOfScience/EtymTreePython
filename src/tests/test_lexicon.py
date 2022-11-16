@@ -145,6 +145,64 @@ class TestRetrievingWordParentsShould:
         assert test_lexicon.get_parents_of_word(child) == [parent]
 
 
+class TestCheckingWordParentsShould:
+    """Test operations for a Lexicon and cases (un)modified, and ancestor modified parent Words"""
+    def test__return_false_if_word_has_no_parents(self):
+        """State Test"""
+        test_lexicon = Lexicon()
+        child = Word()
+        test_lexicon.add_entry(child)
+        assert test_lexicon.determine_ancestor_modification_for(child) is False
+
+    @pytest.mark.parametrize(
+        ["parent_modified", "parent_ancestor", "expected_result"], [
+            (None, None, False),
+            (True, None, True),
+            (None, True, True),
+            (True, True, True)])
+    def test__return_true_if_any_flag_on_parent_is_true(self,
+            parent_modified,
+            parent_ancestor,
+            expected_result):
+        """Is only false if both flags on its parent is false"""
+        test_lexicon = Lexicon()
+        parent = Word({"translated_word": "Parent"})
+        parent.set_field_to("has_been_modified_since_last_resolve", parent_modified)
+        parent.set_field_to("has_modified_ancestor", parent_ancestor)
+        test_lexicon.add_entry(parent)
+        child = Word({"translated_word_components": ["Parent"]})
+        test_lexicon.add_entry(child)
+        assert test_lexicon.determine_ancestor_modification_for(child) == expected_result
+
+    @pytest.mark.parametrize(
+        ["first_flags", "second_flags", "expected_result"], [
+            ((None, None), (None, None), False),  # None & None - False
+            ((True, None), (None, None), True),  # Modified & None - True
+            ((None, True), (None, None), True),  # Ancestor & None - True
+            ((True, None), (True, None), True),  # Modified & Modified - True
+            ((None, True), (True, None), True),  # Ancestor & Modified - True
+            ((None, True), (None, True), True),  # Ancestor & Ancestor - True
+            ((None, None), (True, None), True),  # None & Modified - True
+            ((None, None), (None, True), True)])  # None & Ancestor - True
+    def test__return_true_if_any_flag_on_either_parent_is_true(self,
+            first_flags,
+            second_flags,
+            expected_result):
+        """Is only false if both flags on its parent is false"""
+        test_lexicon = Lexicon()
+        first_parent = Word({"translated_word": "FirstParent"})
+        first_parent.set_field_to("has_been_modified_since_last_resolve", first_flags[0])
+        first_parent.set_field_to("has_modified_ancestor", first_flags[1])
+        test_lexicon.add_entry(first_parent)
+        second_parent = Word({"translated_word": "SecondParent"})
+        second_parent.set_field_to("has_been_modified_since_last_resolve", second_flags[0])
+        second_parent.set_field_to("has_modified_ancestor", second_flags[1])
+        test_lexicon.add_entry(second_parent)
+        child = Word({"translated_word_components": ["FirstParent", "SecondParent"]})
+        test_lexicon.add_entry(child)
+        assert test_lexicon.determine_ancestor_modification_for(child) == expected_result
+
+
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
     def test_when_all_words_are_requested_then_a_list_of_the_items_is_returned(self):
