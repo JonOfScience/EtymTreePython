@@ -113,6 +113,38 @@ class TestModifyingWordFieldsShould:
         assert history_before == history_after
 
 
+class TestRetrievingWordParentsShould:
+    """Test operations for a Lexicon and cases of root, child and partial child Words"""
+    def test__return_an_empty_list_for_a_root_word(self):
+        """A Word with no parents will return an empty list"""
+        new_lexicon = Lexicon()
+        new_word = Word()
+        new_lexicon.add_entry(new_word)
+        assert not new_lexicon.get_parents_of_word(new_word)
+        assert isinstance(new_lexicon.get_parents_of_word(new_word), list)
+
+    def test__return_all_parents_if_all_are_extant(self):
+        """A Word with two extant parents will return their objects"""
+        test_lexicon = Lexicon()
+        first_parent = Word({"translated_word": "FirstParent"})
+        test_lexicon.add_entry(first_parent)
+        second_parent = Word({"translated_word": "SecondParent"})
+        test_lexicon.add_entry(second_parent)
+        child = Word({"translated_word_components": ["FirstParent", "SecondParent"]})
+        test_lexicon.add_entry(child)
+        assert first_parent in test_lexicon.get_parents_of_word(child)
+        assert second_parent in test_lexicon.get_parents_of_word(child)
+
+    def test__return_only_extant_parents_if_some_have_no_entry(self):
+        """A Word with two parents, with one extant will return that one"""
+        test_lexicon = Lexicon()
+        parent = Word({"translated_word": "FirstParent"})
+        test_lexicon.add_entry(parent)
+        child = Word({"translated_word_components": ["FirstParent", "SecondParent"]})
+        test_lexicon.add_entry(child)
+        assert test_lexicon.get_parents_of_word(child) == [parent]
+
+
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
     def test_when_all_words_are_requested_then_a_list_of_the_items_is_returned(self):
