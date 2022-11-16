@@ -205,6 +205,18 @@ class Lexicon:
                 in parent_items
                 if self.index_by_translated_word.get(x) is not None]
 
+    def determine_ancestor_modification_for(self, word: Word) -> bool:
+        """Return True if a parent has been modified or has a modified ancestor, else false"""
+        word_parents = self.get_parents_of_word(word)
+        if not word_parents:
+            return False
+        parent: Word
+        for parent in word_parents:
+            if (parent.find_data_on("has_been_modified_since_last_resolve")
+                or parent.find_data_on("has_modified_ancestor")):
+                return True
+        return False
+
     def validate_for_word_field(self, field_name: str, to_validate: str):
         """Returns True if Word validates to_validate"""
         return Word().validate_for_field(
