@@ -217,6 +217,21 @@ class Lexicon:
                 return True
         return False
 
+    def resolve_modification_flags(self) -> int:
+        """Loops through all entries checking for status flag changes.
+        Returns number of changes made."""
+        flags_flipped = 0
+        word: Word
+        for word in self.members:
+            print("BORK")
+            old_value = word.find_data_on("has_modified_ancestor")
+            word.set_field_to(
+                "has_modified_ancestor",
+                self.determine_ancestor_modification_for(word))
+            if old_value != word.find_data_on("has_modified_ancestor"):
+                flags_flipped += 1
+        return flags_flipped
+
     def validate_for_word_field(self, field_name: str, to_validate: str):
         """Returns True if Word validates to_validate"""
         return Word().validate_for_field(
