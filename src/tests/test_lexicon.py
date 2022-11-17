@@ -203,6 +203,40 @@ class TestCheckingWordParentsShould:
         assert test_lexicon.determine_ancestor_modification_for(child) == expected_result
 
 
+class TestResolvingModificationFlagsShould:
+    """Test flagging operations on Lexicon entries with (un)modified parents"""
+    def test__return_one_change_for_a_word_with_no_parents(self):
+        """Setting initial flag status from None to False"""
+        lexicon = Lexicon()
+        orphan_entry = Word()
+        lexicon.add_entry(orphan_entry)
+        assert lexicon.resolve_modification_flags() == 1
+
+    @pytest.mark.parametrize(
+        ["modified", "ancestor", "expected_result"], [
+            (None, None, 2),
+            (False, False, 1),
+            (True, None, 2),
+            (True, False, 1),
+            (None, True, 2),
+            (False, True, 2),
+            (True, True, 2),
+        ])
+    def test__returns_changes_for_two_connected_entries(self,
+        modified,
+        ancestor,
+        expected_result):
+        """Setting initial flag status from None to False"""
+        lexicon = Lexicon()
+        parent_entry = Word(
+            {"translated_word": "Parent",
+            "has_been_modified_since_last_resolve": modified,
+            "has_modified_ancestor": ancestor})
+        orphan_entry = Word({"translated_word_components": ["Parent"]})
+        lexicon.add_entry(parent_entry)
+        lexicon.add_entry(orphan_entry)
+        assert lexicon.resolve_modification_flags() == expected_result
+
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
     def test_when_all_words_are_requested_then_a_list_of_the_items_is_returned(self):
