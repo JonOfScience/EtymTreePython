@@ -258,7 +258,7 @@ class TestResolvingModificationFlagsShould:
             (None, None),
             (True, True),
         ])
-    def test__return_true_and_resolve_to_false_for_linked_words(self, parent_anc, child_anc):
+    def test__resolve_to_false_for_pair_with_no_modification(self, parent_anc, child_anc):
         """State Test"""
         lexicon = Lexicon()
         parent_entry = Word(
@@ -267,13 +267,42 @@ class TestResolvingModificationFlagsShould:
             {"translated_word_components": ["parent"], "has_modified_ancestor": child_anc})
         lexicon.add_entry(parent_entry)
         lexicon.add_entry(child_entry)
-        print(f'Parent Before: {parent_entry.find_data_on("has_modified_ancestor")}')
-        print(f'Child Before : {child_entry.find_data_on("has_modified_ancestor")}')
         assert lexicon.resolve_modification_flags() is True
-        print(f'Parent After : {parent_entry.find_data_on("has_modified_ancestor")}')
-        print(f'Child After  : {child_entry.find_data_on("has_modified_ancestor")}')
         assert parent_entry.find_data_on("has_modified_ancestor") is False
         assert child_entry.find_data_on("has_modified_ancestor") is False
+
+    def test__resolve_child_to_true_with_a_modified_parent(self):
+        """State Test"""
+        lexicon = Lexicon()
+        parent_entry = Word(
+            {"translated_word": "parent", "has_been_modified_since_last_resolve": True})
+        child_entry = Word(
+            {"translated_word_components": ["parent"]})
+        lexicon.add_entry(parent_entry)
+        lexicon.add_entry(child_entry)
+        assert lexicon.resolve_modification_flags() is True
+        assert parent_entry.find_data_on("has_been_modified_since_last_resolve") is True
+        assert parent_entry.find_data_on("has_modified_ancestor") is False
+        assert child_entry.find_data_on("has_modified_ancestor") is True
+
+    def test__resolve_child_to_true_with_one_modified_parent_out_of_two(self):
+        """State Test"""
+        lexicon = Lexicon()
+        parent_one_entry = Word(
+            {"translated_word": "one", "has_been_modified_since_last_resolve": False})
+        parent_two_entry = Word(
+            {"translated_word": "two", "has_been_modified_since_last_resolve": True})
+        child_entry = Word(
+            {"translated_word_components": ["one", "two"]})
+        lexicon.add_entry(parent_one_entry)
+        lexicon.add_entry(parent_two_entry)
+        lexicon.add_entry(child_entry)
+        assert lexicon.resolve_modification_flags() is True
+        assert parent_one_entry.find_data_on("has_been_modified_since_last_resolve") is False
+        assert parent_one_entry.find_data_on("has_modified_ancestor") is False
+        assert parent_two_entry.find_data_on("has_been_modified_since_last_resolve") is True
+        assert parent_two_entry.find_data_on("has_modified_ancestor") is False
+        assert child_entry.find_data_on("has_modified_ancestor") is True
 
 
 class TestAPopulatedLexiconShould:

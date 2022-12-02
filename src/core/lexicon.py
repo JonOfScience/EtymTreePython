@@ -241,12 +241,13 @@ class Lexicon:
         """Calls multiple resolving passes.
         Continues until no changes are made in consecutive passes.
         Returns - Positive pass count on successful resolution or 0 if resolution fails"""
-        resolve_pass_max = 100
+        resolve_pass_max = 10
         flags_flipped = 1
-        total_passes = 0
-        while total_passes < resolve_pass_max and flags_flipped > 0:
+        passes_since_last_flip = 0
+        while passes_since_last_flip < resolve_pass_max and flags_flipped > 0:
             flags_flipped = self.resolve_modification_flags_pass()
-            total_passes += 1
+            if flags_flipped:
+                passes_since_last_flip += 1
         if flags_flipped == 0:
             return True
         return False
