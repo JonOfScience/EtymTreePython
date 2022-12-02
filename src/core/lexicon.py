@@ -104,7 +104,12 @@ class Word:
                 return
         old_value = self._data[field_name]
         self._data[field_name] = new_value
-        self._data["has_been_modified_since_last_resolve"] = True
+        # System field changes should NOT trigger a modification flag change
+        if field_name not in [
+            "has_modified_ancestor",
+            "has_been_modified_since_last_resolve",
+            "version_history"]:
+            self._data["has_been_modified_since_last_resolve"] = True
         self._add_version_history_entry(field_name, old_value, new_value)
 
     def _add_version_history_entry(self, field_name: str, old_value: Any, new_value: Any):
@@ -212,25 +217,40 @@ class Lexicon:
             return False
         parent: Word
         for parent in word_parents:
-            if (parent.find_data_on("has_been_modified_since_last_resolve")
-                or parent.find_data_on("has_modified_ancestor")):
+            if (parent.find_data_on("has_been_modified_since_last_resolve") is True
+                or parent.find_data_on("has_modified_ancestor") is True):
                 return True
         return False
 
-    def resolve_modification_flags(self) -> int:
+    def resolve_modification_flags_pass(self) -> int:
         """Loops through all entries checking for status flag changes.
         Returns number of changes made."""
         flags_flipped = 0
         word: Word
         for word in self.members:
-            print("BORK")
             old_value = word.find_data_on("has_modified_ancestor")
+            new_value = self.determine_ancestor_modification_for(word)
             word.set_field_to(
                 "has_modified_ancestor",
-                self.determine_ancestor_modification_for(word))
+                new_value)
             if old_value != word.find_data_on("has_modified_ancestor"):
                 flags_flipped += 1
         return flags_flipped
+
+    def resolve_modification_flags(self) -> bool:
+        """Calls multiple resolving passes.
+        Continues until no changes are made in consecutive passes.
+        Returns - Positive pass count on successful resolution or 0 if resolution fails"""
+        resolve_pass_max = 10
+        flags_flipped = 1
+        passes_since_last_flip = 0
+        while passes_since_last_flip < resolve_pass_max and flags_flipped > 0:
+            flags_flipped = self.resolve_modification_flags_pass()
+            if flags_flipped:
+                passes_since_last_flip += 1
+        if flags_flipped == 0:
+            return True
+        return False
 
     def validate_for_word_field(self, field_name: str, to_validate: str):
         """Returns True if Word validates to_validate"""
