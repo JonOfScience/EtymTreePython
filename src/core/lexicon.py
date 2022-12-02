@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 import uuid
 import re
-from typing import Any, Union
+from typing import Any, Tuple, Union
 from collections.abc import Sequence
 from services.io_service import IOService
 from services.lexicon_io_service import LexiconIOService
@@ -217,13 +217,12 @@ class Lexicon:
                 return True
         return False
 
-    def resolve_modification_flags(self) -> int:
+    def resolve_modification_flags_pass(self) -> int:
         """Loops through all entries checking for status flag changes.
         Returns number of changes made."""
         flags_flipped = 0
         word: Word
         for word in self.members:
-            print("BORK")
             old_value = word.find_data_on("has_modified_ancestor")
             word.set_field_to(
                 "has_modified_ancestor",
@@ -232,7 +231,13 @@ class Lexicon:
                 flags_flipped += 1
         return flags_flipped
 
-    def validate_for_word_field(self, field_name: str, to_validate: str):
+    def resolve_modification_flags(self) -> int:
+        """Calls multiple resolving passes.
+        Continues until no changes are made in consecutive passes.
+        Returns - Positive pass count on successful resolution or 0 if resolution fails"""
+        return 0
+
+    def validate_for_word_field(self, field_name: str, to_validate: str): 
         """Returns True if Word validates to_validate"""
         return Word().validate_for_field(
             field_name=field_name,

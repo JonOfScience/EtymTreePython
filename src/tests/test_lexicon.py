@@ -203,14 +203,17 @@ class TestCheckingWordParentsShould:
         assert test_lexicon.determine_ancestor_modification_for(child) == expected_result
 
 
-class TestResolvingModificationFlagsShould:
+class TestResolvingModificationFlagsPassShould:
     """Test flagging operations on Lexicon entries with (un)modified parents"""
-    def test__return_one_change_for_a_word_with_no_parents(self):
-        """Setting initial flag status from None to False"""
+    @pytest.mark.parametrize(
+        ["ancestor", "pass_changes"], [(False, 0), (None, 1), (True, 1)])
+    def test__return_expected_changes_for_a_word_with_no_parents(self, ancestor, pass_changes):
+        """Resolving ancestor flag status from all possible initial status to False"""
         lexicon = Lexicon()
-        orphan_entry = Word()
+        orphan_entry = Word({"has_modified_ancestor": ancestor})
         lexicon.add_entry(orphan_entry)
-        assert lexicon.resolve_modification_flags() == 1
+        assert lexicon.resolve_modification_flags_pass() == pass_changes
+        assert orphan_entry.find_data_on("has_modified_ancestor") is False
 
     @pytest.mark.parametrize(
         ["modified", "ancestor", "expected_result"], [
@@ -235,7 +238,19 @@ class TestResolvingModificationFlagsShould:
         orphan_entry = Word({"translated_word_components": ["Parent"]})
         lexicon.add_entry(parent_entry)
         lexicon.add_entry(orphan_entry)
-        assert lexicon.resolve_modification_flags() == expected_result
+        assert lexicon.resolve_modification_flags_pass() == expected_result
+
+class TestResolvingModificationFlagsShould:
+    """Test flag resolving operations on Lexicon entries"""
+    @pytest.mark.parametrize(
+        ["ancestor", "num_passes"], [(False, 1), (None, 1), (True, 1)])
+    def test__return_one_pass_for_a_word_with_no_parents(self, ancestor, num_passes):
+        """State Test"""
+        lexicon = Lexicon()
+        orphan_entry = Word({"has_modified_ancestor": ancestor})
+        lexicon.add_entry(orphan_entry)
+        assert lexicon.resolve_modification_flags() == num_passes
+        # assert orphan_entry.find_data_on("has_modified_ancestor") is False
 
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
