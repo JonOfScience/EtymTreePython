@@ -243,14 +243,38 @@ class TestResolvingModificationFlagsPassShould:
 class TestResolvingModificationFlagsShould:
     """Test flag resolving operations on Lexicon entries"""
     @pytest.mark.parametrize(
-        ["ancestor", "num_passes"], [(False, 1), (None, 1), (True, 1)])
-    def test__return_one_pass_for_a_word_with_no_parents(self, ancestor, num_passes):
+        "ancestor", [False, None, True])
+    def test__return_true_and_resolve_to_false_for_a_word_with_no_parents(self, ancestor):
         """State Test"""
         lexicon = Lexicon()
         orphan_entry = Word({"has_modified_ancestor": ancestor})
         lexicon.add_entry(orphan_entry)
-        assert lexicon.resolve_modification_flags() == num_passes
-        # assert orphan_entry.find_data_on("has_modified_ancestor") is False
+        assert lexicon.resolve_modification_flags() is True
+        assert orphan_entry.find_data_on("has_modified_ancestor") is False
+
+    @pytest.mark.parametrize(
+        ["parent_anc", "child_anc"], [
+            (False, False),
+            (None, None),
+            (True, True),
+        ])
+    def test__return_true_and_resolve_to_false_for_linked_words(self, parent_anc, child_anc):
+        """State Test"""
+        lexicon = Lexicon()
+        parent_entry = Word(
+            {"translated_word": "parent", "has_modified_ancestor": parent_anc})
+        child_entry = Word(
+            {"translated_word_components": ["parent"], "has_modified_ancestor": child_anc})
+        lexicon.add_entry(parent_entry)
+        lexicon.add_entry(child_entry)
+        print(f'Parent Before: {parent_entry.find_data_on("has_modified_ancestor")}')
+        print(f'Child Before : {child_entry.find_data_on("has_modified_ancestor")}')
+        assert lexicon.resolve_modification_flags() is True
+        print(f'Parent After : {parent_entry.find_data_on("has_modified_ancestor")}')
+        print(f'Child After  : {child_entry.find_data_on("has_modified_ancestor")}')
+        assert parent_entry.find_data_on("has_modified_ancestor") is False
+        assert child_entry.find_data_on("has_modified_ancestor") is False
+
 
 class TestAPopulatedLexiconShould:
     """Test operations on a lexicon with more than 1 word (1+ words)"""
