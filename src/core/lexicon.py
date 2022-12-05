@@ -1,13 +1,12 @@
 """Library for Word and Lexicon level functionality."""
 from __future__ import annotations
-from enum import Enum
 import uuid
 import re
 from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
 from services.lexicon_io_service import LexiconIOService
-from core.core import DataFormat, new_garbage_string
+from core.core import DataFormat, WordField, new_garbage_string
 
 
 class Word:
@@ -41,23 +40,25 @@ class Word:
     _structure_validators = {
         "etymological_symbology": _structure_validator_etymological_symbology}
     def __init__(self, merge_data: dict = None) -> None:
-        class Field(Enum):
-            """External constant mapping to internal structure"""
-            TRANSLATEDWORD = "translated_word"
-            TRANSLATEDCOMPONENTS = "translated_word_components"
-            INLANGUAGECOMPONENTS = "in_language_components"
-            ETYMOLOGICALSYMBOLOGY = "etymological_symbology"
-            COMPILEDSYMBOLOGY = "compiled_symbology"
-            SYMBOLMAPPING = "symbol_mapping"
-            SYMBOLSELECTION = "symbol_selection"
-            SYMBOLPATTERNSELECTED = "symbol_pattern_selected"
-            RULESAPPLIED = "rules_applied"
-            INLANGUAGEWORD = "in_language_word"
-            VERSIONHISTORY = "version_history"
-            HASBEENMODIFIED = "has_been_modified_since_last_resolve"
-            HASMODIFIEDANCESTOR = "has_modified_ancestor"
 
-        self.fields = Field
+        self.fields = {
+            WordField.TRANSLATEDWORD: "translated_word",
+            WordField.TRANSLATEDCOMPONENTS: "translated_word_components",
+            WordField.INLANGUAGECOMPONENTS: "in_language_components",
+            WordField.ETYMOLOGICALSYMBOLOGY: "etymological_symbology",
+            WordField.COMPILEDSYMBOLOGY: "compiled_symbology",
+            WordField.SYMBOLMAPPING: "symbol_mapping",
+            WordField.SYMBOLSELECTION: "symbol_selection",
+            WordField.SYMBOLPATTERNSELECTED: "symbol_pattern_selected",
+            WordField.RULESAPPLIED: "rules_applied",
+            WordField.INLANGUAGEWORD: "in_language_word",
+            WordField.VERSIONHISTORY: "version_history",
+            WordField.HASBEENMODIFIED: "has_been_modified_since_last_resolve",
+            WordField.HASMODIFIEDANCESTOR: "has_modified_ancestor"}
+
+        self._protected = [
+            WordField.HASBEENMODIFIED,
+            WordField.HASMODIFIEDANCESTOR]
 
         self._data = {
             "translated_word": new_garbage_string(),
@@ -80,20 +81,42 @@ class Word:
     def __eq__(self, __o: Word) -> bool:
         if isinstance(__o, Word):
             for (key, value) in self._data.items():
-                if value != __o.find_data_on(key):
+                if value != __o._data[key]:
                     return False
         else:
             return False
         return True
 
-    def find_data_on(self, field_name: str) -> Union[Any, ValueError]:
+    @property
+    def has_unresolved_modification(self) -> bool:
+        """Boolean - Has this Word been modified without being resolved."""
+        return self.find_data_on(WordField.HASBEENMODIFIED)
+
+    @property
+    def has_modified_ancestor(self) -> bool:
+        """Boolean - Does this Word have an ancestor that has been modified."""
+        return self.find_data_on(WordField.HASMODIFIEDANCESTOR)
+
+    def acknowledge_ancestor_modification_status_of(self, ancestor_status: bool) -> None:
+        """Acts on supplied status of ancestor nodes."""
+        self._data["has_modified_ancestor"] = ancestor_status
+
+    def find_data_on(self, field_name: Union[str, WordField]) -> Union[Any, ValueError]:
         """Returns data for field_name, or ValueError if there is no entry"""
-        if field_name in self._data:
-            return self._data[field_name]
+        if isinstance(field_name, WordField):
+            field_name = self.fields[field_name]
+            if field_name in self._data:
+                return self._data[field_name]
         raise ValueError("Specified field not recognised as a member of Word")
 
-    def set_field_to(self, field_name: str, new_value: Any) -> None:
+    def set_field_to(self, field_name: WordField, new_value: Any) -> None:
         """Sets data for field_name to new_value"""
+        if isinstance(field_name, WordField):
+            if field_name in self._protected:
+                return
+            field_name = self.fields[field_name]
+        else:
+            return
         if self._data[field_name] == new_value:
             return
         if field_name == "version_history":
@@ -156,13 +179,28 @@ class Lexicon:
         self.title = "BlankProjectLexicon"
         self.members = []
         self.index_by_translated_word = {}
+        self.label_to_wordfield_mapping = {
+            "Translated Word": WordField.TRANSLATEDWORD,
+            "Translated Word Components": WordField.TRANSLATEDCOMPONENTS,
+            "In Language Components": WordField.INLANGUAGECOMPONENTS,
+            "Etymological Symbology": WordField.ETYMOLOGICALSYMBOLOGY,
+            "Compiled Symbology": WordField.COMPILEDSYMBOLOGY,
+            "Symbol Mapping": WordField.SYMBOLMAPPING,
+            "Symbol Selection": WordField.SYMBOLSELECTION,
+            "Symbol Pattern Selected": WordField.SYMBOLPATTERNSELECTED,
+            "Rules Applied": WordField.RULESAPPLIED,
+            "In Language_word": WordField.INLANGUAGEWORD,
+            "Version History": WordField.VERSIONHISTORY,
+            "Has Been Modified Since Last Resolve": WordField.HASBEENMODIFIED,
+            "Has Modified Ancestor": WordField.HASMODIFIEDANCESTOR}
 
     def _build_indexes(self):
         self.index_by_translated_word.clear()
         for word in self.members:
-            self.index_by_translated_word[self.get_field_for_word(
-                "translated word",
-                word=word)] = word
+            self.index_by_translated_word[word.find_data_on(WordField.TRANSLATEDWORD)] = word
+
+    def _map_label_to_field(self, field_label) -> WordField:
+        return self.label_to_wordfield_mapping.get(field_label)
 
     def retrieve(self, entry_id: str):
         """Returns a Word with identifier entry_id if it has been registered. Otherwise None."""
@@ -186,12 +224,7 @@ class Lexicon:
     def add_entry(self, entry: Word):
         """Register a given Word in the Lexicon"""
         self.members.append(entry)
-        self.index_by_translated_word[self.get_field_for_word(
-            "translated word",
-            word=entry)] = entry
-
-    def _map_label_to_field(self, field_label) -> str:
-        return field_label.lower().replace(" ", "_")
+        self.index_by_translated_word[entry.find_data_on(WordField.TRANSLATEDWORD)] = entry
 
     def get_field_for_word(self, field: str, word: Union[Word, str] = None):
         """Return the data for specified field from a supplied word"""
@@ -200,9 +233,9 @@ class Lexicon:
         this_field = self._map_label_to_field(field)
         return word.find_data_on(this_field)
 
-    def get_parents_of_word(self, word: Word) -> Sequence[Word]:
+    def get_parents_of(self, word: Word) -> Sequence[Word]:
         """Return the Word objects for any extant Translated Word Components"""
-        parent_items = self.get_field_for_word("translated_word_components", word)
+        parent_items = word.find_data_on(WordField.TRANSLATEDCOMPONENTS)
         if parent_items is None:
             return []
         return [self.index_by_translated_word.get(x)
@@ -212,13 +245,12 @@ class Lexicon:
 
     def determine_ancestor_modification_for(self, word: Word) -> bool:
         """Return True if a parent has been modified or has a modified ancestor, else false"""
-        word_parents = self.get_parents_of_word(word)
+        word_parents = self.get_parents_of(word)
         if not word_parents:
             return False
-        parent: Word
-        for parent in word_parents:
-            if (parent.find_data_on("has_been_modified_since_last_resolve") is True
-                or parent.find_data_on("has_modified_ancestor") is True):
+        for parent_word in word_parents:
+            if (parent_word.has_unresolved_modification
+                or parent_word.has_modified_ancestor):
                 return True
         return False
 
@@ -228,12 +260,10 @@ class Lexicon:
         flags_flipped = 0
         word: Word
         for word in self.members:
-            old_value = word.find_data_on("has_modified_ancestor")
+            old_value = word.has_modified_ancestor
             new_value = self.determine_ancestor_modification_for(word)
-            word.set_field_to(
-                "has_modified_ancestor",
-                new_value)
-            if old_value != word.find_data_on("has_modified_ancestor"):
+            word.acknowledge_ancestor_modification_status_of(new_value)
+            if old_value != word.has_modified_ancestor:
                 flags_flipped += 1
         return flags_flipped
 
