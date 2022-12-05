@@ -232,6 +232,10 @@ class ProjectWindow(QWidget):
             if self.options.find_by_id("IsLaunching"):
                 self.options.set_option_to("IsLaunching", False)
                 self._window_launch(self.options.find_by_id("ProjectStatus"))
+                lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+                resolve_result = lexicon.resolve_modification_flags()
+                if resolve_result is False:
+                    print("Project_UI: Flags propagation on load Failed.")
                 self._window_update()
 
     def _build_translated_component_mappings(self):
