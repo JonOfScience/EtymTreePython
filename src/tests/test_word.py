@@ -1,5 +1,5 @@
 """Tests for a single Word."""
-from core.lexicon import Word
+from core.lexicon import Word, WordField
 
 
 class TestAnEmptyWordShould:
@@ -23,18 +23,17 @@ class TestAnEmptyWordShould:
             "rules_applied": None,
             "in_language_word": "TonADrow",
             "version_history": {"Here": "Today"},
-            "has_been_modified_since_last_resolve": True,  # "Ripple" resolution
+            "has_been_modified_since_last_resolve": True,
             "has_modified_ancestor": False}
         word = Word(init_data)
         for (fieldname, fieldvalue) in init_data.items():
-            assert word.find_data_on(fieldname) == fieldvalue
+            assert word._data[fieldname] == fieldvalue #pylint: disable=protected-access
 
-    def test_return_none_when_validating_for_an_extant_field_with_no_validator(self):
+    def test__return_none_when_validating_for_an_extant_field_with_no_validator(self):
         """Return - None if the field has no validator."""
         assert Word().validate_for_field(
             field_name="translated_word",
             to_validate="abcde") is None
-
 
 class TestAnEmptyWordValidatingFieldsShould:
     """Test operations for an empty Word when validating field changes"""
@@ -67,45 +66,45 @@ class TestModifyingFieldsShould:
     def test__setting_a_field_successfully_sets_the_change_flag_to_true(self):
         """Flag value is true and has changed after being successfully set"""
         new_word = Word()
-        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
-        new_word.set_field_to("etymological_symbology", "|abu|da|")
-        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        status_before = new_word.has_unresolved_modification
+        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu|da|")
+        status_after = new_word.has_unresolved_modification
         assert status_after != status_before
         assert status_after
 
     def test__setting_a_field_unsuccessfully_does_not_change_the_flag(self):
         """Flag value is true and has changed after being successfully set"""
         new_word = Word()
-        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
-        new_word.set_field_to("etymological_symbology", "|abu!da|")
-        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        status_before = new_word.has_unresolved_modification
+        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu!da|")
+        status_after = new_word.has_unresolved_modification
         assert status_after == status_before
 
     def test__setting_a_field_successfully_adds_to_the_version_history(self):
         """Version History is longer after a field is successfully set"""
         new_word = Word()
-        history_before = new_word.find_data_on("version_history")
-        new_word.set_field_to("etymological_symbology", "|abu|da|")
-        history_after = new_word.find_data_on("version_history")
+        history_before = new_word.find_data_on(WordField.VERSIONHISTORY)
+        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu|da|")
+        history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert len(history_before) < len(history_after)
 
     def test__setting_a_field_twice_adds_to_the_version_history_each_time(self):
         """Version History is longer after a field is successfully set"""
         new_word = Word()
-        original_history = new_word.find_data_on("version_history")[:]
-        new_word.set_field_to("etymological_symbology", "|abu|da|")
-        history_first = new_word.find_data_on("version_history")[:]
-        new_word.set_field_to("etymological_symbology", "|ice|fu|")
-        history_second = new_word.find_data_on("version_history")[:]
+        original_history = new_word.find_data_on(WordField.VERSIONHISTORY)[:]
+        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu|da|")
+        history_first = new_word.find_data_on(WordField.VERSIONHISTORY)[:]
+        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|ice|fu|")
+        history_second = new_word.find_data_on(WordField.VERSIONHISTORY)[:]
         assert len(original_history) < len(history_first)
         assert len(history_first) < len(history_second)
 
     def test__setting_a_field_unsuccessfully_does_not_add_to_the_version_history(self):
         """Version History is the same length after a field is unsuccessfully set"""
         new_word = Word()
-        history_before = new_word.find_data_on("version_history")
-        new_word.set_field_to("etymological_symbology", "|abu!da|")
-        history_after = new_word.find_data_on("version_history")
+        history_before = new_word.find_data_on(WordField.VERSIONHISTORY)
+        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu!da|")
+        history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert history_before == history_after
 
 
@@ -132,19 +131,25 @@ class TestAPopulatedWordShould:
         """An input of valid characters with valid structure will change the value of the field"""
         init_data = {"etymological_symbology": "|aba|et|"}
         word = Word(init_data)
-        word.set_field_to("etymological_symbology", "|ino|mu|")
-        assert word.find_data_on("etymological_symbology") == "|ino|mu|"
+        word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|ino|mu|")
+        assert word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY) == "|ino|mu|"
 
     def test__not_change_etymological_symbology_with_invalidly_structured_input(self):
         """An input of valid characters with invalid structure will not change the field value"""
         init_data = {"etymological_symbology": "|aba|et|"}
         word = Word(init_data)
-        word.set_field_to("etymological_symbology", "|inomu|")
-        assert word.find_data_on("etymological_symbology") == "|aba|et|"
+        word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|inomu|")
+        assert word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY) == "|aba|et|"
 
     def test__not_change_etymological_symbology_for_input_with_invalid_characters(self):
         """An input of invalid characters with valid structure will not change the field value"""
         init_data = {"etymological_symbology": "|aba|et|"}
         word = Word(init_data)
-        word.set_field_to("etymological_symbology", "|ino!mu|")
-        assert word.find_data_on("etymological_symbology") == "|aba|et|"
+        word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|ino!mu|")
+        assert word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY) == "|aba|et|"
+
+    def test__not_change_a_protected_field_directly(self):
+        """Protected fields should not respond to calls to set_field_to."""
+        word = Word({"has_modified_ancestor": True})
+        word.set_field_to(WordField.HASMODIFIEDANCESTOR, False)
+        assert word.has_modified_ancestor is True

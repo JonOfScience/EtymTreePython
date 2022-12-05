@@ -1,6 +1,6 @@
 """Tests for a Lexicon of Words."""
 import pytest
-from core.lexicon import Lexicon, Word
+from core.lexicon import Lexicon, Word, WordField
 
 
 class TestAnEmptyLexiconShould:
@@ -76,9 +76,9 @@ class TestModifyingWordFieldsShould:
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
-        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu|da|")
-        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        status_before = new_word.has_unresolved_modification
+        new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu|da|")
+        status_after = new_word.has_unresolved_modification
         assert status_after != status_before
         assert status_after
 
@@ -87,9 +87,9 @@ class TestModifyingWordFieldsShould:
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        status_before = new_word.find_data_on("has_been_modified_since_last_resolve")
-        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu!da|")
-        status_after = new_word.find_data_on("has_been_modified_since_last_resolve")
+        status_before = new_word.has_unresolved_modification
+        new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu!da|")
+        status_after = new_word.has_unresolved_modification
         assert status_after == status_before
 
     def test__setting_a_field_successfully_adds_to_the_version_history(self):
@@ -97,9 +97,9 @@ class TestModifyingWordFieldsShould:
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        history_before = new_word.find_data_on("version_history")
-        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu|da|")
-        history_after = new_word.find_data_on("version_history")
+        history_before = new_word.find_data_on(WordField.VERSIONHISTORY)
+        new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu|da|")
+        history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert len(history_before) < len(history_after)
 
     def test__setting_a_field_unsuccessfully_does_not_add_to_the_version_history(self):
@@ -107,9 +107,9 @@ class TestModifyingWordFieldsShould:
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        history_before = new_word.find_data_on("version_history")
-        new_lexicon.set_field_to_value("etymological_symbology", new_word, "|abu!da|")
-        history_after = new_word.find_data_on("version_history")
+        history_before = new_word.find_data_on(WordField.VERSIONHISTORY)
+        new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu!da|")
+        history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert history_before == history_after
 
 
@@ -120,8 +120,8 @@ class TestRetrievingWordParentsShould:
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        assert not new_lexicon.get_parents_of_word(new_word)
-        assert isinstance(new_lexicon.get_parents_of_word(new_word), list)
+        assert not new_lexicon.get_parents_of(new_word)
+        assert isinstance(new_lexicon.get_parents_of(new_word), list)
 
     def test__return_all_parents_if_all_are_extant(self):
         """A Word with two extant parents will return their objects"""
@@ -132,8 +132,8 @@ class TestRetrievingWordParentsShould:
         test_lexicon.add_entry(second_parent)
         child = Word({"translated_word_components": ["FirstParent", "SecondParent"]})
         test_lexicon.add_entry(child)
-        assert first_parent in test_lexicon.get_parents_of_word(child)
-        assert second_parent in test_lexicon.get_parents_of_word(child)
+        assert first_parent in test_lexicon.get_parents_of(child)
+        assert second_parent in test_lexicon.get_parents_of(child)
 
     def test__return_only_extant_parents_if_some_have_no_entry(self):
         """A Word with two parents, with one extant will return that one"""
@@ -142,7 +142,7 @@ class TestRetrievingWordParentsShould:
         test_lexicon.add_entry(parent)
         child = Word({"translated_word_components": ["FirstParent", "SecondParent"]})
         test_lexicon.add_entry(child)
-        assert test_lexicon.get_parents_of_word(child) == [parent]
+        assert test_lexicon.get_parents_of(child) == [parent]
 
 
 class TestCheckingWordParentsShould:
@@ -166,9 +166,10 @@ class TestCheckingWordParentsShould:
             expected_result):
         """Is only false if both flags on its parent is false"""
         test_lexicon = Lexicon()
-        parent = Word({"translated_word": "Parent"})
-        parent.set_field_to("has_been_modified_since_last_resolve", parent_modified)
-        parent.set_field_to("has_modified_ancestor", parent_ancestor)
+        parent = Word({
+            "translated_word": "Parent",
+            "has_been_modified_since_last_resolve": parent_modified,
+            "has_modified_ancestor": parent_ancestor})
         test_lexicon.add_entry(parent)
         child = Word({"translated_word_components": ["Parent"]})
         test_lexicon.add_entry(child)
@@ -190,13 +191,15 @@ class TestCheckingWordParentsShould:
             expected_result):
         """Is only false if both flags on its parent is false"""
         test_lexicon = Lexicon()
-        first_parent = Word({"translated_word": "FirstParent"})
-        first_parent.set_field_to("has_been_modified_since_last_resolve", first_flags[0])
-        first_parent.set_field_to("has_modified_ancestor", first_flags[1])
+        first_parent = Word({
+            "translated_word": "FirstParent",
+            "has_been_modified_since_last_resolve": first_flags[0],
+            "has_modified_ancestor": first_flags[1]})
         test_lexicon.add_entry(first_parent)
-        second_parent = Word({"translated_word": "SecondParent"})
-        second_parent.set_field_to("has_been_modified_since_last_resolve", second_flags[0])
-        second_parent.set_field_to("has_modified_ancestor", second_flags[1])
+        second_parent = Word({
+            "translated_word": "SecondParent",
+            "has_been_modified_since_last_resolve": second_flags[0],
+            "has_modified_ancestor": second_flags[1]})
         test_lexicon.add_entry(second_parent)
         child = Word({"translated_word_components": ["FirstParent", "SecondParent"]})
         test_lexicon.add_entry(child)
@@ -213,7 +216,7 @@ class TestResolvingModificationFlagsPassShould:
         orphan_entry = Word({"has_modified_ancestor": ancestor})
         lexicon.add_entry(orphan_entry)
         assert lexicon.resolve_modification_flags_pass() == pass_changes
-        assert orphan_entry.find_data_on("has_modified_ancestor") is False
+        assert orphan_entry.has_modified_ancestor is False
 
     @pytest.mark.parametrize(
         ["modified", "ancestor", "expected_result"], [
@@ -250,7 +253,7 @@ class TestResolvingModificationFlagsShould:
         orphan_entry = Word({"has_modified_ancestor": ancestor})
         lexicon.add_entry(orphan_entry)
         assert lexicon.resolve_modification_flags() is True
-        assert orphan_entry.find_data_on("has_modified_ancestor") is False
+        assert orphan_entry.has_modified_ancestor is False
 
     @pytest.mark.parametrize(
         ["parent_anc", "child_anc"], [
@@ -268,8 +271,8 @@ class TestResolvingModificationFlagsShould:
         lexicon.add_entry(parent_entry)
         lexicon.add_entry(child_entry)
         assert lexicon.resolve_modification_flags() is True
-        assert parent_entry.find_data_on("has_modified_ancestor") is False
-        assert child_entry.find_data_on("has_modified_ancestor") is False
+        assert parent_entry.has_modified_ancestor is False
+        assert child_entry.has_modified_ancestor is False
 
     def test__resolve_child_to_true_with_a_modified_parent(self):
         """State Test"""
@@ -281,9 +284,9 @@ class TestResolvingModificationFlagsShould:
         lexicon.add_entry(parent_entry)
         lexicon.add_entry(child_entry)
         assert lexicon.resolve_modification_flags() is True
-        assert parent_entry.find_data_on("has_been_modified_since_last_resolve") is True
-        assert parent_entry.find_data_on("has_modified_ancestor") is False
-        assert child_entry.find_data_on("has_modified_ancestor") is True
+        assert parent_entry.has_unresolved_modification is True
+        assert parent_entry.has_modified_ancestor is False
+        assert child_entry.has_modified_ancestor is True
 
     def test__resolve_child_to_true_with_one_modified_parent_out_of_two(self):
         """State Test"""
@@ -298,11 +301,11 @@ class TestResolvingModificationFlagsShould:
         lexicon.add_entry(parent_two_entry)
         lexicon.add_entry(child_entry)
         assert lexicon.resolve_modification_flags() is True
-        assert parent_one_entry.find_data_on("has_been_modified_since_last_resolve") is False
-        assert parent_one_entry.find_data_on("has_modified_ancestor") is False
-        assert parent_two_entry.find_data_on("has_been_modified_since_last_resolve") is True
-        assert parent_two_entry.find_data_on("has_modified_ancestor") is False
-        assert child_entry.find_data_on("has_modified_ancestor") is True
+        assert parent_one_entry.has_unresolved_modification is False
+        assert parent_one_entry.has_modified_ancestor is False
+        assert parent_two_entry.has_unresolved_modification is True
+        assert parent_two_entry.has_modified_ancestor is False
+        assert child_entry.has_modified_ancestor is True
 
 
 class TestAPopulatedLexiconShould:
@@ -321,7 +324,7 @@ class TestAPopulatedLexiconShould:
         """Placeholder: State Test"""
         lexicon = Lexicon()
         new_word = Word()
-        new_word.set_field_to("translated_word", "ATestWord")
+        new_word.set_field_to(WordField.TRANSLATEDWORD, "ATestWord")
         lexicon.add_entry(new_word)
         retrieved_word = lexicon.retrieve("ATestWord")
         assert new_word == retrieved_word
@@ -362,8 +365,8 @@ class TestAPopulatedLexiconShould:
         new_lexicon = Lexicon()
         new_word = Word()
         new_lexicon.add_entry(new_word)
-        field_data = new_lexicon.get_field_for_word("translated word", new_word)
-        assert field_data == new_word.find_data_on("translated_word")
+        field_data = new_lexicon.get_field_for_word("Translated Word", new_word)
+        assert field_data == new_word.find_data_on(WordField.TRANSLATEDWORD)
 
     def test_get_invalid_field_for_extant_word_throws(self):
         """State Test"""
@@ -387,8 +390,8 @@ class TestAPopulatedLexiconShould:
         new_word = Word()
         new_lexicon.add_entry(new_word)
         new_value = "ThisIsAWord"
-        new_lexicon.set_field_to_value("translated word", new_word, new_value)
-        field_data = new_lexicon.get_field_for_word("translated word", new_word)
+        new_lexicon.set_field_to_value("Translated Word", new_word, new_value)
+        field_data = new_lexicon.get_field_for_word("Translated Word", new_word)
         assert field_data == new_value
 
     def test_it_can_be_stored_locally(self):
@@ -415,13 +418,13 @@ class TestAPopulatedLexiconShould:
         lexicon_to_store.store_to("TestLexicon")
         print(f"Lexicon after store: {lexicon_to_store.members}")
         for word in lexicon_to_store.members:
-            print(f"Words Stored   : {word.find_data_on('translated_word')}")
+            print(f"Words Stored   : {word.find_data_on(WordField.TRANSLATEDWORD)}")
         read_lexicon = Lexicon()
         print(f"Empty Read Lexicon : {read_lexicon.members}")
         read_lexicon.load_from("TestLexicon")
         print(f"Read Lexicon After : {read_lexicon.members}")
         for word in read_lexicon.members:
-            print(f"Words Unpacked  : {word.find_data_on('translated_word')}")
+            print(f"Words Unpacked  : {word.find_data_on(WordField.TRANSLATEDWORD)}")
         assert read_lexicon.get_all_words() == [storeable_word]
 
     def test__change_etymological_symbology_for_word_with_valid_input(self):

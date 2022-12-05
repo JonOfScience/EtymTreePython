@@ -3,7 +3,7 @@ from typing import Callable, Sequence
 import os
 import uuid
 import logging
-from enum import Enum
+from enum import Enum, auto
 from abc import ABCMeta, abstractmethod
 from PyQt5.QtCore import QObject, pyqtSignal, QEvent
 
@@ -24,6 +24,21 @@ class ProjectStatus(str, Enum):
     NEW = "new"
     SAVED = "saved"
 
+class WordField(Enum):
+    """External field mapping contract for Word fields"""
+    TRANSLATEDWORD = auto()
+    TRANSLATEDCOMPONENTS = auto()
+    INLANGUAGECOMPONENTS = auto()
+    ETYMOLOGICALSYMBOLOGY = auto()
+    COMPILEDSYMBOLOGY = auto()
+    SYMBOLMAPPING = auto()
+    SYMBOLSELECTION = auto()
+    SYMBOLPATTERNSELECTED = auto()
+    RULESAPPLIED = auto()
+    INLANGUAGEWORD = auto()
+    VERSIONHISTORY = auto()
+    HASBEENMODIFIED = auto()
+    HASMODIFIEDANCESTOR = auto()
 
 def new_garbage_string():
     """Helper method to produce a random string from uuid"""

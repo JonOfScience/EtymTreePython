@@ -115,9 +115,7 @@ class ProjectWindow(QWidget):
             "Symbol Pattern Selected": None,
             "Rules Applied": None,
             "In Language Word": None,
-            "Version History": None,
-            "Has Been Modified Since Last Resolve": None,
-            "Has Modified Ancestor": None}
+            "Version History": None}
 
         return layout
 
@@ -141,6 +139,7 @@ class ProjectWindow(QWidget):
         self._word_details_table_populate()
 
     def _details_model_data_changed(self, item: QStandardItem):
+        # Disconnect itemChanged from this
         details_table: QTreeView = self.controls.control_from_id("WordDetailsTable")
         details_model: QStandardItemModel = details_table.model()
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
