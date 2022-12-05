@@ -107,7 +107,7 @@ class Word:
             field_name = self.fields[field_name]
             if field_name in self._data:
                 return self._data[field_name]
-        raise ValueError("Specified field not recognised as a member of Word")
+        raise ValueError(f"Specified field {field_name} not recognised as a member of Word")
 
     def set_field_to(self, field_name: WordField, new_value: Any) -> None:
         """Sets data for field_name to new_value"""
@@ -189,7 +189,7 @@ class Lexicon:
             "Symbol Selection": WordField.SYMBOLSELECTION,
             "Symbol Pattern Selected": WordField.SYMBOLPATTERNSELECTED,
             "Rules Applied": WordField.RULESAPPLIED,
-            "In Language_word": WordField.INLANGUAGEWORD,
+            "In Language Word": WordField.INLANGUAGEWORD,
             "Version History": WordField.VERSIONHISTORY,
             "Has Been Modified Since Last Resolve": WordField.HASBEENMODIFIED,
             "Has Modified Ancestor": WordField.HASMODIFIEDANCESTOR}
@@ -231,7 +231,9 @@ class Lexicon:
         if isinstance(word, str):
             word: Word = self.index_by_translated_word[word]
         this_field = self._map_label_to_field(field)
-        return word.find_data_on(this_field)
+        if this_field is not None:
+            return word.find_data_on(this_field)
+        raise ValueError(f"Field label {field} is not mapped to a Word field")
 
     def get_parents_of(self, word: Word) -> Sequence[Word]:
         """Return the Word objects for any extant Translated Word Components"""
