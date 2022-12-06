@@ -25,7 +25,7 @@ class Word:
         string_set = Word._split_string_into_groups(to_validate)
         # Check groups for non-conformity
         for group in [x for x in string_set if x]:
-            single_consonants = re.match("^[aeiou]?[bcdfghjklmnpqrstvwxyz]{1}[aeiou]?$", group)
+            single_consonants = re.match("^[aeiou]{0,2}[bcdfghjklmnpqrstvwxyz]{1}[aeiou]{0,2}$", group)
             double_consonants = re.match("(^[aeiou]?(th|sh){1}[aeiou]?$)", group)
             if single_consonants is None and double_consonants is None:
                 return False

@@ -41,6 +41,17 @@ class ProjectUIController:
         return target.split(sep = separator)
 
     @staticmethod
+    def split_and_trim_string(target: str, separator: str='+'):
+        """Splits a string by a separator and trims the fragments"""
+        if not target:
+            return []
+        fragments = target.split(sep=separator)
+        trimmed = [" "] * len(fragments)
+        for i, v in enumerate(fragments):
+            trimmed[i] = str.strip(v)
+        return trimmed
+
+    @staticmethod
     def update_component_mapping(mapping: dict, component_id: str, components: Sequence[str]):
         """Updates component mapping with split component data.
         Components are in order.
@@ -116,8 +127,15 @@ class ProjectWindow(QWidget):
             "Rules Applied": None,
             "In Language Word": None,
             "Version History": None}
+        
+        self._col_formatter = {
+            "Translated Word Components": self._format_twc
+        }
 
         return layout
+
+    def _format_twc(self, twc_list: list[str]) -> str:
+        return " + ".join(twc_list)
 
     def _add_side_panel(self, layout: QLayout):
         side_panel = QVBoxLayout()
@@ -139,25 +157,34 @@ class ProjectWindow(QWidget):
         self._word_details_table_populate()
 
     def _details_model_data_changed(self, item: QStandardItem):
-        # Disconnect itemChanged from this
         details_table: QTreeView = self.controls.control_from_id("WordDetailsTable")
         details_model: QStandardItemModel = details_table.model()
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
         this_project: Project = self.options.find_by_id("CurrentProject")
         this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
-        this_lexicon.set_field_to_value(field_label, associated_word, item.text())
+        new_value = item.text()
+        if field_label == "Translated Word Components":
+            word_components = ProjectUIController.split_and_trim_string(target=new_value)
+            # word_components = ProjectUIController.clean_and_split_string(target=new_value)
+            new_value = word_components
+
+        this_lexicon.set_field_to_value(field_label, associated_word, new_value)
         this_project.store()
+
         if field_label == "Translated Word":
             self._build_translated_component_mappings()
         if field_label == "Translated Word Components":
             self._translated_component_mapping = ProjectUIController.update_component_mapping(
                 mapping=self._translated_component_mapping,
                 component_id=this_lexicon.get_field_for_word("Translated Word", associated_word),
-                components=ProjectUIController.clean_and_split_string(target=item.text()))
+                components=word_components)
         if field_label == "Etymological Symbology":
             item.setText(this_lexicon.get_field_for_word("Etymological Symbology", associated_word))
 
+        resolve_result = this_lexicon.resolve_modification_flags()
+        if resolve_result is False:
+            print("Project_UI: Flags propagation on field change Failed.")
         self._word_details_table_update()
         self._tree_overview_update()
 
@@ -221,8 +248,11 @@ class ProjectWindow(QWidget):
                 item_data = this_lexicon.get_field_for_word(
                     col_title,
                     self._selected_node)
-                if isinstance(item_data, list):
-                    item_data = "\n".join(item_data)
+                if col_title in self._col_formatter:
+                    item_data = self._col_formatter[col_title](item_data)
+                else:
+                    if isinstance(item_data, list):
+                        item_data = "\n".join(item_data)
                 new_item = QStandardItem(item_data)
                 new_item.setData(self._selected_node)
                 word_details_model.setItem(idx, 0, new_item)
@@ -246,7 +276,8 @@ class ProjectWindow(QWidget):
             translated_components = this_lexicon.get_field_for_word(
                 "Translated Word Components",
                 word)
-            components = ProjectUIController.clean_and_split_string(translated_components)
+            components = translated_components
+            # components = ProjectUIController.clean_and_split_string(translated_components)
             self._translated_component_mapping = ProjectUIController.update_component_mapping(
                 mapping=self._translated_component_mapping,
                 component_id=translated_word,

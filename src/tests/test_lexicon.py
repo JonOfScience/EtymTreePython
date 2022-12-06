@@ -44,7 +44,7 @@ class TestAnEmptyLexiconShould:
         """Return - True if the string only contains allowed characters for a Word."""
         assert Lexicon().validate_for_word_field(
             "etymological_symbology",
-            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z[]")
+            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z|aab|aaba|aabaa[]")
 
     def test_return_false_when_validating_symbology_with_invalid_characters_in_valid_groups(self):
         """Return - False if the string contains non-alphanumeric or non delimeters."""
@@ -56,7 +56,7 @@ class TestAnEmptyLexiconShould:
 
     def test_return_false_including_valid_characters_in_invalid_groups(self):
         """Return - False if the string contains invalid group structures"""
-        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'aab', 'aaba', 'aabaa', 'bc']
+        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'bc']
         for test_group in invalid_groups:
             assert Lexicon().validate_for_word_field(
                 field_name="etymological_symbology",
