@@ -41,7 +41,7 @@ class TestAnEmptyWordValidatingFieldsShould:
         """Return - True if the string only contains alphanumeric characters and '|', ']', '['."""
         result = Word().validate_for_field(
             "etymological_symbology",
-            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z[]")
+            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z|aab|aaba|aabaa[]")
         assert result
 
     def test_return_false_including_invalid_characters_in_valid_groups(self):
@@ -54,7 +54,7 @@ class TestAnEmptyWordValidatingFieldsShould:
 
     def test_return_false_including_valid_characters_in_invalid_groups(self):
         """Return - False if the string contains invalid group structures"""
-        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'aab', 'aaba', 'aabaa', 'bc']
+        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'bc']
         for test_group in invalid_groups:
             assert Word().validate_for_field(
                 field_name="etymological_symbology",
