@@ -59,6 +59,9 @@ class Project:
                 # IS IT DOING FILENAMES CORRECTLY?
                 new_lexicon.load_from(lexicon_id)
                 self._lexicons[lexicon_id] = new_lexicon
+                new_changehistory = LexiconChangeHistory()
+                new_changehistory.load_from(lexicon_id)
+                self._changehistories[lexicon_id] = new_changehistory
 
     @property
     def name(self) -> str:
@@ -83,8 +86,10 @@ class Project:
         # Store Project Settings file "Proj-<ProjID>"
         self._settings.export_config(f"data/PROJ-{self._settings.find_by_id('Filename')}")
         # Store Project Lexicon files "Lex-<LexID>"
+        lexicon: Lexicon
         for (lex_id, lexicon) in self._lexicons.items():
             lexicon.store_to(lex_id)
         # Store Project Lexicon Change History files "CHI-<LexID>"
-        # for (lex_id, changehistory) in self._changehistories.items():
-        #   changehistory.store_to(lex_id)
+        changehistory: LexiconChangeHistory
+        for (lex_id, changehistory) in self._changehistories.items():
+            changehistory.store_to(lex_id)

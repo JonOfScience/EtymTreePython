@@ -1,6 +1,9 @@
 """Repository for Change History Items"""
 from typing import Sequence
+from core.core import DataFormat
 from core.change_history_item import ChangeHistoryItem
+from services.io_service import IOService
+from services.change_history_io_service import LexiconChangeHistoryIOService
 
 
 class LexiconChangeHistory:
@@ -25,8 +28,15 @@ class LexiconChangeHistory:
 
     def store_to(self, filename: str):
         """Serialise and store ChangeHistoryItem entries locally"""
-        print(filename)
-    #     storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
+        storage_service: LexiconChangeHistoryIOService = LexiconChangeHistoryIOService(
+            IOService(DataFormat.JSON))
         output_dicts = self.retrieve_export_data_for()
-        print(output_dicts)
-    #     storage_service.store_to(filename + ".json", output_dicts)
+        storage_service.store_to(filename + ".json", output_dicts)
+
+    def load_from(self, filename: str):
+        """Read and deserialise LexiconChangeHistory entries from local store"""
+        storage_service: LexiconChangeHistoryIOService = LexiconChangeHistoryIOService(
+            IOService(DataFormat.JSON))
+        input_data = storage_service.load_from(filename + ".json")
+        for item_data in input_data:
+            self.add_item(ChangeHistoryItem(item_data))
