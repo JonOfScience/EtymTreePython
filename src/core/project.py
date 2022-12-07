@@ -79,9 +79,12 @@ class Project:
         return self._lexicons.get(identifier)
 
     def store(self) -> None:
-        """Store Project Files and Included Lexicon Files (separately)"""
-        # Store Project Settings file "Proj-<ID>"
+        """Store Project Files and then Included Lexicon and Change History Files (separately)"""
+        # Store Project Settings file "Proj-<ProjID>"
         self._settings.export_config(f"data/PROJ-{self._settings.find_by_id('Filename')}")
-        # Store Project Lexicon files "Lex-<ID>"
+        # Store Project Lexicon files "Lex-<LexID>"
         for (lex_id, lexicon) in self._lexicons.items():
             lexicon.store_to(lex_id)
+        # Store Project Lexicon Change History files "CHI-<LexID>"
+        # for (lex_id, changehistory) in self._changehistories.items():
+        #   changehistory.store_to(lex_id)

@@ -28,3 +28,10 @@ class ChangeHistoryItem:
     def set_description_to(self, new_description: str) -> None:
         """Sets the change item description to the value specified by new_description"""
         self._description_of_change = new_description
+
+    def data_for_export(self) -> dict:
+        """Provides data object for serialisation and storage"""
+        return {
+            "UId": self._uid,
+            "DescriptionOfChange": self._description_of_change,
+            "CreationTimeUTC": self._creation_time}

@@ -22,6 +22,14 @@ class TestAChangeHistoryItemShould:
         new_item = ChangeHistoryItem("A test Item relating to a test change.")
         assert new_item.created_utc
 
+    def test__generate_an_export_dto(self):
+        """Ready for serialisation and storage"""
+        new_item = ChangeHistoryItem("A test Item relating to a test change.")
+        export_dto = new_item.data_for_export()
+        assert export_dto["UId"] == new_item.uid
+        assert export_dto["DescriptionOfChange"] == new_item.description
+        assert export_dto["CreationTimeUTC"] == new_item.created_utc
+
 
 class TestGivenANewChangeHistoryItem:
     """Test operations on a new instance relating to simple data manipulation"""
