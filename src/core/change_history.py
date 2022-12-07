@@ -25,6 +25,8 @@ class LexiconChangeHistory:
 
     def store_to(self, filename: str):
         """Serialise and store ChangeHistoryItem entries locally"""
+        print(filename)
     #     storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
         output_dicts = self.retrieve_export_data_for()
+        print(output_dicts)
     #     storage_service.store_to(filename + ".json", output_dicts)
