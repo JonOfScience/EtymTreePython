@@ -5,6 +5,7 @@ import json
 from typing import Union, Sequence
 from configuration.settings import Settings
 from core.lexicon import Lexicon
+from core.change_history import LexiconChangeHistory
 
 
 class ProjectBuilder:
@@ -42,10 +43,13 @@ class Project:
         if isinstance(settings, Settings):
             self._settings = settings
         self._lexicons: Sequence[str, Lexicon] = {}
+        self._changehistories: Sequence[str, LexiconChangeHistory] = {}
         registered_lexicons = self._settings.find_by_id("RegisteredLexicons")
         if not registered_lexicons:
             base_blank_lexicon = Lexicon()
             self._lexicons[base_blank_lexicon.uuid] = base_blank_lexicon
+            base_blank_change_history = LexiconChangeHistory()
+            self._changehistories[base_blank_lexicon.uuid] = base_blank_change_history
             self._settings.set_option_to(
                 "RegisteredLexicons",
                 [lexicon_id for (lexicon_id, _) in self._lexicons.items()])

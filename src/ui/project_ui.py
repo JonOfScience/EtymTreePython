@@ -47,8 +47,8 @@ class ProjectUIController:
             return []
         fragments = target.split(sep=separator)
         trimmed = [" "] * len(fragments)
-        for i, v in enumerate(fragments):
-            trimmed[i] = str.strip(v)
+        for ind, value in enumerate(fragments):
+            trimmed[ind] = str.strip(value)
         return trimmed
 
     @staticmethod
@@ -127,7 +127,7 @@ class ProjectWindow(QWidget):
             "Rules Applied": None,
             "In Language Word": None,
             "Version History": None}
-        
+
         self._col_formatter = {
             "Translated Word Components": self._format_twc
         }
