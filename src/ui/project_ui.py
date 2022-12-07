@@ -141,7 +141,7 @@ class ProjectWindow(QWidget):
 
         return layout
 
-    def _format_twc(self, twc_list: list[str]) -> str:
+    def _format_twc(self, twc_list: Sequence[str]) -> str:
         return " + ".join(twc_list)
 
     def _add_side_panel(self, layout: QLayout):
