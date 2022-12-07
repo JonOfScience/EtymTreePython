@@ -34,12 +34,12 @@ class TestANewEmptyProjectShould:
         empty_project.store()
         assert mock_method.called
 
-    def test__prj_sto_01__store_two_files_locally_for_an_empty_project(self, mocker):
+    def test__prj_sto_01__store_three_files_locally_for_an_empty_project(self, mocker):
         """Placeholder: State Test"""
         empty_project = Project({"Filename": "TestProject"})
         mock_method = mocker.patch("builtins.open")
         empty_project.store()
-        assert mock_method.call_count == 2
+        assert mock_method.call_count == 3
 
 
 class TestANewProjectWithDefinedSettingsShould:

@@ -47,8 +47,8 @@ class ProjectUIController:
             return []
         fragments = target.split(sep=separator)
         trimmed = [" "] * len(fragments)
-        for i, v in enumerate(fragments):
-            trimmed[i] = str.strip(v)
+        for ind, value in enumerate(fragments):
+            trimmed[ind] = str.strip(value)
         return trimmed
 
     @staticmethod
@@ -116,25 +116,32 @@ class ProjectWindow(QWidget):
         # "Translated Word": ColType.FIELD  ->  A field of the Word object
         # "Translated Word Component Status": ColType.INVIEW  ->  Calculated in the view (a fn?)
         self._col_info = {
-            "Translated Word": None,
-            "Translated Word Components": None,
-            "In Language Components": None,
-            "Etymological Symbology": None,
-            "Compiled Symbology": None,
-            "Symbol Mapping": None,
-            "Symbol Selection": None,
-            "Symbol Pattern Selected": None,
-            "Rules Applied": None,
-            "In Language Word": None,
-            "Version History": None}
-        
-        self._col_formatter = {
-            "Translated Word Components": self._format_twc
-        }
+            "Translated Word":
+                {"ColType": None},
+            "Translated Word Components":
+                {"ColType": None, "ColFormatter": self._format_twc},
+            "In Language Components":
+                {"ColType": None},
+            "Etymological Symbology":
+                {"ColType": None},
+            "Compiled Symbology":
+                {"ColType": None},
+            "Symbol Mapping":
+                {"ColType": None},
+            "Symbol Selection":
+                {"ColType": None},
+            "Symbol Pattern Selected":
+                {"ColType": None},
+            "Rules Applied":
+                {"ColType": None},
+            "In Language Word":
+                {"ColType": None},
+            "Version History":
+                {"ColType": None}}
 
         return layout
 
-    def _format_twc(self, twc_list: list[str]) -> str:
+    def _format_twc(self, twc_list: Sequence[str]) -> str:
         return " + ".join(twc_list)
 
     def _add_side_panel(self, layout: QLayout):
@@ -244,12 +251,12 @@ class ProjectWindow(QWidget):
         word_details_model: QStandardItemModel = word_details_table.model()
         if self._selected_node:
             this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
-            for idx, (col_title, _) in enumerate(self._col_info.items()):
+            for idx, (col_title, col_settings) in enumerate(self._col_info.items()):
                 item_data = this_lexicon.get_field_for_word(
                     col_title,
                     self._selected_node)
-                if col_title in self._col_formatter:
-                    item_data = self._col_formatter[col_title](item_data)
+                if "ColFormatter" in col_settings:
+                    item_data = col_settings["ColFormatter"](item_data)
                 else:
                     if isinstance(item_data, list):
                         item_data = "\n".join(item_data)
