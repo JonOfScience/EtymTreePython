@@ -8,6 +8,11 @@ class LexiconChangeHistory:
     def __init__(self) -> None:
         self._items: Sequence[ChangeHistoryItem] = []
 
+    def add_item(self, item_to_add: ChangeHistoryItem) -> None:
+        """Add a ChangeHistoryItem that has not already been registered."""
+        if item_to_add not in self._items:
+            self._items.extend([item_to_add])
+
     def get_all_items(self) -> Sequence[ChangeHistoryItem]:
         """List all ChangeHistoryItems currently registered in the History"""
         return self._items
@@ -18,8 +23,8 @@ class LexiconChangeHistory:
             return [x.data_for_export() for x in items]
         return [x.data_for_export() for x in self.get_all_items()]
 
-    # def store_to(self, filename: str):
-    #     """Serialise and store Word entries locally"""
+    def store_to(self, filename: str):
+        """Serialise and store ChangeHistoryItem entries locally"""
     #     storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
-    #     output_dicts = self.retrieve_export_data_for()
+        output_dicts = self.retrieve_export_data_for()
     #     storage_service.store_to(filename + ".json", output_dicts)

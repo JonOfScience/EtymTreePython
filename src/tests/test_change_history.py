@@ -45,3 +45,44 @@ class TestALexiconChangeHistoryShould:
     def test__instantiate_blank(self):
         """A blank Change History is a valid state."""
         assert LexiconChangeHistory()
+
+
+class TestGivenANewLexiconChangeHistory:
+    """Test operations on a new instance related to records and I/O"""
+    def test__when_getting_all_items_then_provide_an_empty_list(self):
+        """Should not be None, but Empty list"""
+        empty_lch_items = LexiconChangeHistory().get_all_items()
+        assert isinstance(empty_lch_items, list)
+        assert not empty_lch_items
+
+    def test__when_getting_export_data_then_provide_an_empty_list(self):
+        """Should not be None, but Empty list"""
+        empty_lch_export_data = LexiconChangeHistory().retrieve_export_data_for()
+        assert isinstance(empty_lch_export_data, list)
+        assert not empty_lch_export_data
+
+    def test__a_new_item_can_be_added(self):
+        """The number of items registered should be 1 more after than before"""
+        new_lch = LexiconChangeHistory()
+        items_before = len(new_lch.get_all_items())
+        new_item = ChangeHistoryItem("A test item to be added.")
+        new_lch.add_item(new_item)
+        assert len(new_lch.get_all_items()) == items_before + 1
+
+
+class TestGivenALexiconChangeHistoryWithOneItem:
+    """Test operations on a LexiconChangeHistory related to records and I/O"""
+    def test__when_getting_all_items_then_provide_a_list_with_one_item(self):
+        """A list containing the one entry"""
+        new_item = ChangeHistoryItem("A test item.")
+        lch = LexiconChangeHistory()
+        lch.add_item(new_item)
+        assert lch.get_all_items() == [new_item]
+
+    def test__when_getting_export_data_then_provide_a_list_with_data_matching_the_item(self):
+        """A list containing the dictionary represantation of the one entry"""
+        new_item = ChangeHistoryItem("A test item.")
+        lch = LexiconChangeHistory()
+        export_dto = new_item.data_for_export()
+        lch.add_item(new_item)
+        assert lch.retrieve_export_data_for() == [export_dto]
