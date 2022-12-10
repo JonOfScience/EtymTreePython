@@ -15,7 +15,9 @@ from PyQt5.QtWidgets import (
 
 from core.core import ProjectStatus
 from core.project import Project, ProjectBuilder
-from core.lexicon import Lexicon, Word
+from core.change_history import LexiconChangeHistory
+from core.lexicon import Lexicon
+from core.word import Word
 # Replace this with an interface
 from configuration.settings import Settings
 from ui.interfaces import Controls
@@ -137,12 +139,21 @@ class ProjectWindow(QWidget):
             "In Language Word":
                 {"ColType": None},
             "Version History":
-                {"ColType": None}}
+                {"ColType": None, "ColFormatter": self._format_vh}}
 
         return layout
 
     def _format_twc(self, twc_list: Sequence[str]) -> str:
         return " + ".join(twc_list)
+
+    def _format_vh(self, vh_list: Sequence[str]) -> str:
+        this_changehistory: LexiconChangeHistory = self.options.find_by_id("CurrentChangeHistory")
+        return_items = []
+        for list_item in vh_list:
+            found_item = this_changehistory.find_item_with_id(list_item)
+            if found_item is not None:
+                return_items.append(found_item.description)
+        return "\n".join(return_items)
 
     def _add_side_panel(self, layout: QLayout):
         side_panel = QVBoxLayout()
@@ -170,13 +181,18 @@ class ProjectWindow(QWidget):
         associated_word: Word = item.data()
         this_project: Project = self.options.find_by_id("CurrentProject")
         this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+        this_changehistory: LexiconChangeHistory = self.options.find_by_id("CurrentChangeHistory")
         new_value = item.text()
         if field_label == "Translated Word Components":
             word_components = ProjectUIController.split_and_trim_string(target=new_value)
             # word_components = ProjectUIController.clean_and_split_string(target=new_value)
             new_value = word_components
 
-        this_lexicon.set_field_to_value(field_label, associated_word, new_value)
+        change_history_item = this_lexicon.set_field_to_value(
+            field_label,
+            associated_word,
+            new_value)
+        this_changehistory.add_item(change_history_item)
         this_project.store()
 
         if field_label == "Translated Word":
@@ -204,6 +220,15 @@ class ProjectWindow(QWidget):
     def _tree_overview_update(self, lexicon: Lexicon = None):
         if lexicon is None:
             lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+
+        # project: Project = self.options.find_by_id("CurrentProject")
+        # changehistory: LexiconChangeHistory = project.find_changehistory_by_id(lexicon.uuid)
+        # items = changehistory.get_all_items()
+        # print("CHANGE HISTORY START")
+        # for item in items:
+        #     print(item)
+        # print("CHANGE HISTORY END")
+
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
         _tree_model.clear()
@@ -323,3 +348,6 @@ class ProjectWindow(QWidget):
             self.options.find_by_id("CurrentProjectFile"))
         self.options.set_option_to("CurrentProject", loaded_project)
         self.options.set_option_to("CurrentLexicon", loaded_project.list_lexicons()[0])
+        self.options.set_option_to(
+            "CurrentChangeHistory",
+            loaded_project.find_changehistory_by_id(loaded_project.list_lexicons()[0].uuid))

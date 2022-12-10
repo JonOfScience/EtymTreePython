@@ -5,10 +5,14 @@ import uuid
 
 class ChangeHistoryItem:
     """Item recording a single change made to a single word."""
-    def __init__(self, description_of_change: str) -> None:
+    def __init__(self, description_of_change: str, item_data: dict = None) -> None:
         self._uid = uuid.uuid4().hex
         self._description_of_change = description_of_change
         self._creation_time = int(datetime.datetime.now().timestamp())
+        if item_data is not None:
+            self._uid = item_data["UId"]
+            self._description_of_change = item_data["DescriptionOfChange"]
+            self._creation_time = item_data["CreationTimeUTC"]
 
     @property
     def uid(self) -> str:

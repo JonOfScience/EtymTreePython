@@ -78,8 +78,12 @@ class Project:
         return [x for (_, x) in self._lexicons.items()]
 
     def find_lexicon_by_id(self, identifier: str) -> Lexicon:
-        """If identifier exists then a Lexicon is return, otherwise None"""
+        """If identifier exists then a Lexicon is returned, otherwise None"""
         return self._lexicons.get(identifier)
+
+    def find_changehistory_by_id(self, identifier: str) -> LexiconChangeHistory:
+        """If identifier exists then a LexiconChangeHistory is returned, otherwise None"""
+        return self._changehistories.get(identifier)
 
     def store(self) -> None:
         """Store Project Files and then Included Lexicon and Change History Files (separately)"""

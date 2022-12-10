@@ -136,8 +136,9 @@ class Lexicon:
         if isinstance(word, str):
             word: Word = self.index_by_translated_word[word]
         this_field = self._map_label_to_field(field)
-        word.set_field_to(this_field, new_value)
+        change_history_item = word.set_field_to(this_field, new_value)
         self._build_indexes()
+        return change_history_item
 
     def store_to(self, filename: str):
         """Serialise and store Word entries locally"""
@@ -149,5 +150,6 @@ class Lexicon:
         """Read and deserialise Word entries from local store"""
         storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
         input_data = storage_service.load_from(filename + ".json")
+        self.uuid = filename
         for word_data in input_data:
             self.add_entry(Word(word_data))

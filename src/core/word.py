@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Union, Any
 from core.core import WordField, new_garbage_string
+from core.change_history_item import ChangeHistoryItem
 
 
 class Word:
@@ -50,7 +51,8 @@ class Word:
             WordField.INLANGUAGEWORD: "in_language_word",
             WordField.VERSIONHISTORY: "version_history",
             WordField.HASBEENMODIFIED: "has_been_modified_since_last_resolve",
-            WordField.HASMODIFIEDANCESTOR: "has_modified_ancestor"}
+            WordField.HASMODIFIEDANCESTOR: "has_modified_ancestor",
+            WordField.RESOLVEDHISTORYITEMS: "resolved_history_items"}
 
         self._protected = [
             WordField.HASBEENMODIFIED,
@@ -58,7 +60,7 @@ class Word:
 
         self._data = {
             "translated_word": new_garbage_string(),
-            "translated_word_components": None,
+            "translated_word_components": [],
             "in_language_components": None,
             "etymological_symbology": None,
             "compiled_symbology": None,
@@ -69,7 +71,8 @@ class Word:
             "in_language_word": None,
             "version_history": [],
             "has_been_modified_since_last_resolve": None,  # "Ripple" resolution
-            "has_modified_ancestor": None}
+            "has_modified_ancestor": None,
+            "resolved_history_items": []}
         if merge_data is not None:
             for (field_name, field_value) in merge_data.items():
                 self._data[field_name] = field_value
@@ -105,37 +108,46 @@ class Word:
                 return self._data[field_name]
         raise ValueError(f"Specified field {field_name} not recognised as a member of Word")
 
-    def set_field_to(self, field_name: WordField, new_value: Any) -> None:
+    def set_field_to(self, field_name: WordField, new_value: Any) -> Union[ChangeHistoryItem, None]:
         """Sets data for field_name to new_value"""
         if isinstance(field_name, WordField):
             if field_name in self._protected:
-                return
+                return None
             field_name = self.fields[field_name]
         else:
-            return
+            return None
         if self._data[field_name] == new_value:
-            return
+            return None
         if field_name == "version_history":
-            return
+            return None
         if isinstance(new_value, str):
             if self.validate_for_field(field_name=field_name, to_validate=new_value) is False:
                 print("Word: Error - Field cannot be set to invalid value.")
-                return
+                return None
         old_value = self._data[field_name]
         self._data[field_name] = new_value
         # System field changes should NOT trigger a modification flag change
         if field_name not in [
             "has_modified_ancestor",
             "has_been_modified_since_last_resolve",
-            "version_history"]:
+            "version_history",
+            "resolved_history_items"]:
             self._data["has_been_modified_since_last_resolve"] = True
-        self._add_version_history_entry(field_name, old_value, new_value)
+        new_change_history_item = self._add_version_history_entry(field_name, old_value, new_value)
+        return new_change_history_item
 
-    def _add_version_history_entry(self, field_name: str, old_value: Any, new_value: Any):
+    def _add_version_history_entry(self,
+            field_name: str,
+            old_value: Any,
+            new_value: Any) -> ChangeHistoryItem:
         if not self._data["version_history"]:
             self._data["version_history"] = []
-        log_entry = f"{field_name} FROM {old_value} TO {new_value}"
-        self._data["version_history"].append(log_entry)
+        word_for_entry =self.find_data_on(WordField.TRANSLATEDWORD)
+        log_entry = f"{field_name} ON {word_for_entry} FROM {old_value} TO {new_value}"
+        change_history_item = ChangeHistoryItem(log_entry)
+        # self._data["version_history"].append(log_entry)
+        self._data["version_history"].append(change_history_item.uid)
+        return change_history_item
 
     def _validate_characters_for_field(self, field_name: str, to_validate: str):
         if field_name not in Word._character_validators:
