@@ -1,10 +1,12 @@
 """Word details GUI module"""
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import (
+    QAbstractItemView,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QPlainTextEdit,
+    QPushButton,
     QTableView,
     QVBoxLayout
 )
@@ -133,12 +135,29 @@ class WordDetails:
         self.details_group = QGroupBox("Word Details")
         self.details_group.setMinimumWidth(500)
         details_layout = QVBoxLayout()
+
         details_table = QTableView()
         details_table.setObjectName("WordDetailsTable")
         details_model = QStandardItemModel()
         details_table.setModel(details_model)
         details_layout.addWidget(details_table)
+
+        changes_table = QTableView()
+        changes_table.setObjectName("ChangeHistoryTable")
+        changes_model = QStandardItemModel()
+        changes_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows) #pylint: disable=no-member
+        changes_table.setModel(changes_model)
+        details_layout.addWidget(changes_table)
+
+        resolve_change_btn = QPushButton()
+        resolve_change_btn.setObjectName("ResolveChangeBtn")
+        resolve_change_btn.setText("Resolve Selected Change")
+        resolve_change_btn.setEnabled(False)
+        details_layout.addWidget(resolve_change_btn)
+
         self.controls.register_control(details_table)
+        self.controls.register_control(changes_table)
+        self.controls.register_control(resolve_change_btn)
         self.details_group.setLayout(details_layout)
 
     def get_layout(self):

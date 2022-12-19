@@ -7,6 +7,8 @@ from services.io_service import IOService
 from services.lexicon_io_service import LexiconIOService
 from core.core import DataFormat, WordField
 from core.word import Word
+from core.change_history import LexiconChangeHistory
+from core.change_history_item import ChangeHistoryItem
 
 
 class Lexicon:
@@ -19,7 +21,9 @@ class Lexicon:
         self.uuid = uuid.uuid4().hex
         self.title = "BlankProjectLexicon"
         self.members = []
+        self.changehistory = LexiconChangeHistory()
         self.index_by_translated_word = {}
+        self.index_by_relationship = {}
         self.label_to_wordfield_mapping = {
             "Translated Word": WordField.TRANSLATEDWORD,
             "Translated Word Components": WordField.TRANSLATEDCOMPONENTS,
@@ -37,8 +41,39 @@ class Lexicon:
 
     def _build_indexes(self):
         self.index_by_translated_word.clear()
+        self.index_by_relationship = {"ROOT": []}
         for word in self.members:
-            self.index_by_translated_word[word.find_data_on(WordField.TRANSLATEDWORD)] = word
+            translated_word = word.find_data_on(WordField.TRANSLATEDWORD)
+            self.index_by_translated_word[translated_word] = word
+            self.index_by_relationship[translated_word] = []
+        for word in self.members:
+            parent_components: list = word.find_data_on(WordField.TRANSLATEDCOMPONENTS)
+            if parent_components is None:
+                self.index_by_relationship["ROOT"].append(word)
+            elif len(parent_components) == 0:
+                self.index_by_relationship["ROOT"].append(word)
+            else:
+                for component in parent_components:
+                    if self.index_by_translated_word.get(component) is not None:
+                        self.index_by_relationship[component].append(word)
+
+    def get_children_of(self, parent_word: Word) -> Union[list[Word], None]:
+        """Gets the immediate child Words of the specified Word, otherwise None"""
+        return self.index_by_relationship[parent_word.find_data_on(WordField.TRANSLATEDWORD)]
+
+    def get_descendants_of(
+            self,
+            parent_word: Word,
+            descendants_list: list = None) -> Union[list[Word], None]:
+        """Recursively gets all children and further descendents of a parent Word"""
+        further_descendants_list = []
+        if descendants_list is not None:
+            further_descendants_list = descendants_list
+        next_children = self.get_children_of(parent_word)
+        further_descendants_list.extend(next_children)
+        for child_word in next_children:
+            further_descendants_list = self.get_descendants_of(child_word, further_descendants_list)
+        return further_descendants_list
 
     def _map_label_to_field(self, field_label) -> WordField:
         return self.label_to_wordfield_mapping.get(field_label)
@@ -57,15 +92,17 @@ class Lexicon:
             return [x.data_for_export() for x in words_selected]
         return [x.data_for_export() for x in self.get_all_words()]
 
-    def create_entry(self):
+    def create_entry(self) -> Word:
         """Create a Word from the Template and then register it in the Lexicon"""
         new_word = Word()
         self.add_entry(new_word)
+        return new_word
 
     def add_entry(self, entry: Word):
         """Register a given Word in the Lexicon"""
         self.members.append(entry)
-        self.index_by_translated_word[entry.find_data_on(WordField.TRANSLATEDWORD)] = entry
+        self._build_indexes()
+        # self.index_by_translated_word[entry.find_data_on(WordField.TRANSLATEDWORD)] = entry
 
     def get_field_for_word(self, field: str, word: Union[Word, str] = None):
         """Return the data for specified field from a supplied word"""
@@ -76,54 +113,10 @@ class Lexicon:
             return word.find_data_on(this_field)
         raise ValueError(f"Field label {field} is not mapped to a Word field")
 
-    def get_parents_of(self, word: Word) -> Sequence[Word]:
-        """Return the Word objects for any extant Translated Word Components"""
-        parent_items = word.find_data_on(WordField.TRANSLATEDCOMPONENTS)
-        if parent_items is None:
-            return []
-        return [self.index_by_translated_word.get(x)
-                for x
-                in parent_items
-                if self.index_by_translated_word.get(x) is not None]
-
-    def determine_ancestor_modification_for(self, word: Word) -> bool:
-        """Return True if a parent has been modified or has a modified ancestor, else false"""
-        word_parents = self.get_parents_of(word)
-        if not word_parents:
-            return False
-        for parent_word in word_parents:
-            if (parent_word.has_unresolved_modification
-                or parent_word.has_modified_ancestor):
-                return True
-        return False
-
-    def resolve_modification_flags_pass(self) -> int:
-        """Loops through all entries checking for status flag changes.
-        Returns number of changes made."""
-        flags_flipped = 0
-        word: Word
+    def resolve_modification_flags(self):
+        """Identifies unresolved modifications on all entries."""
         for word in self.members:
-            old_value = word.has_modified_ancestor
-            new_value = self.determine_ancestor_modification_for(word)
-            word.acknowledge_ancestor_modification_status_of(new_value)
-            if old_value != word.has_modified_ancestor:
-                flags_flipped += 1
-        return flags_flipped
-
-    def resolve_modification_flags(self) -> bool:
-        """Calls multiple resolving passes.
-        Continues until no changes are made in consecutive passes.
-        Returns - Positive pass count on successful resolution or 0 if resolution fails"""
-        resolve_pass_max = 10
-        flags_flipped = 1
-        passes_since_last_flip = 0
-        while passes_since_last_flip < resolve_pass_max and flags_flipped > 0:
-            flags_flipped = self.resolve_modification_flags_pass()
-            if flags_flipped:
-                passes_since_last_flip += 1
-        if flags_flipped == 0:
-            return True
-        return False
+            word.identify_unresolved_modifications(self.changehistory)
 
     def validate_for_word_field(self, field_name: str, to_validate: str):
         """Returns True if Word validates to_validate"""
@@ -137,8 +130,23 @@ class Lexicon:
             word: Word = self.index_by_translated_word[word]
         this_field = self._map_label_to_field(field)
         change_history_item = word.set_field_to(this_field, new_value)
-        self._build_indexes()
-        return change_history_item
+
+        if change_history_item is not None:
+            self._build_indexes()
+
+            self.changehistory.add_item(change_history_item)
+
+            word.identify_unresolved_modifications(self.changehistory)
+
+            all_children = self.get_descendants_of(word)
+            for child_word in all_children:
+                child_word.acknowledge_ancestor_modification_of(change_history_item.uid)
+                child_word.identify_unresolved_modifications(self.changehistory)
+
+    def resolve_change_for(self, change_item: ChangeHistoryItem, changed_word: Word):
+        """Logs that change_item has been resolved for changed_word"""
+        changed_word.resolve_change_with_id(change_item.uid)
+        changed_word.identify_unresolved_modifications(self.changehistory)
 
     def store_to(self, filename: str):
         """Serialise and store Word entries locally"""

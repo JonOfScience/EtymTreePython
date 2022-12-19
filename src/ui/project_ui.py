@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 from core.core import ProjectStatus
 from core.project import Project, ProjectBuilder
 from core.change_history import LexiconChangeHistory
+from core.change_history_item import ChangeHistoryItem
 from core.lexicon import Lexicon
 from core.word import Word
 # Replace this with an interface
@@ -72,12 +73,13 @@ class ProjectWindow(QWidget):
 
         self._selected_item = None
         self._selected_node = None
+        self._selected_change_node = None
 
         self._translated_component_mapping = {}
 
         modified_status_colours = {
             True: QBrush(QColor(255, 0, 0)),
-            False: QBrush(QColor(255, 255, 255))}
+            False: QBrush(QColor(0, 0, 0))}
         ancestor_status_colours = {
             True: QBrush(QColor(243, 207, 198)),
             False: QBrush(QColor(255, 255, 255))}
@@ -137,9 +139,14 @@ class ProjectWindow(QWidget):
             "Rules Applied":
                 {"ColType": None},
             "In Language Word":
-                {"ColType": None},
-            "Version History":
-                {"ColType": None, "ColFormatter": self._format_vh}}
+                {"ColType": None}}
+
+        history_table: QTableView = self.controls.control_from_id("ChangeHistoryTable")
+        history_table.clicked.connect(
+            self._change_history_selection_changed)
+
+        _resolve_btn: QPushButton = self.controls.control_from_id("ResolveChangeBtn")
+        _resolve_btn.clicked.connect(self._resolve_change_btn_clicked)
 
         return layout
 
@@ -173,6 +180,27 @@ class ProjectWindow(QWidget):
         # The data formatting & field selection needs to be in a controller (MVC)
         # Don't pass OUT a control, pass IN the text that needs to be set.
         self._word_details_table_populate()
+        self._changehistory_table_populate()
+
+    def _change_history_selection_changed(self):
+        _change_history: QTreeView = self.controls.control_from_id("ChangeHistoryTable")
+        selected_row = _change_history.selectionModel().selectedIndexes()[0]
+        _selected_change_item = _change_history.model().itemFromIndex(selected_row)
+        self._selected_change_node: ChangeHistoryItem = _selected_change_item.data()
+        _resolve_btn: QPushButton = self.controls.control_from_id("ResolveChangeBtn")
+        if self._selected_change_node and not _resolve_btn.isEnabled():
+            _resolve_btn.setEnabled(True)
+        else:
+            _resolve_btn.setEnabled(False)
+
+    def _resolve_change_btn_clicked(self):
+        if self._selected_change_node and self._selected_node:
+            self.current_lexicon.resolve_change_for(self._selected_change_node, self._selected_node)
+            self._tree_overview_update()
+            self._changehistory_table_populate()
+            this_project: Project = self.options.find_by_id("CurrentProject")
+            this_project.store()
+            self.controls.control_from_id("ResolveChangeBtn").setEnabled(False)
 
     def _details_model_data_changed(self, item: QStandardItem):
         details_table: QTreeView = self.controls.control_from_id("WordDetailsTable")
@@ -180,12 +208,11 @@ class ProjectWindow(QWidget):
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
         this_project: Project = self.options.find_by_id("CurrentProject")
-        this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+        this_lexicon = self.current_lexicon
         this_changehistory: LexiconChangeHistory = self.options.find_by_id("CurrentChangeHistory")
         new_value = item.text()
         if field_label == "Translated Word Components":
             word_components = ProjectUIController.split_and_trim_string(target=new_value)
-            # word_components = ProjectUIController.clean_and_split_string(target=new_value)
             new_value = word_components
 
         change_history_item = this_lexicon.set_field_to_value(
@@ -205,29 +232,17 @@ class ProjectWindow(QWidget):
         if field_label == "Etymological Symbology":
             item.setText(this_lexicon.get_field_for_word("Etymological Symbology", associated_word))
 
-        resolve_result = this_lexicon.resolve_modification_flags()
-        if resolve_result is False:
-            print("Project_UI: Flags propagation on field change Failed.")
         self._word_details_table_update()
         self._tree_overview_update()
 
     def _new_word_clicked(self):
-        lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
-        lexicon.create_entry()
+        self.current_lexicon.create_entry()
         self._build_translated_component_mappings()
         self._window_update()
 
     def _tree_overview_update(self, lexicon: Lexicon = None):
         if lexicon is None:
-            lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
-
-        # project: Project = self.options.find_by_id("CurrentProject")
-        # changehistory: LexiconChangeHistory = project.find_changehistory_by_id(lexicon.uuid)
-        # items = changehistory.get_all_items()
-        # print("CHANGE HISTORY START")
-        # for item in items:
-        #     print(item)
-        # print("CHANGE HISTORY END")
+            lexicon = self.current_lexicon
 
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
@@ -239,15 +254,11 @@ class ProjectWindow(QWidget):
             word_components = self._translated_component_mapping[translated_word]
             display_text = f"{translated_word} [{', '.join(word_components)}]"
             new_item = QStandardItem(display_text)
-            modified_status = lexicon.get_field_for_word(
-                "Has Been Modified Since Last Resolve",
-                word)
+            modified_status = word.has_unresolved_modification
             foreground_colour = self.options.find_by_id("ModStatusColours").get(modified_status)
             if foreground_colour is not None:
                 new_item.setForeground(foreground_colour)
-            ancestor_status = lexicon.get_field_for_word(
-                "Has Modified Ancestor",
-                word)
+            ancestor_status = word.has_modified_ancestor
             background_colour = self.options.find_by_id("AncStatusColours").get(ancestor_status)
             if background_colour is not None:
                 new_item.setBackground(background_colour)
@@ -275,7 +286,7 @@ class ProjectWindow(QWidget):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
         word_details_model: QStandardItemModel = word_details_table.model()
         if self._selected_node:
-            this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+            this_lexicon = self.current_lexicon
             for idx, (col_title, col_settings) in enumerate(self._col_info.items()):
                 item_data = this_lexicon.get_field_for_word(
                     col_title,
@@ -289,19 +300,52 @@ class ProjectWindow(QWidget):
                 new_item.setData(self._selected_node)
                 word_details_model.setItem(idx, 0, new_item)
 
+    def _changehistory_table_update(self):
+        table: QTableView = self.controls.control_from_id("ChangeHistoryTable")
+        table.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch
+        )
+        table.verticalHeader().setSectionResizeMode(
+            # QHeaderView.ResizeToContents
+            QHeaderView.Stretch
+        )
+        model: QStandardItemModel = table.model()
+        model.setHorizontalHeaderLabels(["Change Description", "Resolved"])
+
+    def _changehistory_table_populate(self):
+        changes_table: QTableView = self.controls.control_from_id("ChangeHistoryTable")
+        changes_model: QStandardItemModel = changes_table.model()
+        changes_model.clear()
+        self._changehistory_table_update()
+
+        change_history = self.current_changehistory
+        if self._selected_node:
+            this_lexicon = self.current_lexicon
+            item_data = this_lexicon.get_field_for_word(
+                "Version History",
+                self._selected_node)
+            for idx, change_data in enumerate(item_data):
+                logged_item = change_history.find_item_with_id(change_data)
+                resolved = self._selected_node.has_resolved_change_with_id(change_data)
+                resolve_description = QStandardItem(str(resolved))
+                resolve_description.setData(logged_item)
+                if logged_item is not None:
+                    change_description = QStandardItem(logged_item.description)
+                else:
+                    change_description = QStandardItem(change_data)
+                change_description.setData(logged_item)
+                changes_model.setItem(idx, 0, change_description)
+                changes_model.setItem(idx, 1, resolve_description)
+
     def _check_focus(self):
         if self.isActiveWindow():
             if self.options.find_by_id("IsLaunching"):
                 self.options.set_option_to("IsLaunching", False)
                 self._window_launch(self.options.find_by_id("ProjectStatus"))
-                lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
-                resolve_result = lexicon.resolve_modification_flags()
-                if resolve_result is False:
-                    print("Project_UI: Flags propagation on load Failed.")
                 self._window_update()
 
     def _build_translated_component_mappings(self):
-        this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
+        this_lexicon = self.current_lexicon
         all_words = this_lexicon.get_all_words()
         for word in all_words:
             translated_word = this_lexicon.get_field_for_word("Translated Word", word)
@@ -309,7 +353,6 @@ class ProjectWindow(QWidget):
                 "Translated Word Components",
                 word)
             components = translated_components
-            # components = ProjectUIController.clean_and_split_string(translated_components)
             self._translated_component_mapping = ProjectUIController.update_component_mapping(
                 mapping=self._translated_component_mapping,
                 component_id=translated_word,
@@ -331,9 +374,9 @@ class ProjectWindow(QWidget):
             project_title = this_project.name
         self.setWindowTitle("EtymTree - Project Overview - (" + project_title + ")")
 
-        this_lexicon: Lexicon = self.options.find_by_id("CurrentLexicon")
-        self._tree_overview_update(this_lexicon)
+        self._tree_overview_update(self.current_lexicon)
         self._word_details_table_update()
+        self._changehistory_table_update()
 
     def _create_new_project(self):
         self.options.set_option_to("ProjectStatus", ProjectStatus.EMPTY)
@@ -351,3 +394,13 @@ class ProjectWindow(QWidget):
         self.options.set_option_to(
             "CurrentChangeHistory",
             loaded_project.find_changehistory_by_id(loaded_project.list_lexicons()[0].uuid))
+
+    @property
+    def current_lexicon(self) -> Lexicon:
+        """The currently active Lexicon in the Window"""
+        return self.options.find_by_id("CurrentLexicon")
+
+    @property
+    def current_changehistory(self) -> LexiconChangeHistory:
+        """The change history attached to the active Lexicon"""
+        return self.options.find_by_id("CurrentChangeHistory")
