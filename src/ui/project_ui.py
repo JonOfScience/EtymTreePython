@@ -71,7 +71,6 @@ class ProjectWindow(QWidget):
         self.options = Settings()
         self.controls = Controls()
 
-        self._selected_item = None
         self._selected_node = None
         self._selected_change_node = None
 
@@ -175,8 +174,8 @@ class ProjectWindow(QWidget):
     def _tree_overview_selection_changed(self):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         selected_cell = _tree_overview.selectionModel().selectedIndexes()[0]
-        self._selected_item = _tree_overview.model().itemFromIndex(selected_cell)
-        self._selected_node: Word = self._selected_item.data()
+        _selected_item = _tree_overview.model().itemFromIndex(selected_cell)
+        self._selected_node: Word = _selected_item.data()
         # The data formatting & field selection needs to be in a controller (MVC)
         # Don't pass OUT a control, pass IN the text that needs to be set.
         self._word_details_table_populate()
