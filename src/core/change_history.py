@@ -1,5 +1,5 @@
 """Repository for Change History Items"""
-from typing import Sequence
+from typing import Sequence, List
 from core.core import DataFormat
 from core.change_history_item import ChangeHistoryItem
 from services.io_service import IOService
@@ -37,7 +37,7 @@ class LexiconChangeHistory:
         """Return a ChangeHistoryItem if the id exists, otherwise None."""
         return self._id_index.get(item_id)
 
-    def find_items_with_originator(self, originator_id: str) -> list[str]:
+    def find_items_with_originator(self, originator_id: str) -> List[str]:
         """Return a sequence of ChangeHistoryItem ids with the given originator, otherwise None."""
         return self._originator_index.get(originator_id)
 
