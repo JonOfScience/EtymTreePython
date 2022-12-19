@@ -39,6 +39,8 @@ class WordField(Enum):
     VERSIONHISTORY = auto()
     HASBEENMODIFIED = auto()
     HASMODIFIEDANCESTOR = auto()
+    RESOLVEDHISTORYITEMS = auto()
+    UID = auto()
 
 def new_garbage_string():
     """Helper method to produce a random string from uuid"""

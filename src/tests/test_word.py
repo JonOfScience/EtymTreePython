@@ -1,5 +1,6 @@
 """Tests for a single Word."""
 from core.lexicon import Word, WordField
+from core.change_history_item import ChangeHistoryItem
 
 
 class TestAnEmptyWordShould:
@@ -63,14 +64,12 @@ class TestAnEmptyWordValidatingFieldsShould:
 
 class TestModifyingFieldsShould:
     """Test operations for an empty Word with linked changes when changing field values"""
-    def test__setting_a_field_successfully_sets_the_change_flag_to_true(self):
-        """Flag value is true and has changed after being successfully set"""
+    def test__setting_a_field_successfully_produces_a_change_history_item(self):
+        """Items are then stored for cross-referencing and recall."""
         new_word = Word()
-        status_before = new_word.has_unresolved_modification
-        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu|da|")
-        status_after = new_word.has_unresolved_modification
-        assert status_after != status_before
-        assert status_after
+        change_item = new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu|da|")
+        assert change_item is not None
+        assert isinstance(change_item, ChangeHistoryItem)
 
     def test__setting_a_field_unsuccessfully_does_not_change_the_flag(self):
         """Flag value is true and has changed after being successfully set"""
@@ -150,6 +149,6 @@ class TestAPopulatedWordShould:
 
     def test__not_change_a_protected_field_directly(self):
         """Protected fields should not respond to calls to set_field_to."""
-        word = Word({"has_modified_ancestor": True})
-        word.set_field_to(WordField.HASMODIFIEDANCESTOR, False)
-        assert word.has_modified_ancestor is True
+        word = Word({"resolved_history_items": ["OLDITEM"]})
+        word.set_field_to(WordField.RESOLVEDHISTORYITEMS, ["NEWITEM"])
+        assert word.find_data_on(WordField.RESOLVEDHISTORYITEMS) == ["OLDITEM"]

@@ -6,7 +6,7 @@ from core.change_history import LexiconChangeHistory
 
 class TestAChangeHistoryItemShould:
     """Test operations related to instantiation."""
-    def test__not_be_able_to_be_instantiated_without_a_description(self):
+    def test__not_be_able_to_be_instantiated_without_a_description_or_originator(self):
         """An item with no description is not a valid item."""
         with pytest.raises(Exception) as e_info:
             ChangeHistoryItem() #pylint: disable=no-value-for-parameter
@@ -14,28 +14,29 @@ class TestAChangeHistoryItemShould:
 
     def test__have_an_id(self):
         """Unique ids are the way Items are referenced"""
-        new_item = ChangeHistoryItem("A test Item relating to a test change.")
+        new_item = ChangeHistoryItem("A test Item relating to a test change.", "Me")
         assert new_item.uid
 
     def test__have_a_timestamp_from_when_it_was_created(self):
         """Changes are listed in timestamp order for resolution"""
-        new_item = ChangeHistoryItem("A test Item relating to a test change.")
+        new_item = ChangeHistoryItem("A test Item relating to a test change.", "Me")
         assert new_item.created_utc
 
     def test__generate_an_export_dto(self):
         """Ready for serialisation and storage"""
-        new_item = ChangeHistoryItem("A test Item relating to a test change.")
+        new_item = ChangeHistoryItem("A test Item relating to a test change.", "Me")
         export_dto = new_item.data_for_export()
         assert export_dto["UId"] == new_item.uid
         assert export_dto["DescriptionOfChange"] == new_item.description
         assert export_dto["CreationTimeUTC"] == new_item.created_utc
+        assert export_dto["Originator"] == new_item.originator
 
 
 class TestGivenANewChangeHistoryItem:
     """Test operations on a new instance relating to simple data manipulation"""
     def test__when_set_description_to_is_called__then_the_description_is_changed(self):
         """Description is the only field that is modified by the user."""
-        new_item = ChangeHistoryItem("DescriptionA")
+        new_item = ChangeHistoryItem("DescriptionA", "Me")
         new_item.set_description_to("DescriptionB")
         assert new_item.description == "DescriptionB"
 
@@ -65,7 +66,7 @@ class TestGivenANewLexiconChangeHistory:
         """The number of items registered should be 1 more after than before"""
         new_lch = LexiconChangeHistory()
         items_before = len(new_lch.get_all_items())
-        new_item = ChangeHistoryItem("A test item to be added.")
+        new_item = ChangeHistoryItem("A test item to be added.", "Me")
         new_lch.add_item(new_item)
         assert len(new_lch.get_all_items()) == items_before + 1
 
@@ -74,15 +75,29 @@ class TestGivenALexiconChangeHistoryWithOneItem:
     """Test operations on a LexiconChangeHistory related to records and I/O"""
     def test__when_getting_all_items_then_provide_a_list_with_one_item(self):
         """A list containing the one entry"""
-        new_item = ChangeHistoryItem("A test item.")
+        new_item = ChangeHistoryItem("A test item.", "Me")
         lch = LexiconChangeHistory()
         lch.add_item(new_item)
         assert lch.get_all_items() == [new_item]
 
     def test__when_getting_export_data_then_provide_a_list_with_data_matching_the_item(self):
         """A list containing the dictionary represantation of the one entry"""
-        new_item = ChangeHistoryItem("A test item.")
+        new_item = ChangeHistoryItem("A test item.", "Me")
         lch = LexiconChangeHistory()
         export_dto = new_item.data_for_export()
         lch.add_item(new_item)
         assert lch.retrieve_export_data_for() == [export_dto]
+
+    def test__when_find_item_with_id_has_a_valid_id__then_the_item_is_returned(self):
+        """Items are indexed and returned."""
+        new_item = ChangeHistoryItem("A test item.", "Me")
+        lch = LexiconChangeHistory()
+        lch.add_item(new_item)
+        assert lch.find_item_with_id(new_item.uid) == new_item
+
+    def test__when_find_items_with_originator__then_the_item_is_returned(self):
+        """Items are indexed by originator and returned."""
+        new_item = ChangeHistoryItem("A test item.", "Me")
+        lch = LexiconChangeHistory()
+        lch.add_item(new_item)
+        assert lch.find_items_with_originator("Me") == [new_item.uid]

@@ -53,6 +53,8 @@ class Project:
             self._settings.set_option_to(
                 "RegisteredLexicons",
                 [lexicon_id for (lexicon_id, _) in self._lexicons.items()])
+            base_blank_lexicon.changehistory = base_blank_change_history
+            base_blank_lexicon.resolve_modification_flags()
         else:
             for lexicon_id in registered_lexicons:
                 new_lexicon = Lexicon()
@@ -62,6 +64,8 @@ class Project:
                 new_changehistory = LexiconChangeHistory()
                 new_changehistory.load_from(lexicon_id)
                 self._changehistories[lexicon_id] = new_changehistory
+                new_lexicon.changehistory = new_changehistory
+                new_lexicon.resolve_modification_flags()
 
     @property
     def name(self) -> str:
@@ -78,8 +82,12 @@ class Project:
         return [x for (_, x) in self._lexicons.items()]
 
     def find_lexicon_by_id(self, identifier: str) -> Lexicon:
-        """If identifier exists then a Lexicon is return, otherwise None"""
+        """If identifier exists then a Lexicon is returned, otherwise None"""
         return self._lexicons.get(identifier)
+
+    def find_changehistory_by_id(self, identifier: str) -> LexiconChangeHistory:
+        """If identifier exists then a LexiconChangeHistory is returned, otherwise None"""
+        return self._changehistories.get(identifier)
 
     def store(self) -> None:
         """Store Project Files and then Included Lexicon and Change History Files (separately)"""
