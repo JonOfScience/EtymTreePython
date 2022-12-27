@@ -138,6 +138,8 @@ class ProjectWindow(QWidget):
             "Rules Applied":
                 {"ColType": None},
             "In Language Word":
+                {"ColType": None},
+            "Is Related To":
                 {"ColType": None}}
 
         history_table: QTableView = self.controls.control_from_id("ChangeHistoryTable")
@@ -233,6 +235,7 @@ class ProjectWindow(QWidget):
 
         self._word_details_table_update()
         self._tree_overview_update()
+        self._changehistory_table_populate()
 
     def _new_word_clicked(self):
         self.current_lexicon.create_entry()
@@ -240,6 +243,8 @@ class ProjectWindow(QWidget):
         self._window_update()
 
     def _tree_overview_update(self, lexicon: Lexicon = None):
+        _root_char = '\N{seedling}'
+
         if lexicon is None:
             lexicon = self.current_lexicon
 
@@ -251,7 +256,12 @@ class ProjectWindow(QWidget):
         for word in lexicon.members:
             translated_word = lexicon.get_field_for_word("Translated Word", word)
             word_components = self._translated_component_mapping[translated_word]
-            display_text = f"{translated_word} [{', '.join(word_components)}]"
+            _display_char = '\N{herb}'
+            if len(lexicon.get_field_for_word("Translated Word Components", word)) < 1:
+                _display_char = _root_char
+            display_text = _display_char + f" {translated_word}"
+            if word_components:
+                display_text += f" [{', '.join(word_components)}]"
             new_item = QStandardItem(display_text)
             modified_status = word.has_unresolved_modification
             foreground_colour = self.options.find_by_id("ModStatusColours").get(modified_status)
@@ -335,6 +345,7 @@ class ProjectWindow(QWidget):
                 change_description.setData(logged_item)
                 changes_model.setItem(idx, 0, change_description)
                 changes_model.setItem(idx, 1, resolve_description)
+        changes_model.sort(1)
 
     def _check_focus(self):
         if self.isActiveWindow():

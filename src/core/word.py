@@ -14,12 +14,12 @@ class Word:
     @staticmethod
     def _split_string_into_groups(to_split: str):
         # Split to_validate into groups
-        delimiter_processing_order = ['|', '][', '[', ']']
+        delimiter_processing_order = ['+', '|', '][', '[', ']']
         string_set = [to_split]
         new_string_set = []
         for delimeter in delimiter_processing_order:
             for element in string_set:
-                new_string_set.extend(element.split(sep=delimeter))
+                new_string_set.extend(element.strip().split(sep=delimeter))
             string_set = new_string_set.copy()
             new_string_set.clear()
         return string_set
@@ -29,14 +29,18 @@ class Word:
         string_set = Word._split_string_into_groups(to_validate)
         # Check groups for non-conformity
         for group in [x for x in string_set if x]:
-            single_consonants = re.match("^[aeiou]{0,2}[bcdfghjklmnpqrstvwxyz][aeiou]{0,2}$", group)
-            double_consonants = re.match("(^[aeiou]?(th|sh){1}[aeiou]?$)", group)
+            single_consonants = re.match(
+                "^[aeioué]{0,2}[bcdfghjklmnpqrstvwxyz][aeioué]{0,2}$",
+                group)
+            double_consonants = re.match(
+                "(^[aeioué]?(th|sh|ch){1}[aeioué]?$)",
+                group)
             if single_consonants is None and double_consonants is None:
                 return False
         return True
 
     _character_validators = {
-        "etymological_symbology": 'abcdefghijklmnopqrstuvwxyz|[]'}
+        "etymological_symbology": 'abcdeéfghijklmnopqrstuvwxyz|[]+ '}
     _structure_validators = {
         "etymological_symbology": _structure_validator_etymological_symbology}
     def __init__(self, merge_data: dict = None) -> None:
@@ -59,6 +63,7 @@ class Word:
             WordField.HASBEENMODIFIED: "has_been_modified_since_last_resolve",
             WordField.HASMODIFIEDANCESTOR: "has_modified_ancestor",
             WordField.RESOLVEDHISTORYITEMS: "resolved_history_items",
+            WordField.ISRELATEDTO: "is_related_to",
             WordField.UID: "uid"}
 
         self._protected = [
@@ -71,18 +76,19 @@ class Word:
         self._data = {
             "translated_word": new_garbage_string(),
             "translated_word_components": [],
-            "in_language_components": None,
-            "etymological_symbology": None,
-            "compiled_symbology": None,
-            "symbol_mapping": None,
-            "symbol_selection": None,
-            "symbol_pattern_selected": None,
-            "rules_applied": None,
-            "in_language_word": None,
+            "in_language_components": "",
+            "etymological_symbology": "",
+            "compiled_symbology": "",
+            "symbol_mapping": "",
+            "symbol_selection": "",
+            "symbol_pattern_selected": "",
+            "rules_applied": "",
+            "in_language_word": "",
             "version_history": [],
             "has_been_modified_since_last_resolve": None,  # "Ripple" resolution
-            "has_modified_ancestor": None,
+            "has_modified_ancestor": "",
             "resolved_history_items": [],
+            "is_related_to": "",
             "uid": uuid.uuid4().hex}
         if merge_data is not None:
             for (field_name, field_value) in merge_data.items():
