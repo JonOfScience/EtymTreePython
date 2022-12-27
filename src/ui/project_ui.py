@@ -242,18 +242,25 @@ class ProjectWindow(QWidget):
         self._build_translated_component_mappings()
         self._window_update()
 
+    def _get_item_status_colour(self, palette_name: str, colour_key):
+        return self.options.find_by_id(palette_name).get(colour_key)
+
     def _tree_overview_update(self, lexicon: Lexicon = None):
         _root_char = '\N{seedling}'
 
         if lexicon is None:
             lexicon = self.current_lexicon
 
+        # Get View, Model and Root - Clear Model, Set Header to Hidden
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
         _tree_model.clear()
         _tree_overview.setHeaderHidden(True)
         root = _tree_model.invisibleRootItem()
+
+        # For each Word
         for word in lexicon.members:
+            # Get data about the Word
             translated_word = lexicon.get_field_for_word("Translated Word", word)
             word_components = self._translated_component_mapping[translated_word]
             _display_char = '\N{herb}'
@@ -262,16 +269,24 @@ class ProjectWindow(QWidget):
             display_text = _display_char + f" {translated_word}"
             if word_components:
                 display_text += f" [{', '.join(word_components)}]"
+
+            # Use data from thw Word to create the Item
             new_item = QStandardItem(display_text)
-            modified_status = word.has_unresolved_modification
-            foreground_colour = self.options.find_by_id("ModStatusColours").get(modified_status)
+            new_item.setData(word)
+
+            foreground_colour = self._get_item_status_colour(
+                "ModStatusColours",
+                word.has_unresolved_modification)
             if foreground_colour is not None:
                 new_item.setForeground(foreground_colour)
-            ancestor_status = word.has_modified_ancestor
-            background_colour = self.options.find_by_id("AncStatusColours").get(ancestor_status)
+
+            background_colour = self._get_item_status_colour(
+                "AncStatusColours",
+                word.has_modified_ancestor)
             if background_colour is not None:
                 new_item.setBackground(background_colour)
-            new_item.setData(word)
+
+            # Add new Item to the model
             root.appendRow(new_item)
         _tree_overview.expandAll()
         _tree_model.sort(0)
