@@ -40,6 +40,7 @@ class WordField(Enum):
     HASBEENMODIFIED = auto()
     HASMODIFIEDANCESTOR = auto()
     RESOLVEDHISTORYITEMS = auto()
+    ISRELATEDTO = auto()
     UID = auto()
 
 def new_garbage_string():

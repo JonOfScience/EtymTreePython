@@ -37,7 +37,8 @@ class Lexicon:
             "In Language Word": WordField.INLANGUAGEWORD,
             "Version History": WordField.VERSIONHISTORY,
             "Has Been Modified Since Last Resolve": WordField.HASBEENMODIFIED,
-            "Has Modified Ancestor": WordField.HASMODIFIEDANCESTOR}
+            "Has Modified Ancestor": WordField.HASMODIFIEDANCESTOR,
+            "Is Related To": WordField.ISRELATEDTO}
 
     def _build_indexes(self):
         self.index_by_translated_word.clear()
