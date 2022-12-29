@@ -28,7 +28,7 @@ class TestAnEmptyWordShould:
             "has_modified_ancestor": False}
         word = Word(init_data)
         for (fieldname, fieldvalue) in init_data.items():
-            assert word._data[fieldname] == fieldvalue #pylint: disable=protected-access
+            assert word._data[fieldname] == fieldvalue  # pylint: disable=protected-access
 
 
 class TestModifyingFieldsShould:

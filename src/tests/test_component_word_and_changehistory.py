@@ -4,6 +4,7 @@ from core.word import Word
 from core.lexicon import Lexicon
 from core.change_history import LexiconChangeHistory
 
+
 class TestGivenAModifiedWord:
     """Test functionality around distributed change tracking"""
     def test__when_a_field_is_changed__then_an_unresolved_self_modification_is_identified(self):
@@ -33,7 +34,6 @@ class TestGivenAModifiedWord:
         test_history.add_item(change_item)
         child_word.identify_unresolved_modifications(test_history)
         assert not child_word.has_unresolved_modification
-
 
     def test__when_an_ancestor_field_is_changed__then_unresolved_ancestor_modification(self):
         """BORK"""

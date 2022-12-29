@@ -26,6 +26,7 @@ class TestANewControlsInstance():
         print(e_info.type)
         assert e_info.type == ValueError
 
+
 class TestAFilledControlsInstance():
     """An instance of the Controls class with items should be able to..."""
     def test_lists_all_registered_controls(self):

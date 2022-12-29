@@ -9,7 +9,7 @@ class TestAChangeHistoryItemShould:
     def test__not_be_able_to_be_instantiated_without_a_description_or_originator(self):
         """An item with no description is not a valid item."""
         with pytest.raises(Exception) as e_info:
-            ChangeHistoryItem() #pylint: disable=no-value-for-parameter
+            ChangeHistoryItem()  # pylint: disable=no-value-for-parameter
         assert e_info.type == TypeError
 
     def test__have_an_id(self):

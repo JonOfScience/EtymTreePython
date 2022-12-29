@@ -176,8 +176,7 @@ class Lexicon:
 
         if isinstance(new_value, str):
             if self.validate_for_field(field_name=field, to_validate=new_value) is False:
-                print("Word: Error - Field cannot be set to invalid value.")
-                return None
+                raise ValueError("Word: Error - Field cannot be set to invalid value.")
 
         this_field = self._map_label_to_field(field)
         change_history_item = word.set_field_to(this_field, new_value)

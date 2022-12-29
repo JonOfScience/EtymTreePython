@@ -22,7 +22,6 @@ class LexiconChangeHistory:
             else:
                 self._originator_index[item.originator] = [item.uid]
 
-
     def add_item(self, item_to_add: ChangeHistoryItem) -> None:
         """Add a ChangeHistoryItem that has not already been registered."""
         if item_to_add not in self._items and item_to_add is not None:
@@ -62,5 +61,5 @@ class LexiconChangeHistory:
             IOService(DataFormat.JSON))
         input_data = storage_service.load_from(filename + ".json")
         for item_data in input_data:
-            self.add_item(ChangeHistoryItem("", "", item_data = item_data))
+            self.add_item(ChangeHistoryItem("", "", item_data=item_data))
         self._build_indexes()

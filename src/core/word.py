@@ -106,11 +106,13 @@ class Word:
                 else:
                     if change_item.originator == self._data["uid"]:
                         self._unresolved_changes_to_self.append(change_id)
-                        logger.debug("Item with id %s is an unresolved changed to %s.",
+                        logger.debug(
+                            "Item with id %s is an unresolved changed to %s.",
                             change_id, self._data["translated_word"])
                     else:
                         self._unresolved_changes_to_ancestor.append(change_id)
-                        logger.debug("Item with id %s is an unresolved ancestral change to %s.",
+                        logger.debug(
+                            "Item with id %s is an unresolved ancestral change to %s.",
                             change_id, self._data["translated_word"])
         logger.debug("END Determining Changes for : %s", self._data["translated_word"])
 
@@ -148,13 +150,14 @@ class Word:
         new_change_history_item = self._add_version_history_entry(field_name, old_value, new_value)
         return new_change_history_item
 
-    def _add_version_history_entry(self,
+    def _add_version_history_entry(
+            self,
             field_name: str,
             old_value: Any,
             new_value: Any) -> ChangeHistoryItem:
         if not self._data["version_history"]:
             self._data["version_history"] = []
-        word_for_entry =self.find_data_on(WordField.TRANSLATEDWORD)
+        word_for_entry = self.find_data_on(WordField.TRANSLATEDWORD)
         log_entry = f"{field_name} ON {word_for_entry} FROM {old_value} TO {new_value}"
         change_history_item = ChangeHistoryItem(log_entry, self._data["uid"])
         self._data["version_history"].append(change_history_item.uid)

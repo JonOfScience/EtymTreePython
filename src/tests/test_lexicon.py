@@ -113,6 +113,7 @@ class TestModifyingWordFieldsShould:
         history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert history_before == history_after
 
+
 class TestRetrievingWordChildrenShould:
     """Test operations for a Lexicon and Word cases"""
     def test__return_an_empty_list_for_a_childless_word(self):
