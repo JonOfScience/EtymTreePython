@@ -1,11 +1,12 @@
 """Library for Word and Lexicon level functionality."""
 from __future__ import annotations
 import uuid
+import re
 from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
 from services.lexicon_io_service import LexiconIOService
-from core.core import DataFormat, WordField
+from core.core import DataFormat, WordField, split_string_into_groups
 from core.word import Word
 from core.change_history import LexiconChangeHistory
 from core.change_history_item import ChangeHistoryItem
@@ -13,6 +14,26 @@ from core.change_history_item import ChangeHistoryItem
 
 class Lexicon:
     """Container to hold Words that comprise a language."""
+    @staticmethod
+    def _structure_validator_etymological_symbology(to_validate: str):
+        string_set = split_string_into_groups(to_validate)
+        # Check groups for non-conformity
+        for group in [x for x in string_set if x]:
+            single_consonants = re.match(
+                "^[aeioué]{0,2}[bcdfghjklmnpqrstvwxyz][aeioué]{0,2}$",
+                group)
+            double_consonants = re.match(
+                "(^[aeioué]?(th|sh|ch){1}[aeioué]?$)",
+                group)
+            if single_consonants is None and double_consonants is None:
+                return False
+        return True
+
+    _character_validators = {
+        "Etymological Symbology": 'abcdeéfghijklmnopqrstuvwxyz|[]+ '}
+    _structure_validators = {
+        "Etymological Symbology": _structure_validator_etymological_symbology}
+
     uuid: str
     title: str
     members: list[Word]
@@ -103,7 +124,6 @@ class Lexicon:
         """Register a given Word in the Lexicon"""
         self.members.append(entry)
         self._build_indexes()
-        # self.index_by_translated_word[entry.find_data_on(WordField.TRANSLATEDWORD)] = entry
 
     def get_field_for_word(self, field: str, word: Union[Word, str] = None):
         """Return the data for specified field from a supplied word"""
@@ -119,9 +139,31 @@ class Lexicon:
         for word in self.members:
             word.identify_unresolved_modifications(self.changehistory)
 
+    def _validate_characters_for_field(self, field_name: str, to_validate: str):
+        if field_name not in Lexicon._character_validators:
+            return None
+        acceptable_chars = set(Lexicon._character_validators[field_name])
+        characters = set(to_validate.lower())
+        return characters.issubset(acceptable_chars)
+
+    def _validate_structure_for_field(self, field_name: str, to_validate: str):
+        return Lexicon._structure_validators[field_name](to_validate)
+
+    def validate_for_field(self, field_name: str, to_validate: str):
+        """Returns True if characters in to_validate are valid for field_name.
+            Otherwise returns False."""
+        validation_pipeline = [
+            self._validate_characters_for_field,
+            self._validate_structure_for_field]
+        for validation_stage in validation_pipeline:
+            stage_result = validation_stage(field_name, to_validate)
+            if stage_result is not True:
+                return stage_result
+        return True
+
     def validate_for_word_field(self, field_name: str, to_validate: str):
         """Returns True if Word validates to_validate"""
-        return Word().validate_for_field(
+        return self.validate_for_field(
             field_name=field_name,
             to_validate=to_validate)
 
@@ -129,6 +171,12 @@ class Lexicon:
         """Set the value of the specified field for a supplied word"""
         if isinstance(word, str):
             word: Word = self.index_by_translated_word[word]
+
+        if isinstance(new_value, str):
+            if self.validate_for_field(field_name=field, to_validate=new_value) is False:
+                print("Word: Error - Field cannot be set to invalid value.")
+                return None
+
         this_field = self._map_label_to_field(field)
         change_history_item = word.set_field_to(this_field, new_value)
 

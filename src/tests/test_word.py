@@ -30,37 +30,6 @@ class TestAnEmptyWordShould:
         for (fieldname, fieldvalue) in init_data.items():
             assert word._data[fieldname] == fieldvalue #pylint: disable=protected-access
 
-    def test__return_none_when_validating_for_an_extant_field_with_no_validator(self):
-        """Return - None if the field has no validator."""
-        assert Word().validate_for_field(
-            field_name="translated_word",
-            to_validate="abcde") is None
-
-class TestAnEmptyWordValidatingFieldsShould:
-    """Test operations for an empty Word when validating field changes"""
-    def test_return_true_for_with_correct_characters_and_groups(self):
-        """Return - True if the string only contains alphanumeric characters and '|', ']', '['."""
-        result = Word().validate_for_field(
-            "etymological_symbology",
-            "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z|aab|aaba|aabaa[]")
-        assert result
-
-    def test_return_false_including_invalid_characters_in_valid_groups(self):
-        """Return - False if the string contains non-alphanumeric or non delimeters."""
-        invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
-        for test_character in invalid_characters:
-            assert Word().validate_for_field(
-                "etymological_symbology",
-                f"|aba|d{test_character}|") is False
-
-    def test_return_false_including_valid_characters_in_invalid_groups(self):
-        """Return - False if the string contains invalid group structures"""
-        invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'bc']
-        for test_group in invalid_groups:
-            assert Word().validate_for_field(
-                field_name="etymological_symbology",
-                to_validate=f"|{test_group}|") is False
-
 
 class TestModifyingFieldsShould:
     """Test operations for an empty Word with linked changes when changing field values"""
@@ -98,14 +67,6 @@ class TestModifyingFieldsShould:
         assert len(original_history) < len(history_first)
         assert len(history_first) < len(history_second)
 
-    def test__setting_a_field_unsuccessfully_does_not_add_to_the_version_history(self):
-        """Version History is the same length after a field is unsuccessfully set"""
-        new_word = Word()
-        history_before = new_word.find_data_on(WordField.VERSIONHISTORY)
-        new_word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|abu!da|")
-        history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
-        assert history_before == history_after
-
 
 class TestAPopulatedWordShould:
     """Test operations for a Word with populated fields"""
@@ -132,20 +93,6 @@ class TestAPopulatedWordShould:
         word = Word(init_data)
         word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|ino|mu|")
         assert word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY) == "|ino|mu|"
-
-    def test__not_change_etymological_symbology_with_invalidly_structured_input(self):
-        """An input of valid characters with invalid structure will not change the field value"""
-        init_data = {"etymological_symbology": "|aba|et|"}
-        word = Word(init_data)
-        word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|inomu|")
-        assert word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY) == "|aba|et|"
-
-    def test__not_change_etymological_symbology_for_input_with_invalid_characters(self):
-        """An input of invalid characters with valid structure will not change the field value"""
-        init_data = {"etymological_symbology": "|aba|et|"}
-        word = Word(init_data)
-        word.set_field_to(WordField.ETYMOLOGICALSYMBOLOGY, "|ino!mu|")
-        assert word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY) == "|aba|et|"
 
     def test__not_change_a_protected_field_directly(self):
         """Protected fields should not respond to calls to set_field_to."""
