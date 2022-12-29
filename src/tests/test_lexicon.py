@@ -44,15 +44,15 @@ class TestAnEmptyLexiconShould:
     def test_return_true_when_validating_symbology_with_correct_characters(self):
         """Return - True if the string only contains allowed characters for a Word."""
         assert Lexicon().validate_for_word_field(
-            "etymological_symbology",
+            "Etymological Symbology",
             "|b|ac|de|ifo|g|h|j|k|l|m|n|p|q|r|s|sh|tu|th|v|w|x|y|z|aab|aaba|aabaa[]")
 
     def test_return_false_when_validating_symbology_with_invalid_characters_in_valid_groups(self):
         """Return - False if the string contains non-alphanumeric or non delimeters."""
-        invalid_characters = '!"£$%^&*()_-+={}~#:;@<,>.?\\/'
+        invalid_characters = '!"£$%^&*()_-={}~#:;@<,>.?\\/'
         for test_character in invalid_characters:
             assert not Lexicon().validate_for_word_field(
-                "etymological_symbology",
+                "Etymological Symbology",
                 f"|aba|d{test_character}|")
 
     def test_return_false_including_valid_characters_in_invalid_groups(self):
@@ -60,13 +60,13 @@ class TestAnEmptyLexiconShould:
         invalid_groups = ['a', 'e', 'i', 'o', 'u', 'aa', 'bc']
         for test_group in invalid_groups:
             assert Lexicon().validate_for_word_field(
-                field_name="etymological_symbology",
+                field_name="Etymological Symbology",
                 to_validate=f"|{test_group}|") is False
 
-    def test_return_none_when_validating_for_an_extant_word_field_with_no_validator(self):
+    def test__return_none_when_validating_for_an_extant_word_field_with_no_validator(self):
         """Return - None if the field has no validator."""
         assert Lexicon().validate_for_word_field(
-            field_name="translated_word",
+            field_name="Translated Word",
             to_validate="abcde") is None
 
 
@@ -112,6 +112,7 @@ class TestModifyingWordFieldsShould:
         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu!da|")
         history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert history_before == history_after
+
 
 class TestRetrievingWordChildrenShould:
     """Test operations for a Lexicon and Word cases"""

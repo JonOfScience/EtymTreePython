@@ -28,7 +28,7 @@ from ui.project_word_details import WordDetails
 class ProjectUIController:
     """Static class to provide Controller functions to ProjectWindow"""
     @staticmethod
-    def clean_and_split_string(target: str, excluded: Sequence[str]=None, separator: str='+'):
+    def clean_and_split_string(target: str, excluded: Sequence[str] = None, separator: str = '+'):
         """Removes all instances of excluded characters and then splits by separator
 
         excluded: default value [' ']
@@ -41,10 +41,10 @@ class ProjectUIController:
         target = target.lower()
         for character in excluded:
             target = target.replace(character, '')
-        return target.split(sep = separator)
+        return target.split(sep=separator)
 
     @staticmethod
-    def split_and_trim_string(target: str, separator: str='+'):
+    def split_and_trim_string(target: str, separator: str = '+'):
         """Splits a string by a separator and trims the fragments"""
         if not target:
             return []

@@ -24,6 +24,7 @@ class ProjectStatus(str, Enum):
     NEW = "new"
     SAVED = "saved"
 
+
 class WordField(Enum):
     """External field mapping contract for Word fields"""
     TRANSLATEDWORD = auto()
@@ -43,9 +44,23 @@ class WordField(Enum):
     ISRELATEDTO = auto()
     UID = auto()
 
+
 def new_garbage_string():
     """Helper method to produce a random string from uuid"""
     return ''.join([x for x in uuid.uuid4().hex if x.isalpha()])
+
+
+def split_string_into_groups(to_split: str):
+    """Helper method to split a string into groups."""
+    delimiter_processing_order = ['+', '|', '][', '[', ']']
+    string_set = [to_split]
+    new_string_set = []
+    for delimeter in delimiter_processing_order:
+        for element in string_set:
+            new_string_set.extend(element.strip().split(sep=delimeter))
+        string_set = new_string_set.copy()
+        new_string_set.clear()
+    return string_set
 
 
 class SerialiserInterface(metaclass=ABCMeta):

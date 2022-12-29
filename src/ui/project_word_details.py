@@ -145,7 +145,8 @@ class WordDetails:
         changes_table = QTableView()
         changes_table.setObjectName("ChangeHistoryTable")
         changes_model = QStandardItemModel()
-        changes_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows) #pylint: disable=no-member
+        changes_table.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows)  # pylint: disable=no-member
         changes_table.setModel(changes_model)
         details_layout.addWidget(changes_table)
 
