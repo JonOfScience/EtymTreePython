@@ -30,9 +30,9 @@ class Lexicon:
         return True
 
     _character_validators = {
-        "Etymological Symbology": 'abcdeéfghijklmnopqrstuvwxyz|[]+ '}
+        WordField.ETYMOLOGICALSYMBOLOGY: 'abcdeéfghijklmnopqrstuvwxyz|[]+ '}
     _structure_validators = {
-        "Etymological Symbology": _structure_validator_etymological_symbology}
+        WordField.ETYMOLOGICALSYMBOLOGY: _structure_validator_etymological_symbology}
 
     uuid: str
     title: str
@@ -139,15 +139,15 @@ class Lexicon:
         for word in self.members:
             word.identify_unresolved_modifications(self.changehistory)
 
-    def _validate_characters_for_field(self, field_name: str, to_validate: str):
-        if field_name not in Lexicon._character_validators:
+    def _validate_characters_for_field(self, field: WordField, to_validate: str):
+        if field not in Lexicon._character_validators:
             return None
-        acceptable_chars = set(Lexicon._character_validators[field_name])
+        acceptable_chars = set(Lexicon._character_validators[field])
         characters = set(to_validate.lower())
         return characters.issubset(acceptable_chars)
 
-    def _validate_structure_for_field(self, field_name: str, to_validate: str):
-        return Lexicon._structure_validators[field_name](to_validate)
+    def _validate_structure_for_field(self, field: WordField, to_validate: str):
+        return Lexicon._structure_validators[field](to_validate)
 
     def validate_for_field(self, field_name: str, to_validate: str):
         """Returns True if characters in to_validate are valid for field_name.
@@ -156,7 +156,9 @@ class Lexicon:
             self._validate_characters_for_field,
             self._validate_structure_for_field]
         for validation_stage in validation_pipeline:
-            stage_result = validation_stage(field_name, to_validate)
+            stage_result = validation_stage(
+                self._map_label_to_field(field_name),
+                to_validate)
             if stage_result is not True:
                 return stage_result
         return True
