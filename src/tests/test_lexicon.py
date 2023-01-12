@@ -69,10 +69,6 @@ class TestAnEmptyLexiconShould:
             field_name="Translated Word",
             to_validate="abcde") is None
 
-    def test__return_an_empty_list_of_structural_rulesets(self):
-        """Return - Empty if there are no rulesets defined."""
-        assert not Lexicon().list_rulesets()
-
 
 class TestModifyingWordFieldsShould:
     """Test operations for a Lexicon and the linked changes when changing field values"""
@@ -348,40 +344,3 @@ class TestResolvingChangesOnAWordShould:
         new_lexicon.resolve_change_for(false_change_item, new_word)
         new_lexicon.resolve_modification_flags()
         assert new_word.has_unresolved_modification
-
-
-class TestALexiconWithStructuralRulesetsShould:
-    """Test operations on rulesets associated with the character of a Lexicon"""
-    def test__define_a_new_empty_ruleset(self):
-        """If the set doesn't exist before it should do afterwards."""
-        test_lexicon = Lexicon()
-        test_lexicon.create_ruleset("TestGlobal")
-        assert test_lexicon.list_rulesets()
-        assert test_lexicon.list_rulesets() == ["TestGlobal"]
-
-    def test__return_a_ruleset_with_a_valid_label(self):
-        """If the ruleset exists it will be returned."""
-        test_lexicon = Lexicon()
-        test_lexicon.create_ruleset("TestGlobal")
-        assert test_lexicon.find_rules_labelled("TestGlobal") == []
-
-    def test__add_rules_in_the_correct_order(self):
-        """Rule ids and descriptions should match."""
-        test_lexicon = Lexicon()
-        test_lexicon.create_ruleset("TestGlobal")
-        test_lexicon.add_rule_to("TestGlobal", "StructuralRule1")
-        test_lexicon.add_rule_to("TestGlobal", "StructuralRule2")
-        rules = test_lexicon.find_rules_labelled("TestGlobal")
-        assert rules[0][1] == "StructuralRule1"
-        assert rules[1][1] == "StructuralRule2"
-
-    def test__store_its_rulesets(self, mocker):
-        mock = mocker.patch("builtins.open")
-        test_lexicon = Lexicon()
-        test_lexicon.create_ruleset("TestGlobal")
-        test_lexicon.add_rule_to("TestGlobal", "StructuralRule1")
-        test_lexicon.add_rule_to("TestGlobal", "StructuralRule2")
-        test_lexicon.store_to("NotAFile")
-        mock.assert_called_with("data/LSR-NotAFile.json", "w", encoding="UTF-8")
-        # handle = mock()
-        # handle.write.assert_called()

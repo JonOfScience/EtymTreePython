@@ -45,7 +45,6 @@ class Lexicon:
         self.title = "BlankProjectLexicon"
         self.members = []
         self.changehistory = LexiconChangeHistory()
-        self._rulesets = {}
         self.index_by_translated_word = {}
         self.index_by_relationship = {}
         self.label_to_wordfield_mapping = {
@@ -81,23 +80,6 @@ class Lexicon:
                 for component in parent_components:
                     if self.index_by_translated_word.get(component) is not None:
                         self.index_by_relationship[component].append(word)
-
-    def create_ruleset(self, ruleset_label: str):
-        """Create a new ruleset and register it with the given name"""
-        self._rulesets[ruleset_label] = []
-
-    def list_rulesets(self) -> list[str]:
-        """An unordered list of all registered rulesets"""
-        return [x for x in self._rulesets.keys()]
-
-    def add_rule_to(self, set_label: str, rule: str) -> None:
-        """Adds rule at the end of the specified ruleset"""
-        new_rule_id = uuid.uuid4().hex
-        self._rulesets[set_label].append([new_rule_id, rule])
-
-    def find_rules_labelled(self, ruleset_label: str) -> list[str, str]:
-        """An ordered list of id and rule desceription pairs"""
-        return self._rulesets.get(ruleset_label)
 
     def get_children_of(self, parent_word: Word) -> Union[list[Word], None]:
         """Gets the immediate child Words of the specified Word, otherwise None"""
@@ -227,8 +209,8 @@ class Lexicon:
         storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
         output_dicts = self.retrieve_export_data_for()
         storage_service.store_to(filename + ".json", output_dicts)
-        ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
-        ruleset_io_service.store_to(filename + ".json", self._rulesets)
+        # ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
+        # ruleset_io_service.store_to(filename + ".json", self._rulesets)
 
     def load_from(self, filename: str):
         """Read and deserialise Word entries from local store"""
@@ -237,6 +219,6 @@ class Lexicon:
         self.uuid = filename
         for word_data in input_data:
             self.add_entry(Word(word_data))
-        ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
-        ruleset_data = ruleset_io_service.load_from(filename + ".json")
-        self._rulesets = ruleset_data
+        # ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
+        # ruleset_data = ruleset_io_service.load_from(filename + ".json")
+        # self._rulesets = ruleset_data
