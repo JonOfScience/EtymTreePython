@@ -39,7 +39,7 @@ class TestANewEmptyProjectShould:
         empty_project = Project({"Filename": "TestProject"})
         mock_method = mocker.patch("builtins.open")
         empty_project.store()
-        assert mock_method.call_count == 3
+        assert mock_method.call_count == 4
 
 
 class TestANewProjectWithDefinedSettingsShould:

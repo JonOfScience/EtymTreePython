@@ -262,6 +262,10 @@ class ProjectWindow(QWidget):
         for word in lexicon.members:
             # Get data about the Word
             translated_word = lexicon.get_field_for_word("Translated Word", word)
+            wordflow = lexicon.get_word_validitor()
+            wordflow.run_stages(word=word)
+            total_checks = wordflow.count_checks()
+            failed_checks = wordflow.failed_stages()
             word_components = self._translated_component_mapping[translated_word]
             _display_char = '\N{herb}'
             if len(lexicon.get_field_for_word("Translated Word Components", word)) < 1:
@@ -269,6 +273,11 @@ class ProjectWindow(QWidget):
             display_text = _display_char + f" {translated_word}"
             if word_components:
                 display_text += f" [{', '.join(word_components)}]"
+            if failed_checks == 0:
+                display_text += ' \N{check mark}'
+            else:
+                display_text += ' \N{cross mark}'
+                display_text += f" ({((total_checks - failed_checks)/total_checks) * 100}%)"
 
             # Use data from thw Word to create the Item
             new_item = QStandardItem(display_text)
