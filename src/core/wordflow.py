@@ -1,9 +1,11 @@
+"""Library for measuring validity of Word entries in a Lexicon"""
 import uuid
 from core.core import WordField
 from core.word import Word
 
 
 class Wordflow:
+    """Pipeline integrating stages to provide validity statistics."""
     def __init__(self, validators=None) -> None:
         self._id = uuid.uuid4().hex
         self._label = "Base Wordflow"
@@ -12,8 +14,8 @@ class Wordflow:
             self._validators = validators
         self._results = []
 
-    def run_stages(self, word: Word):
-
+    def run_stages(self, word: Word) -> list:
+        """Calculates validity of word with regards to predefined conditions."""
         # TRANSLATEDWORD
         self._stage_translatedword(word)
 

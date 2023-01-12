@@ -6,7 +6,7 @@ from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
 from services.lexicon_io_service import LexiconIOService
-from services.io_service_api import IOServiceAPI
+# from services.io_service_api import IOServiceAPI
 from core.core import DataFormat, WordField, split_string_into_groups
 from core.word import Word
 from core.change_history import LexiconChangeHistory
