@@ -263,7 +263,7 @@ class ProjectWindow(QWidget):
             display_text += ' \N{check mark}'
         else:
             display_text += ' \N{cross mark}'
-            display_text += f" ({((total_checks - failed_checks)/total_checks) * 100}%)"
+            display_text += f" ({round(((total_checks - failed_checks)/total_checks) * 100, 0)}%)"
         return display_text
 
     def _tree_overview_update(self, lexicon: Lexicon = None):

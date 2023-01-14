@@ -1,6 +1,7 @@
 """Library for measuring validity of Word entries in a Lexicon"""
 import uuid
-from core.core import WordField
+import re
+from core.core import WordField, split_string_into_groups
 from core.word import Word
 
 
@@ -34,9 +35,11 @@ class Wordflow:
         # TRANSLATED COMPONENTS
         self._stage_translatedcomponents(word=word, options=options)
 
-        # YES - IN LANGUAGE COMPONENTS
+        # IN LANGUAGE COMPONENTS
         self._stage_inlanguagecomponents(word=word, options=options)
-        # YES - ETYMOLOGICAL SYMBOLOGY
+
+        # ETYMOLOGICAL SYMBOLOGY
+        self._stage_etymologicalsymbology(word=word, options=options)
 
         # COMPILEDSYMBOLOGY = auto()
         # SYMBOLMAPPING = auto()
@@ -104,3 +107,31 @@ class Wordflow:
                     self._results.append(("In Language Components: COMBINED FAILED", False))
                     return
             self._results.append(("In Language Components: COMBINED PASSED", True))
+
+    def _stage_etymologicalsymbology(self, word: Word, options: dict) -> None:
+        """Stage Requirements for INLANGUAGECOMPONENTS:
+            IS_ROOT is True  -> Check,
+            IS_ROOT is False -> Check
+        """
+        fill = {True: "ROOT", False: "COMBINED"}[options["IS_ROOT"]]
+        etymological_symbology = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
+        acceptable_chars = set('abcdeéfghijklmnopqrstuvwxyz|[]+ ')
+        characters = set(etymological_symbology)
+        if characters.issubset(acceptable_chars):
+            self._results.append((f"Etymological Symbology - Characters: {fill} PASSED", True))
+        else:
+            self._results.append((f"Etymological Symbology - Characters: {fill} FAILED", False))
+
+        string_set = split_string_into_groups(etymological_symbology)
+        for group in [x for x in string_set if x]:
+            single_consonants = re.match(
+                "^[aeioué]{0,2}[bcdfghjklmnpqrstvwxyz][aeioué]{0,2}$",
+                group)
+            double_consonants = re.match(
+                "(^[aeioué]?(th|sh|ch){1}[aeioué]?$)",
+                group)
+            if single_consonants is None and double_consonants is None:
+                self._results.append((f"Etymological Symbology - Groups: {fill} FAILED", False))
+                return
+        self._results.append((f"Etymological Symbology - Groups: {fill} PASSED", True))
+        return
