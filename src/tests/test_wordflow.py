@@ -32,10 +32,8 @@ class TestTheBaseWordFlowShould:
         word = Word({
             "translated_word": "OneTwo",
             "translated_word_components": ["One", "Two"]})
-        stage_results = baseflow.run_stages(word)
-        for result in stage_results:
-            if isinstance(result, tuple):
-                assert result[-1] is True
+        baseflow.run_stages(word)
+        assert baseflow.failed_stages() == 0
 
     def test__fail_for_a_combined_word_that_fails_translatedword_stage(self):
         """State Test: Placeholder"""
@@ -43,9 +41,8 @@ class TestTheBaseWordFlowShould:
         word = Word({
             "translated_word_components": ["One", "Two"]})
         word.set_field_to(WordField.TRANSLATEDWORD, "")
-        stage_results = baseflow.run_stages(word)
-        tuple_results = [x[-1] for x in stage_results if isinstance(x, tuple)].count(False)
-        assert tuple_results == 1
+        baseflow.run_stages(word)
+        assert baseflow.failed_stages() == 1
 
     def test__pass_for_a_combined_word_that_fails_translated_components_stage(self):
         """State Test: Placeholder"""
@@ -53,6 +50,15 @@ class TestTheBaseWordFlowShould:
         word = Word({
             "translated_word": "OneTwo",
             "translated_word_components": ["", "Two"]})
-        stage_results = baseflow.run_stages(word)
-        tuple_results = [x[-1] for x in stage_results if isinstance(x, tuple)].count(False)
-        assert tuple_results == 1
+        baseflow.run_stages(word)
+        assert baseflow.failed_stages() == 1
+
+    def test__pass_for_a_combined_word_that_fails_in_language_components_stage(self):
+        """State Test: Placeholder"""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": ["One", "Two"],
+            "in_language_components": ["", "Two"]})
+        baseflow.run_stages(word)
+        assert baseflow.failed_stages() == 1

@@ -25,17 +25,17 @@ class Wordflow:
         if self._split__has_parents(word) is False:
             self._results.append(("WORD IS ROOT"))
             options["IS_ROOT"] = True
-
-            # NO - TRANSLATEDCOMPONENTS
             # NO - IN LANGUAGE COMPONENTS
             # YES - ETYMOLOGICAL SYMBOLOGY
         else:
             self._results.append(("WORD IS COMBINED"))
             options["IS_ROOT"] = False
 
+        # TRANSLATED COMPONENTS
         self._stage_translatedcomponents(word=word, options=options)
-        # YES - TRANSLATEDCOMPONENTS
+
         # YES - IN LANGUAGE COMPONENTS
+        self._stage_inlanguagecomponents(word=word, options=options)
         # YES - ETYMOLOGICAL SYMBOLOGY
 
         # COMPILEDSYMBOLOGY = auto()
@@ -54,7 +54,7 @@ class Wordflow:
         return self._results
 
     def _select_stage_results(self) -> list:
-        return [x for x in self._results if isinstance(x, tuple)]
+        return [x[-1] for x in self._results if isinstance(x, tuple)]
 
     def count_checks(self) -> int:
         """Returns count of result stages have have a pass or fail status."""
@@ -79,8 +79,11 @@ class Wordflow:
             return True
         return False
 
-    def _stage_translatedcomponents(self, word: Word, options: bool):
-        """Stage Requirements for TRANSLATEDCOMPONENTS"""
+    def _stage_translatedcomponents(self, word: Word, options: dict) -> None:
+        """Stage Requirements for TRANSLATEDCOMPONENTS
+            IS_ROOT is True  -> No Check
+            IS_ROOT is False -> Check
+        """
         translated_components = word.find_data_on(WordField.TRANSLATEDCOMPONENTS)
         if options["IS_ROOT"] is False:
             for component in translated_components:
@@ -88,3 +91,16 @@ class Wordflow:
                     self._results.append(("Translated Components: COMBINED FAILED", False))
                     return
             self._results.append(("Translated Components: COMBINED PASSED", True))
+
+    def _stage_inlanguagecomponents(self, word: Word, options: dict) -> None:
+        """Stage Requirements for INLANGUAGECOMPONENTS
+            IS_ROOT is True  -> No Check
+            IS_ROOT is False -> Check
+        """
+        in_language_components = word.find_data_on(WordField.INLANGUAGECOMPONENTS)
+        if options["IS_ROOT"] is False:
+            for component in in_language_components:
+                if not component:
+                    self._results.append(("In Language Components: COMBINED FAILED", False))
+                    return
+            self._results.append(("In Language Components: COMBINED PASSED", True))
