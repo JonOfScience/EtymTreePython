@@ -63,9 +63,13 @@ class Wordflow:
         """Returns count of result stages have have a pass or fail status."""
         return len(self._select_stage_results())
 
-    def failed_stages(self) -> int:
+    def count_failed_stages(self) -> int:
         """Returns count of False values in stage results."""
         return self._select_stage_results().count(False)
+
+    def list_failed_stages(self) -> list:
+        """Returns list of strings associated with False values in stage results."""
+        return [x[0] for x in self._results if x[-1] is False]
 
     def _stage_translatedword(self, word: Word):
         """Stage Requirements for TRANSLATEDWORD"""

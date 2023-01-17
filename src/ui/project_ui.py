@@ -246,11 +246,14 @@ class ProjectWindow(QWidget):
         return self.options.find_by_id(palette_name).get(colour_key)
 
     def __build_tree_item_text(self, lexicon: Lexicon, word: Word):
+        tooltip = ""
         _root_char = '\N{seedling}'
         wordflow = lexicon.get_word_validitor()
         wordflow.run_stages(word=word)
         total_checks = wordflow.count_checks()
-        failed_checks = wordflow.failed_stages()
+        failed_checks = wordflow.count_failed_stages()
+        if (failed_checks > 0):
+            tooltip = "\n".join(wordflow.list_failed_stages())
         translated_word = lexicon.get_field_for_word("Translated Word", word)
         word_components = self._translated_component_mapping[translated_word]
         _display_char = '\N{herb}'
@@ -264,7 +267,7 @@ class ProjectWindow(QWidget):
         else:
             display_text += ' \N{cross mark}'
             display_text += f" ({round(((total_checks - failed_checks)/total_checks) * 100, 0)}%)"
-        return display_text
+        return display_text, tooltip
 
     def _tree_overview_update(self, lexicon: Lexicon = None):
 
@@ -281,12 +284,13 @@ class ProjectWindow(QWidget):
         # For each Word
         for word in lexicon.members:
             # Get data about the Word
-            display_text = self.__build_tree_item_text(
+            display_text, tooltip_text = self.__build_tree_item_text(
                 lexicon=lexicon,
                 word=word)
 
             # Use data from thw Word to create the Item
             new_item = QStandardItem(display_text)
+            new_item.setToolTip(tooltip_text)
             new_item.setData(word)
 
             foreground_colour = self._get_item_status_colour(

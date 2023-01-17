@@ -35,7 +35,7 @@ class TestTheBaseWordFlowShould:
             "in_language_components": ["One", "Two"],
             "etymological_symbology": "|aba|et|"})
         baseflow.run_stages(word)
-        assert baseflow.failed_stages() == 0
+        assert baseflow.count_failed_stages() == 0
 
     def test__fail_for_a_combined_word_that_fails_translatedword_stage(self):
         """State Test: Placeholder"""
@@ -44,7 +44,7 @@ class TestTheBaseWordFlowShould:
             "translated_word_components": ["One", "Two"]})
         word.set_field_to(WordField.TRANSLATEDWORD, "")
         baseflow.run_stages(word)
-        assert baseflow.failed_stages() == 1
+        assert baseflow.count_failed_stages() == 1
 
     def test__fail_for_a_combined_word_that_fails_translated_components_stage(self):
         """State Test: Placeholder"""
@@ -53,7 +53,7 @@ class TestTheBaseWordFlowShould:
             "translated_word": "OneTwo",
             "translated_word_components": ["", "Two"]})
         baseflow.run_stages(word)
-        assert baseflow.failed_stages() == 1
+        assert baseflow.count_failed_stages() == 1
 
     def test__fail_for_a_combined_word_that_fails_in_language_components_stage(self):
         """State Test: Placeholder"""
@@ -63,7 +63,7 @@ class TestTheBaseWordFlowShould:
             "translated_word_components": ["One", "Two"],
             "in_language_components": ["", "Two"]})
         baseflow.run_stages(word)
-        assert baseflow.failed_stages() == 1
+        assert baseflow.count_failed_stages() == 1
 
     def test__fail_for_a_combined_word_that_fails_etymological_symbology_stage(self):
         """State Test: Placeholder"""
@@ -74,4 +74,4 @@ class TestTheBaseWordFlowShould:
             "in_language_components": ["One", "Two"],
             "etymological_symbology": "|abaet|"})
         baseflow.run_stages(word)
-        assert baseflow.failed_stages() == 1
+        assert baseflow.count_failed_stages() == 1
