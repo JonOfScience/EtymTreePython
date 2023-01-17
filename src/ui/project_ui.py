@@ -252,7 +252,7 @@ class ProjectWindow(QWidget):
         wordflow.run_stages(word=word)
         total_checks = wordflow.count_checks()
         failed_checks = wordflow.count_failed_stages()
-        if (failed_checks > 0):
+        if failed_checks > 0:
             tooltip = "\n".join(wordflow.list_failed_stages())
         translated_word = lexicon.get_field_for_word("Translated Word", word)
         word_components = self._translated_component_mapping[translated_word]
