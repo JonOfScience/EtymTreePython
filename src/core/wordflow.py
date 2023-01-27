@@ -46,7 +46,7 @@ class Wordflow:
 
         # SYMBOLMAPPING = auto()
         # Number of symbols matches number of groups
-        
+
         # SYMBOLSELECTION = auto()
         # SYMBOLPATTERNSELECTED = auto()
         # RULESAPPLIED = auto()
@@ -159,17 +159,18 @@ class Wordflow:
             - The alpha character sequence has to match those present in etymological symbology.
             - Character groups have to be valid.
         """
+        fill = {True: "ROOT", False: "COMBINED"}[options["IS_ROOT"]]
         compiled_symbology = word.find_data_on(WordField.COMPILEDSYMBOLOGY)
         passed_character_validation = self.__character_validator(
             compiled_symbology,
             'abcdeéfghijklmnopqrstuvwxyz|')
         if passed_character_validation:
-            self._results.append(("Compiled Symbology - Characters: PASSED", True))
+            self._results.append((f"Compiled Symbology - Characters: {fill} PASSED", True))
         else:
-            self._results.append(("Compiled Symbology - Characters: FAILED", False))
+            self._results.append((f"Compiled Symbology - Characters: {fill} FAILED", False))
 
         passed_group_validation = self.__group_validator(compiled_symbology)
         if passed_group_validation:
-            self._results.append(("Compiled Symbology - Groups: PASSED", True))
+            self._results.append((f"Compiled Symbology - Groups: {fill} PASSED", True))
         else:
-            self._results.append(("Compiled Symbology - Groups: FAILED", False))
+            self._results.append((f"Compiled Symbology - Groups: {fill} FAILED", False))
