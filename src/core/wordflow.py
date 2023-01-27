@@ -42,7 +42,11 @@ class Wordflow:
         self._stage_etymologicalsymbology(word=word, options=options)
 
         # COMPILEDSYMBOLOGY = auto()
+        self._stage_compiledsymbology(word=word, options=options)
+
         # SYMBOLMAPPING = auto()
+        # Number of symbols matches number of groups
+        
         # SYMBOLSELECTION = auto()
         # SYMBOLPATTERNSELECTED = auto()
         # RULESAPPLIED = auto()
@@ -112,21 +116,14 @@ class Wordflow:
                     return
             self._results.append(("In Language Components: COMBINED PASSED", True))
 
-    def _stage_etymologicalsymbology(self, word: Word, options: dict) -> None:
-        """Stage Requirements for INLANGUAGECOMPONENTS:
-            IS_ROOT is True  -> Check,
-            IS_ROOT is False -> Check
-        """
-        fill = {True: "ROOT", False: "COMBINED"}[options["IS_ROOT"]]
-        etymological_symbology = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
-        acceptable_chars = set('abcdeéfghijklmnopqrstuvwxyz|[]+ ')
-        characters = set(etymological_symbology)
-        if characters.issubset(acceptable_chars):
-            self._results.append((f"Etymological Symbology - Characters: {fill} PASSED", True))
-        else:
-            self._results.append((f"Etymological Symbology - Characters: {fill} FAILED", False))
+    def __character_validator(self, text_to_validate: str, acceptable_characters: str) -> bool:
+        characters = set(text_to_validate)
+        if characters.issubset(acceptable_characters):
+            return True
+        return False
 
-        string_set = split_string_into_groups(etymological_symbology)
+    def __group_validator(self, text_to_validate: str) -> bool:
+        string_set = split_string_into_groups(text_to_validate)
         for group in [x for x in string_set if x]:
             single_consonants = re.match(
                 "^[aeioué]{0,2}[bcdfghjklmnpqrstvwxyz][aeioué]{0,2}$",
@@ -135,7 +132,44 @@ class Wordflow:
                 "(^[aeioué]?(th|sh|ch){1}[aeioué]?$)",
                 group)
             if single_consonants is None and double_consonants is None:
-                self._results.append((f"Etymological Symbology - Groups: {fill} FAILED", False))
-                return
-        self._results.append((f"Etymological Symbology - Groups: {fill} PASSED", True))
-        return
+                return False
+        return True
+
+    def _stage_etymologicalsymbology(self, word: Word, options: dict) -> None:
+        """Stage Requirements for ETYMOLOGICALSYMBOLOGY:"""
+        fill = {True: "ROOT", False: "COMBINED"}[options["IS_ROOT"]]
+        etymological_symbology = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
+        passed_character_validation = self.__character_validator(
+            etymological_symbology,
+            'abcdeéfghijklmnopqrstuvwxyz|[]+ ')
+        if passed_character_validation:
+            self._results.append((f"Etymological Symbology - Characters: {fill} PASSED", True))
+        else:
+            self._results.append((f"Etymological Symbology - Characters: {fill} FAILED", False))
+
+        passed_group_validation = self.__group_validator(etymological_symbology)
+        if passed_group_validation:
+            self._results.append((f"Etymological Symbology - Groups: {fill} PASSED", True))
+        else:
+            self._results.append((f"Etymological Symbology - Groups: {fill} FAILED", False))
+
+    def _stage_compiledsymbology(self, word: Word, options: dict) -> None:
+        """Stage Requirements for COMPILEDSYMBOLOGY:
+            - Characters have to be continuous except for group breaks.
+            - The alpha character sequence has to match those present in etymological symbology.
+            - Character groups have to be valid.
+        """
+        compiled_symbology = word.find_data_on(WordField.COMPILEDSYMBOLOGY)
+        passed_character_validation = self.__character_validator(
+            compiled_symbology,
+            'abcdeéfghijklmnopqrstuvwxyz|')
+        if passed_character_validation:
+            self._results.append(("Compiled Symbology - Characters: PASSED", True))
+        else:
+            self._results.append(("Compiled Symbology - Characters: FAILED", False))
+
+        passed_group_validation = self.__group_validator(compiled_symbology)
+        if passed_group_validation:
+            self._results.append(("Compiled Symbology - Groups: PASSED", True))
+        else:
+            self._results.append(("Compiled Symbology - Groups: FAILED", False))
