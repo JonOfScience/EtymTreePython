@@ -200,7 +200,7 @@ class Wordflow:
         etymological_symbology = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
         cleaned_etym = [x for x in etymological_symbology if str.isalpha(x)]
         cleaned_comp = [x for x in compiled_symbology if str.isalpha(x)]
-        passed_sequence_validation = True if cleaned_etym == cleaned_comp else False
+        passed_sequence_validation = bool(cleaned_etym == cleaned_comp)
         self.__update_results(
             "Compiled Symbology - Sequence:",
             passed_sequence_validation,
@@ -220,23 +220,21 @@ class Wordflow:
         etymological_symbology: str = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
         unique_characters = set(symbol_mapping)
         if options["IS_ROOT"] is True:
-            combinator_present = False if '+' in unique_characters else True
             self.__update_results(
                 stage_description="Symbol Mapping - Combination Character",
-                stage_result=combinator_present,
+                stage_result=not bool('+' in unique_characters),
                 stage_field=WordField.SYMBOLMAPPING)
             groups = [x for x in split_string_into_groups(etymological_symbology) if len(x) > 0]
             symbols = [x for x in symbol_mapping.split(sep=" ") if (len(x) > 0 and x != '+')]
-            group_and_symbols_match = True if len(groups) == len(symbols) else False
+            group_and_symbols_match = bool(len(groups) == len(symbols))
             self.__update_results(
                 stage_description="Symbol Mapping - Member Count Match",
                 stage_result=group_and_symbols_match,
                 stage_field=WordField.SYMBOLMAPPING)
         else:
-            combinator_present = True if '+' in unique_characters else False
             self.__update_results(
                 stage_description="Symbol Mapping - Combination Character",
-                stage_result=combinator_present,
+                stage_result=bool('+' in unique_characters),
                 stage_field=WordField.SYMBOLMAPPING)
             elements = etymological_symbology.split(sep='+')
             element_counts = []
@@ -247,7 +245,7 @@ class Wordflow:
             symbol_counts = []
             for group in symbols_groups:
                 symbol_counts.append(len([x for x in group.split(sep=' ') if len(x) > 0]))
-            group_counts_match = True if len(element_counts) == len(symbol_counts) else False
+            group_counts_match = bool(len(element_counts) == len(symbol_counts))
             self.__update_results(
                 stage_description="Symbol Mapping - Total Group Count",
                 stage_result=group_counts_match,
