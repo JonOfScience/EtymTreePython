@@ -206,6 +206,33 @@ class Wordflow:
             passed_sequence_validation,
             stage_field=WordField.COMPILEDSYMBOLOGY)
 
+    def __stage_symbolmapping__component_combined_group_structure(
+            self,
+            etymological_symbology: str,
+            symbol_mapping: str):
+
+        elements = etymological_symbology.split(sep='+')
+        element_counts = []
+        for element in elements:
+            element_counts.append(
+                len([x for x in split_string_into_groups(element) if len(x) > 0]))
+        symbols_groups = symbol_mapping.split(sep='+')
+        symbol_counts = []
+        for group in symbols_groups:
+            symbol_counts.append(len([x for x in group.split(sep=' ') if len(x) > 0]))
+        self.__update_results(
+            stage_description="Symbol Mapping - Total Group Count",
+            stage_result=bool(len(element_counts) == len(symbol_counts)),
+            stage_field=WordField.SYMBOLMAPPING)
+        group_lengths_match = True
+        for ind, counts in enumerate(element_counts):
+            if counts != symbol_counts[ind]:
+                group_lengths_match = False
+        self.__update_results(
+            stage_description="Symbol Mapping - Individual Group Lengths",
+            stage_result=group_lengths_match,
+            stage_field=WordField.SYMBOLMAPPING)
+
     def _stage_symbolmapping(self, word: Word, options: dict) -> None:
         """Stage Requirements for SYMBOLMAPPING:
             - IS_ROOT -> TRUE
@@ -226,35 +253,16 @@ class Wordflow:
                 stage_field=WordField.SYMBOLMAPPING)
             groups = [x for x in split_string_into_groups(etymological_symbology) if len(x) > 0]
             symbols = [x for x in symbol_mapping.split(sep=" ") if (len(x) > 0 and x != '+')]
-            group_and_symbols_match = bool(len(groups) == len(symbols))
             self.__update_results(
                 stage_description="Symbol Mapping - Member Count Match",
-                stage_result=group_and_symbols_match,
+                stage_result=bool(len(groups) == len(symbols)),
                 stage_field=WordField.SYMBOLMAPPING)
         else:
             self.__update_results(
                 stage_description="Symbol Mapping - Combination Character",
                 stage_result=bool('+' in unique_characters),
                 stage_field=WordField.SYMBOLMAPPING)
-            elements = etymological_symbology.split(sep='+')
-            element_counts = []
-            for element in elements:
-                element_counts.append(
-                    len([x for x in split_string_into_groups(element) if len(x) > 0]))
-            symbols_groups = symbol_mapping.split(sep='+')
-            symbol_counts = []
-            for group in symbols_groups:
-                symbol_counts.append(len([x for x in group.split(sep=' ') if len(x) > 0]))
-            group_counts_match = bool(len(element_counts) == len(symbol_counts))
-            self.__update_results(
-                stage_description="Symbol Mapping - Total Group Count",
-                stage_result=group_counts_match,
-                stage_field=WordField.SYMBOLMAPPING)
-            group_lengths_match = True
-            for ind, counts in enumerate(element_counts):
-                if counts != symbol_counts[ind]:
-                    group_lengths_match = False
-            self.__update_results(
-                stage_description="Symbol Mapping - Individual Group Lengths",
-                stage_result=group_lengths_match,
-                stage_field=WordField.SYMBOLMAPPING)
+
+            self.__stage_symbolmapping__component_combined_group_structure(
+                etymological_symbology=etymological_symbology,
+                symbol_mapping=symbol_mapping)
