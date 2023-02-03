@@ -36,8 +36,6 @@ class Wordflow:
         if self._split__has_parents(word) is False:
             self._results.append(("WORD IS ROOT"))
             options["IS_ROOT"] = True
-            # NO - IN LANGUAGE COMPONENTS
-            # YES - ETYMOLOGICAL SYMBOLOGY
         else:
             self._results.append(("WORD IS COMBINED"))
             options["IS_ROOT"] = False
@@ -58,16 +56,13 @@ class Wordflow:
         self._stage_symbolmapping(word=word, options=options)
 
         # SYMBOLSELECTION = auto()
+        # self._stage_symbolselection()
+
         # SYMBOLPATTERNSELECTED = auto()
+        # self._stage_symbolpatternselected()
+
         # RULESAPPLIED = auto()
         # INLANGUAGEWORD = auto()
-        # VERSIONHISTORY = auto()
-        # HASBEENMODIFIED = auto()
-        # HASMODIFIEDANCESTOR = auto()
-        # RESOLVEDHISTORYITEMS = auto()
-        # ISRELATEDTO = auto()
-        # UID = auto()
-
         return self._results
 
     def _select_stage_results(self) -> list:

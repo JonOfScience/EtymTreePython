@@ -1,5 +1,6 @@
 """Test operations associated with word validity pipeline"""
 # import pytest
+import re
 from core.core import WordField
 from core.wordflow import Wordflow
 from core.word import Word
@@ -176,3 +177,26 @@ class TestTheBaseWordFlowShould:
             "symbol_mapping": "A + B"})
         baseflow.run_stages(word)
         assert baseflow.list_failed_fields().count(WordField.SYMBOLMAPPING) == 1
+
+    def test__fail_for_a_combined_word_with_undefined_symbol(self):
+        """State Test: Placeholder"""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": ["One", "Two"],
+            "in_language_components": ["One", "Two"],
+            "etymological_symbology": "|aba|et| + |an|",
+            "compiled_symbology": "|aba|et|an|",
+            "symbol_mapping": "A + B",
+            "symbol_selection": "C"})
+        baseflow.run_stages(word)
+        assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
+        # I'VE GOT LOGIC IN TESTS. THIS IS ATROCIOUS!
+        # THIS NEEDS TO BE A METHOD IN THE WORDFLOW
+        has_undefined_symbol_message = False
+        for message in baseflow.list_failed_stages():
+            result = re.fullmatch(".*Symbol Selection.*Undefined Symbol.*", message)
+            if result.group():
+                has_undefined_symbol_message = True
+                break
+        assert has_undefined_symbol_message
