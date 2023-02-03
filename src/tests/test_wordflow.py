@@ -1,6 +1,5 @@
 """Test operations associated with word validity pipeline"""
 # import pytest
-import re
 from core.core import WordField
 from core.wordflow import Wordflow
 from core.word import Word
@@ -191,12 +190,19 @@ class TestTheBaseWordFlowShould:
             "symbol_selection": "C"})
         baseflow.run_stages(word)
         assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
-        # I'VE GOT LOGIC IN TESTS. THIS IS ATROCIOUS!
-        # THIS NEEDS TO BE A METHOD IN THE WORDFLOW
-        has_undefined_symbol_message = False
-        for message in baseflow.list_failed_stages():
-            result = re.fullmatch(".*Symbol Selection.*Undefined Symbol.*", message)
-            if result.group():
-                has_undefined_symbol_message = True
-                break
-        assert has_undefined_symbol_message
+        assert baseflow.has_failure_message_like(".*Symbol Selection.*Undefined Symbol.*")
+
+    # def test__fail_for_a_combined_word_with_unregistered_pattern(self):
+    #     """State Test: Placeholder"""
+    #     baseflow = Wordflow()
+    #     word = Word({
+    #         "translated_word": "OneTwo",
+    #         "translated_word_components": ["One", "Two"],
+    #         "in_language_components": ["One", "Two"],
+    #         "etymological_symbology": "|aba|et| + |an|in|on|",
+    #         "compiled_symbology": "|aba|et|an|in|on|",
+    #         "symbol_mapping": "A B C + D E",
+    #         "symbol_selection": "A B C + D E"})
+    #     baseflow.run_stages(word)
+    #     assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
+    #     assert baseflow.has_failure_message_like(".*Symbol Selection.*Unregistered Selection.*")

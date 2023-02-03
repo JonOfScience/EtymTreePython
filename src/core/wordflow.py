@@ -56,10 +56,10 @@ class Wordflow:
         self._stage_symbolmapping(word=word, options=options)
 
         # SYMBOLSELECTION = auto()
-        # self._stage_symbolselection()
+        self._stage_symbolselection(word=word)
 
         # SYMBOLPATTERNSELECTED = auto()
-        # self._stage_symbolpatternselected()
+        # self._stage_symbolpatternselected(word=word, options=options)
 
         # RULESAPPLIED = auto()
         # INLANGUAGEWORD = auto()
@@ -83,6 +83,14 @@ class Wordflow:
     def list_failed_fields(self) -> list:
         """Returns an ordered list of Wordfield members that failed stages."""
         return [x[-2] for x in self._results if x[-1] is False]
+
+    def has_failure_message_like(self, search_pattern: str) -> bool:
+        """Returns boolean if a message, or regex pattern is found in failes stages."""
+        for message in self.list_failed_stages():
+            result = re.fullmatch(search_pattern, message)
+            if result.group():
+                return True
+        return False
 
     def _stage_translatedword(self, word: Word):
         """Stage Requirements for TRANSLATEDWORD"""
@@ -261,3 +269,33 @@ class Wordflow:
             self.__stage_symbolmapping__component_combined_group_structure(
                 etymological_symbology=etymological_symbology,
                 symbol_mapping=symbol_mapping)
+
+    def _stage_symbolselection(self, word: Word) -> None:
+        """Stage Requirements for SYMBOLSELECTION
+            - (N) Can only include previously defined symbols
+        """
+        def __symbol_split(string_to_split: str) -> set:
+            return set([
+                x
+                for x
+                in string_to_split.split(sep=" ")
+                if (len(x) > 0 and x != '+')])
+
+        symbol_mapping: str = word.find_data_on(WordField.SYMBOLMAPPING)
+        mapping_symbols = __symbol_split(symbol_mapping)
+
+        symbol_selection: str = word.find_data_on(WordField.SYMBOLSELECTION)
+        selection_symbols = __symbol_split(symbol_selection)
+        has_undefined_symbols = False
+        if len(selection_symbols.difference(mapping_symbols)) > 0:
+            has_undefined_symbols = True
+        self.__update_results(
+            stage_description="Symbol Selection - Undefined Symbol",
+            stage_result=has_undefined_symbols,
+            stage_field=WordField.SYMBOLSELECTION)
+
+    # def _stage_symbolpatternselected(self, word: Word, options: dict) -> None:
+    #     """Stage Requirements for SYMBOLPATTERNSELECTED
+    #         - (N) Can only include previously defined symbols
+    #     """
+    #     pass
