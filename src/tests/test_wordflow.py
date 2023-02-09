@@ -209,4 +209,5 @@ class TestTheBaseWordFlowShould:
             "symbol_pattern_selected": "A B C + D E F"})
         baseflow.run_stages(word)
         assert baseflow.list_failed_fields().count(WordField.SYMBOLPATTERNSELECTED) > 0
-        assert baseflow.has_failure_message_like(".*Symbol Pattern Selected.*Registered Selection.*")
+        assert baseflow.has_failure_message_like(
+            ".*Symbol Pattern Selected.*Registered Selection.*")

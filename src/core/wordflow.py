@@ -314,9 +314,15 @@ class Wordflow:
         """Stage Requirements for SYMBOLPATTERNSELECTED
             - (N) Can only include registered patterns
         """
-        symbol_mapping: str = word.find_data_on(WordField.SYMBOLMAPPING)
-        pattern_selection: str = word.find_data_on(WordField.SYMBOLPATTERNSELECTED)
+        pattern_is_registered = True
+        if options.get("IS_ROOT") is False:
+            symbol_mapping: str = word.find_data_on(WordField.SYMBOLMAPPING)
+            pattern_selection: str = word.find_data_on(WordField.SYMBOLPATTERNSELECTED)
+            pattern_is_registered = self.__symbol_selection_patterns(
+                symbol_mapping,
+                pattern_selection)
+
         self.__update_results(
             stage_description="Symbol Pattern Selected - Registered Selection",
-            stage_result=self.__symbol_selection_patterns(symbol_mapping, pattern_selection),
+            stage_result=pattern_is_registered,
             stage_field=WordField.SYMBOLPATTERNSELECTED)
