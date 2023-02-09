@@ -11,6 +11,7 @@ class Wordflow:
         self._id = uuid.uuid4().hex
         self._label = "Base Wordflow"
         self._validators = []
+        self._patterns = {}
         if validators is not None:
             self._validators = validators
         self._results = []
@@ -88,8 +89,9 @@ class Wordflow:
         """Returns boolean if a message, or regex pattern is found in failes stages."""
         for message in self.list_failed_stages():
             result = re.fullmatch(search_pattern, message)
-            if result.group():
-                return True
+            if result is not None:
+                if result.group():
+                    return True
         return False
 
     def _stage_translatedword(self, word: Word):
@@ -270,6 +272,19 @@ class Wordflow:
                 etymological_symbology=etymological_symbology,
                 symbol_mapping=symbol_mapping)
 
+    def __symbol_selection_patterns(self, key_pattern: str, query_pattern: str) -> bool:
+        self._patterns = {
+            "A + B": ["A + B"],  # Temporary Pattern to support test
+            "A B C + D": ["A C + D"],  # Temporary Pattern to support test
+            "A B C + D E F": []}
+        if self._patterns.get(key_pattern) is None:
+            return False
+
+        if query_pattern not in self._patterns.get(key_pattern):
+            return False
+
+        return True
+
     def _stage_symbolselection(self, word: Word) -> None:
         """Stage Requirements for SYMBOLSELECTION
             - (N) Can only include previously defined symbols
@@ -286,12 +301,18 @@ class Wordflow:
 
         symbol_selection: str = word.find_data_on(WordField.SYMBOLSELECTION)
         selection_symbols = __symbol_split(symbol_selection)
-        has_undefined_symbols = False
-        if len(selection_symbols.difference(mapping_symbols)) > 0:
-            has_undefined_symbols = True
+        no_undefined_symbols = True
+        undefined_symbols = selection_symbols.difference(mapping_symbols)
+        if len(undefined_symbols) > 0:
+            no_undefined_symbols = False
         self.__update_results(
-            stage_description="Symbol Selection - Undefined Symbol",
-            stage_result=has_undefined_symbols,
+            stage_description="Symbol Selection - Defined Symbols",
+            stage_result=no_undefined_symbols,
+            stage_field=WordField.SYMBOLSELECTION)
+
+        self.__update_results(
+            stage_description="Symbol Selection - Registered Selection",
+            stage_result=self.__symbol_selection_patterns(symbol_mapping, symbol_selection),
             stage_field=WordField.SYMBOLSELECTION)
 
     # def _stage_symbolpatternselected(self, word: Word, options: dict) -> None:

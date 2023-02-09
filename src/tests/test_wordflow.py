@@ -36,7 +36,7 @@ class TestTheBaseWordFlowShould:
             "etymological_symbology": "|aba|et|an| + |arae|",
             "compiled_symbology": "|aba|et|an|arae|",
             "symbol_mapping": "A B C + D",
-            "symbol_selection": "ACD",
+            "symbol_selection": "A C + D",
             "in_language_word": "abaanarae"})
         baseflow.run_stages(word)
         assert baseflow.count_failed_stages() == 0
@@ -82,7 +82,7 @@ class TestTheBaseWordFlowShould:
         failed_fields = baseflow.list_failed_fields()
         assert failed_fields.count(WordField.ETYMOLOGICALSYMBOLOGY) == 2
 
-    def test__fail_combined_groups_for_etymological_symbology_and_combined_symbology(self):
+    def test__fail_combined_groups_for_etymological_symbology_and_compiled_symbology(self):
         """State Test: Placeholder"""
         baseflow = Wordflow()
         word = Word({
@@ -91,7 +91,8 @@ class TestTheBaseWordFlowShould:
             "in_language_components": ["One", "Two"],
             "etymological_symbology": "|abaet| + |an|",
             "compiled_symbology": "|abaet|an|",
-            "symbol_mapping": "A + B"})
+            "symbol_mapping": "A + B",
+            "symbol_selection": "A + B"})
         baseflow.run_stages(word)
         failed_fields = baseflow.list_failed_fields()
         assert len(failed_fields) == 2
@@ -190,19 +191,19 @@ class TestTheBaseWordFlowShould:
             "symbol_selection": "C"})
         baseflow.run_stages(word)
         assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
-        assert baseflow.has_failure_message_like(".*Symbol Selection.*Undefined Symbol.*")
+        assert baseflow.has_failure_message_like(".*Symbol Selection.*Defined Symbols.*")
 
-    # def test__fail_for_a_combined_word_with_unregistered_pattern(self):
-    #     """State Test: Placeholder"""
-    #     baseflow = Wordflow()
-    #     word = Word({
-    #         "translated_word": "OneTwo",
-    #         "translated_word_components": ["One", "Two"],
-    #         "in_language_components": ["One", "Two"],
-    #         "etymological_symbology": "|aba|et| + |an|in|on|",
-    #         "compiled_symbology": "|aba|et|an|in|on|",
-    #         "symbol_mapping": "A B C + D E",
-    #         "symbol_selection": "A B C + D E"})
-    #     baseflow.run_stages(word)
-    #     assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
-    #     assert baseflow.has_failure_message_like(".*Symbol Selection.*Unregistered Selection.*")
+    def test__fail_for_a_combined_word_with_unregistered_and_impossible_pattern(self):
+        """State Test: Placeholder"""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": ["One", "Two"],
+            "in_language_components": ["One", "Two"],
+            "etymological_symbology": "|aba|et|it| + |an|in|on|",
+            "compiled_symbology": "|aba|et|it|an|in|on|",
+            "symbol_mapping": "A B C + D E F",
+            "symbol_selection": "A B C + D E F"})
+        baseflow.run_stages(word)
+        assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
+        assert baseflow.has_failure_message_like(".*Symbol Selection.*Registered Selection.*")
