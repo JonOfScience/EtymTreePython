@@ -290,11 +290,11 @@ class Wordflow:
             - (N) Can only include previously defined symbols
         """
         def __symbol_split(string_to_split: str) -> set:
-            return set([
+            return {
                 x
                 for x
                 in string_to_split.split(sep=" ")
-                if (len(x) > 0 and x != '+')])
+                if (len(x) > 0 and x != '+')}
 
         symbol_mapping: str = word.find_data_on(WordField.SYMBOLMAPPING)
         mapping_symbols = __symbol_split(symbol_mapping)
