@@ -60,7 +60,7 @@ class Wordflow:
         self._stage_symbolselection(word=word)
 
         # SYMBOLPATTERNSELECTED = auto()
-        # self._stage_symbolpatternselected(word=word, options=options)
+        self._stage_symbolpatternselected(word=word, options=options)
 
         # RULESAPPLIED = auto()
         # INLANGUAGEWORD = auto()
@@ -310,13 +310,13 @@ class Wordflow:
             stage_result=no_undefined_symbols,
             stage_field=WordField.SYMBOLSELECTION)
 
+    def _stage_symbolpatternselected(self, word: Word, options: dict) -> None:
+        """Stage Requirements for SYMBOLPATTERNSELECTED
+            - (N) Can only include registered patterns
+        """
+        symbol_mapping: str = word.find_data_on(WordField.SYMBOLMAPPING)
+        pattern_selection: str = word.find_data_on(WordField.SYMBOLPATTERNSELECTED)
         self.__update_results(
-            stage_description="Symbol Selection - Registered Selection",
-            stage_result=self.__symbol_selection_patterns(symbol_mapping, symbol_selection),
-            stage_field=WordField.SYMBOLSELECTION)
-
-    # def _stage_symbolpatternselected(self, word: Word, options: dict) -> None:
-    #     """Stage Requirements for SYMBOLPATTERNSELECTED
-    #         - (N) Can only include previously defined symbols
-    #     """
-    #     pass
+            stage_description="Symbol Pattern Selected - Registered Selection",
+            stage_result=self.__symbol_selection_patterns(symbol_mapping, pattern_selection),
+            stage_field=WordField.SYMBOLPATTERNSELECTED)

@@ -36,7 +36,8 @@ class TestTheBaseWordFlowShould:
             "etymological_symbology": "|aba|et|an| + |arae|",
             "compiled_symbology": "|aba|et|an|arae|",
             "symbol_mapping": "A B C + D",
-            "symbol_selection": "A C + D",
+            "symbol_selection": "A C D",
+            "symbol_pattern_selected": "A C + D",
             "in_language_word": "abaanarae"})
         baseflow.run_stages(word)
         assert baseflow.count_failed_stages() == 0
@@ -92,7 +93,8 @@ class TestTheBaseWordFlowShould:
             "etymological_symbology": "|abaet| + |an|",
             "compiled_symbology": "|abaet|an|",
             "symbol_mapping": "A + B",
-            "symbol_selection": "A + B"})
+            "symbol_selection": "A B",
+            "symbol_pattern_selected": "A + B"})
         baseflow.run_stages(word)
         failed_fields = baseflow.list_failed_fields()
         assert len(failed_fields) == 2
@@ -203,7 +205,8 @@ class TestTheBaseWordFlowShould:
             "etymological_symbology": "|aba|et|it| + |an|in|on|",
             "compiled_symbology": "|aba|et|it|an|in|on|",
             "symbol_mapping": "A B C + D E F",
-            "symbol_selection": "A B C + D E F"})
+            "symbol_selection": "A B C D E F",
+            "symbol_pattern_selected": "A B C + D E F"})
         baseflow.run_stages(word)
-        assert baseflow.list_failed_fields().count(WordField.SYMBOLSELECTION) > 0
-        assert baseflow.has_failure_message_like(".*Symbol Selection.*Registered Selection.*")
+        assert baseflow.list_failed_fields().count(WordField.SYMBOLPATTERNSELECTED) > 0
+        assert baseflow.has_failure_message_like(".*Symbol Pattern Selected.*Registered Selection.*")
