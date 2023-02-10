@@ -230,7 +230,22 @@ class TestTheBaseWordFlowShould:
         baseflow.run_stages(word)
         assert baseflow.list_failed_fields().count(WordField.INLANGUAGEWORD) > 0
         assert baseflow.has_failure_message_like(
-            ".*In Language Word.*Symbol Selection To In Language Word Match.*")
+            ".*In Language Word.*Combined Selection To In Language Word Match.*")
+
+    def test_fail_for_a_root_word_with_mismatched_etymsymb_and_word(self):
+        """If the in-language_word does not match the base combination of symbols it must fail."""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": [],
+            "in_language_components": [],
+            "etymological_symbology": "|aba|et|an|",
+            "symbol_mapping": "A B C",
+            "in_language_word": "abaetam"})
+        baseflow.run_stages(word)
+        assert baseflow.list_failed_fields().count(WordField.INLANGUAGEWORD) > 0
+        assert baseflow.has_failure_message_like(
+            ".*In Language Word.*Root Symbols To In Language Word Match.*")
 
     def test__contain_results_for_all_specified_stages(self):
         """Each user-defined WordField should exist at least once."""

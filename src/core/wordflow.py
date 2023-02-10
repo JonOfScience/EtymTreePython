@@ -366,19 +366,28 @@ class Wordflow:
                     filtered through SYMBOLSELECTION
         """
 
-        etymological_symbology = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
+        etymological_symbology: str = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
         symbol_mapping = word.find_data_on(WordField.SYMBOLMAPPING)
-        mapped_symbols = self.__map_symbols_to_groups(etymological_symbology, symbol_mapping)
-        symbolic_and_in_language_words_match = False
-        if mapped_symbols is not False:
-            symbol_selection = word.find_data_on(WordField.SYMBOLSELECTION)
-            symbols_selected = self.__symbol_split_into_list(symbol_selection)
-            comparator = ""
-            for symbol in symbols_selected:
-                comparator += mapped_symbols[symbol]
-            in_language_word = word.find_data_on(WordField.INLANGUAGEWORD)
-            symbolic_and_in_language_words_match = in_language_word == comparator
-        self.__update_results(
-            stage_description="In Language Word - Symbol Selection To In Language Word Match",
-            stage_result=symbolic_and_in_language_words_match,
-            stage_field=WordField.INLANGUAGEWORD)
+        in_language_word = word.find_data_on(WordField.INLANGUAGEWORD)
+
+        if options.get("IS_ROOT") is True:
+            compiled_word = etymological_symbology.replace('|', '')
+            self.__update_results(
+                stage_description="In Language Word - Root Symbols To In Language Word Match",
+                stage_result=compiled_word == in_language_word,
+                stage_field=WordField.INLANGUAGEWORD)
+
+        if options.get("IS_ROOT") is False:
+            mapped_symbols = self.__map_symbols_to_groups(etymological_symbology, symbol_mapping)
+            symbolic_and_in_language_words_match = False
+            if mapped_symbols is not False:
+                symbol_selection = word.find_data_on(WordField.SYMBOLSELECTION)
+                symbols_selected = self.__symbol_split_into_list(symbol_selection)
+                comparator = ""
+                for symbol in symbols_selected:
+                    comparator += mapped_symbols[symbol]
+                symbolic_and_in_language_words_match = in_language_word == comparator
+            self.__update_results(
+                stage_description="In Language Word - Combined Selection To In Language Word Match",
+                stage_result=symbolic_and_in_language_words_match,
+                stage_field=WordField.INLANGUAGEWORD)
