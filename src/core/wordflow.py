@@ -64,6 +64,8 @@ class Wordflow:
 
         # RULESAPPLIED = auto()
         # INLANGUAGEWORD = auto()
+        self._stage_inlanguageword(word=word, options=options)
+
         return self._results
 
     def _select_stage_results(self) -> list:
@@ -76,6 +78,10 @@ class Wordflow:
     def count_failed_stages(self) -> int:
         """Returns count of False values in stage results."""
         return self._select_stage_results().count(False)
+
+    def list_stage_fields(self) -> list:
+        """Returns an ordered list of Wordfield members that were carried out."""
+        return [x[-2] for x in self._results]
 
     def list_failed_stages(self) -> list:
         """Returns list of strings associated with False values in stage results."""
@@ -287,7 +293,7 @@ class Wordflow:
 
     def _stage_symbolselection(self, word: Word) -> None:
         """Stage Requirements for SYMBOLSELECTION
-            - (N) Can only include previously defined symbols
+            - (Y) Can only include previously defined symbols
         """
         def __symbol_split(string_to_split: str) -> set:
             return {
@@ -312,7 +318,7 @@ class Wordflow:
 
     def _stage_symbolpatternselected(self, word: Word, options: dict) -> None:
         """Stage Requirements for SYMBOLPATTERNSELECTED
-            - (N) Can only include registered patterns
+            - (Y) Can only include registered patterns
         """
         pattern_is_registered = True
         if options.get("IS_ROOT") is False:
@@ -326,3 +332,53 @@ class Wordflow:
             stage_description="Symbol Pattern Selected - Registered Selection",
             stage_result=pattern_is_registered,
             stage_field=WordField.SYMBOLPATTERNSELECTED)
+
+    def __symbol_split_into_list(self, string_to_split: str, separator: str = ' ') -> list:
+        return [
+            x
+            for x
+            in string_to_split.split(sep=separator)
+            if (len(x) > 0 and x != '+')]
+
+    def __map_symbols_to_groups(self, groups_text: str, groups_mapping: str) -> dict:
+        """Returns a symbol:group paired dictionary."""
+        mapped_symbols = {}
+        split_groups = self.__symbol_split_into_list(groups_text)
+        split_elements = []
+        for group in split_groups:
+            split_elements.extend(self.__symbol_split_into_list(group, '|'))
+        split_symbols = self.__symbol_split_into_list(groups_mapping)
+        if len(split_symbols) != len(split_elements):
+            return False
+
+        for ind, val in enumerate(split_symbols):
+            mapped_symbols[val] = split_elements[ind]
+        return mapped_symbols
+
+    def _stage_inlanguageword(self, word: Word, options: dict) -> None:
+        """Stage Requirements for INLANGUAGEWORD
+            - IS_ROOT -> TRUE
+                (N) Root words need to match ETYMOLOGICALSYMBOLOGY alphabetic characters
+            - IS_ROOT -> FALSE
+                (N) Combined words need to:
+                    match ETYMOLOGICALSYMBOLOGY
+                    mapped to SYMBOLMAPPING
+                    filtered through SYMBOLSELECTION
+        """
+
+        etymological_symbology = word.find_data_on(WordField.ETYMOLOGICALSYMBOLOGY)
+        symbol_mapping = word.find_data_on(WordField.SYMBOLMAPPING)
+        mapped_symbols = self.__map_symbols_to_groups(etymological_symbology, symbol_mapping)
+        symbolic_and_in_language_words_match = False
+        if mapped_symbols is not False:
+            symbol_selection = word.find_data_on(WordField.SYMBOLSELECTION)
+            symbols_selected = self.__symbol_split_into_list(symbol_selection)
+            comparator = ""
+            for symbol in symbols_selected:
+                comparator += mapped_symbols[symbol]
+            in_language_word = word.find_data_on(WordField.INLANGUAGEWORD)
+            symbolic_and_in_language_words_match = in_language_word == comparator
+        self.__update_results(
+            stage_description="In Language Word - Symbol Selection To In Language Word Match",
+            stage_result=symbolic_and_in_language_words_match,
+            stage_field=WordField.INLANGUAGEWORD)

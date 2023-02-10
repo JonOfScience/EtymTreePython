@@ -94,7 +94,8 @@ class TestTheBaseWordFlowShould:
             "compiled_symbology": "|abaet|an|",
             "symbol_mapping": "A + B",
             "symbol_selection": "A B",
-            "symbol_pattern_selected": "A + B"})
+            "symbol_pattern_selected": "A + B",
+            "in_language_word": "abaetan"})
         baseflow.run_stages(word)
         failed_fields = baseflow.list_failed_fields()
         assert len(failed_fields) == 2
@@ -137,7 +138,8 @@ class TestTheBaseWordFlowShould:
             "in_language_components": [],
             "etymological_symbology": "|aba|et|",
             "compiled_symbology": "|aba|et|",
-            "symbol_mapping": "A B C"})
+            "symbol_mapping": "A B C",
+            "in_language_word": "abaet"})
         baseflow.run_stages(word)
         assert baseflow.list_failed_fields().count(WordField.SYMBOLMAPPING) == 1
 
@@ -211,3 +213,50 @@ class TestTheBaseWordFlowShould:
         assert baseflow.list_failed_fields().count(WordField.SYMBOLPATTERNSELECTED) > 0
         assert baseflow.has_failure_message_like(
             ".*Symbol Pattern Selected.*Registered Selection.*")
+
+    def test__fail_for_a_combined_word_with_mismatched_symbol_selection_and_word(self):
+        """If the in_language_word does not match the symbols selected it must fail."""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": ["One", "Two"],
+            "in_language_components": ["One", "Two"],
+            "etymological_symbology": "|aba|et|an| + |arae|",
+            "compiled_symbology": "|aba|et|an|arae|",
+            "symbol_mapping": "A B C + D",
+            "symbol_selection": "A C D",
+            "symbol_pattern_selected": "A C + D",
+            "in_language_word": "abaanarai"})
+        baseflow.run_stages(word)
+        assert baseflow.list_failed_fields().count(WordField.INLANGUAGEWORD) > 0
+        assert baseflow.has_failure_message_like(
+            ".*In Language Word.*Symbol Selection To In Language Word Match.*")
+
+    def test__contain_results_for_all_specified_stages(self):
+        """Each user-defined WordField should exist at least once."""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": ["One", "Two"],
+            "in_language_components": ["One", "Two"],
+            "etymological_symbology": "|aba|et|an| + |arae|",
+            "compiled_symbology": "|aba|et|an|arae|",
+            "symbol_mapping": "A B C + D",
+            "symbol_selection": "A C D",
+            "symbol_pattern_selected": "A C + D",
+            "in_language_word": "abaanarae"})
+        baseflow.run_stages(word)
+        field_list = baseflow.list_stage_fields()
+        assert WordField.TRANSLATEDWORD in field_list
+        assert WordField.TRANSLATEDCOMPONENTS in field_list
+        assert WordField.INLANGUAGECOMPONENTS in field_list
+        assert WordField.ETYMOLOGICALSYMBOLOGY in field_list
+        assert WordField.COMPILEDSYMBOLOGY in field_list
+        assert WordField.SYMBOLMAPPING in field_list
+        assert WordField.SYMBOLSELECTION in field_list
+        assert WordField.SYMBOLPATTERNSELECTED in field_list
+        assert WordField.INLANGUAGEWORD in field_list
+
+    # def test__contain_results_for_the_specified_stages_in_order(self):
+    #     """Each user-defined WordField should exist at least once."""
+    #     pytest.fail()
