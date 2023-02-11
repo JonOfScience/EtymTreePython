@@ -299,5 +299,5 @@ class TestTheBaseWordFlowShould:
         assert field_list[0] == WordField.TRANSLATEDWORD
         last_field = WordField.TRANSLATEDWORD
         for field in field_list[1:]:
-            assert field == last_field or stage_pairs[field] == last_field
+            assert last_field in (field, stage_pairs[field])
             last_field = field
