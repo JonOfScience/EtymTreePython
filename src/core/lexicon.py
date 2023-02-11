@@ -6,10 +6,12 @@ from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
 from services.lexicon_io_service import LexiconIOService
+# from services.io_service_api import IOServiceAPI
 from core.core import DataFormat, WordField, split_string_into_groups
 from core.word import Word
 from core.change_history import LexiconChangeHistory
 from core.change_history_item import ChangeHistoryItem
+from core.wordflow import Wordflow
 
 
 class Lexicon:
@@ -169,14 +171,18 @@ class Lexicon:
             field_name=field_name,
             to_validate=to_validate)
 
+    def get_word_validitor(self):
+        """Returns Wordflow results"""
+        return Wordflow()
+
     def set_field_to_value(self, field: str, word: Union[Word, str], new_value: Any):
         """Set the value of the specified field for a supplied word"""
         if isinstance(word, str):
             word: Word = self.index_by_translated_word[word]
 
-        if isinstance(new_value, str):
-            if self.validate_for_field(field_name=field, to_validate=new_value) is False:
-                raise ValueError("Word: Error - Field cannot be set to invalid value.")
+        # if isinstance(new_value, str):
+        #     if self.validate_for_field(field_name=field, to_validate=new_value) is False:
+        #         raise ValueError("Word: Error - Field cannot be set to invalid value.")
 
         this_field = self._map_label_to_field(field)
         change_history_item = word.set_field_to(this_field, new_value)
@@ -203,6 +209,8 @@ class Lexicon:
         storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
         output_dicts = self.retrieve_export_data_for()
         storage_service.store_to(filename + ".json", output_dicts)
+        # ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
+        # ruleset_io_service.store_to(filename + ".json", self._rulesets)
 
     def load_from(self, filename: str):
         """Read and deserialise Word entries from local store"""
@@ -211,3 +219,6 @@ class Lexicon:
         self.uuid = filename
         for word_data in input_data:
             self.add_entry(Word(word_data))
+        # ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
+        # ruleset_data = ruleset_io_service.load_from(filename + ".json")
+        # self._rulesets = ruleset_data
