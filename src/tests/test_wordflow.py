@@ -272,6 +272,32 @@ class TestTheBaseWordFlowShould:
         assert WordField.SYMBOLPATTERNSELECTED in field_list
         assert WordField.INLANGUAGEWORD in field_list
 
-    # def test__contain_results_for_the_specified_stages_in_order(self):
-    #     """Each user-defined WordField should exist at least once."""
-    #     pytest.fail()
+    def test__contain_results_for_the_specified_stages_in_order(self):
+        """Each user-defined WordField should exist in stage order."""
+        baseflow = Wordflow()
+        word = Word({
+            "translated_word": "OneTwo",
+            "translated_word_components": ["One", "Two"],
+            "in_language_components": ["One", "Two"],
+            "etymological_symbology": "|aba|et|an| + |arae|",
+            "compiled_symbology": "|aba|et|an|arae|",
+            "symbol_mapping": "A B C + D",
+            "symbol_selection": "A C D",
+            "symbol_pattern_selected": "A C + D",
+            "in_language_word": "abaanarae"})
+        baseflow.run_stages(word)
+        field_list = baseflow.list_stage_fields()
+        stage_pairs = {
+            WordField.TRANSLATEDCOMPONENTS: WordField.TRANSLATEDWORD,
+            WordField.INLANGUAGECOMPONENTS: WordField.TRANSLATEDCOMPONENTS,
+            WordField.ETYMOLOGICALSYMBOLOGY: WordField.INLANGUAGECOMPONENTS,
+            WordField.COMPILEDSYMBOLOGY: WordField.ETYMOLOGICALSYMBOLOGY,
+            WordField.SYMBOLMAPPING: WordField.COMPILEDSYMBOLOGY,
+            WordField.SYMBOLSELECTION: WordField.SYMBOLMAPPING,
+            WordField.SYMBOLPATTERNSELECTED: WordField.SYMBOLSELECTION,
+            WordField.INLANGUAGEWORD: WordField.SYMBOLPATTERNSELECTED}
+        assert field_list[0] == WordField.TRANSLATEDWORD
+        last_field = WordField.TRANSLATEDWORD
+        for field in field_list[1:]:
+            assert field == last_field or stage_pairs[field] == last_field
+            last_field = field

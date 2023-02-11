@@ -81,7 +81,7 @@ class Wordflow:
 
     def list_stage_fields(self) -> list:
         """Returns an ordered list of Wordfield members that were carried out."""
-        return [x[-2] for x in self._results]
+        return [x[-2] for x in self._results if not isinstance(x, str)]
 
     def list_failed_stages(self) -> list:
         """Returns list of strings associated with False values in stage results."""
