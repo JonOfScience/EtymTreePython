@@ -16,7 +16,6 @@ from PyQt5.QtWidgets import (
 from core.core import ProjectStatus
 from core.project import Project, ProjectBuilder
 from core.change_history import LexiconChangeHistory
-from core.change_history_item import ChangeHistoryItem
 from core.lexicon import Lexicon
 from core.word import Word
 # Replace this with an interface
