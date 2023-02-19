@@ -72,7 +72,7 @@ class ProjectWindow(QWidget):
         self.controls = Controls()
 
         self._selected_node = None
-        self._selected_change_nodes = set[ChangeHistoryItem]()
+        self._selected_change_nodes: set[ChangeHistoryItem] = set()
 
         self._translated_component_mapping = {}
 
@@ -187,7 +187,7 @@ class ProjectWindow(QWidget):
         _change_history: QTreeView = self.controls.control_from_id("ChangeHistoryTable")
         _resolve_btn: QPushButton = self.controls.control_from_id("ResolveChangeBtn")
 
-        self._selected_change_nodes = set[ChangeHistoryItem]()
+        self._selected_change_nodes: set[ChangeHistoryItem] = set()
         selected_rows = _change_history.selectionModel().selectedIndexes()
         for row in selected_rows:
             _selected_change_item: QStandardItem = _change_history.model().itemFromIndex(row)
@@ -197,7 +197,7 @@ class ProjectWindow(QWidget):
             _resolve_btn.setEnabled(True)
         else:
             _resolve_btn.setEnabled(False)
-    
+
     def _resolve_changes_btn_clicked(self):
         """Resolve all selected indexes"""
         if self._selected_change_nodes and self._selected_node:
