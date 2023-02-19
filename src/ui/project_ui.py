@@ -72,7 +72,7 @@ class ProjectWindow(QWidget):
         self.controls = Controls()
 
         self._selected_node = None
-        self._selected_change_node = None
+        self._selected_change_nodes = set[ChangeHistoryItem]()
 
         self._translated_component_mapping = {}
 
@@ -147,7 +147,7 @@ class ProjectWindow(QWidget):
             self._change_history_selection_changed)
 
         _resolve_btn: QPushButton = self.controls.control_from_id("ResolveChangeBtn")
-        _resolve_btn.clicked.connect(self._resolve_change_btn_clicked)
+        _resolve_btn.clicked.connect(self._resolve_changes_btn_clicked)
 
         return layout
 
@@ -185,18 +185,24 @@ class ProjectWindow(QWidget):
 
     def _change_history_selection_changed(self):
         _change_history: QTreeView = self.controls.control_from_id("ChangeHistoryTable")
-        selected_row = _change_history.selectionModel().selectedIndexes()[0]
-        _selected_change_item = _change_history.model().itemFromIndex(selected_row)
-        self._selected_change_node: ChangeHistoryItem = _selected_change_item.data()
         _resolve_btn: QPushButton = self.controls.control_from_id("ResolveChangeBtn")
-        if self._selected_change_node and not _resolve_btn.isEnabled():
+
+        self._selected_change_nodes = set[ChangeHistoryItem]()
+        selected_rows = _change_history.selectionModel().selectedIndexes()
+        for row in selected_rows:
+            _selected_change_item: QStandardItem = _change_history.model().itemFromIndex(row)
+            self._selected_change_nodes.add(_selected_change_item.data())
+
+        if self._selected_change_nodes:
             _resolve_btn.setEnabled(True)
         else:
             _resolve_btn.setEnabled(False)
-
-    def _resolve_change_btn_clicked(self):
-        if self._selected_change_node and self._selected_node:
-            self.current_lexicon.resolve_change_for(self._selected_change_node, self._selected_node)
+    
+    def _resolve_changes_btn_clicked(self):
+        """Resolve all selected indexes"""
+        if self._selected_change_nodes and self._selected_node:
+            for change_node in self._selected_change_nodes:
+                self.current_lexicon.resolve_change_for(change_node, self._selected_node)
             self._tree_overview_update()
             self._changehistory_table_populate()
             this_project: Project = self.options.find_by_id("CurrentProject")

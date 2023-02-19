@@ -152,7 +152,7 @@ class WordDetails:
 
         resolve_change_btn = QPushButton()
         resolve_change_btn.setObjectName("ResolveChangeBtn")
-        resolve_change_btn.setText("Resolve Selected Change")
+        resolve_change_btn.setText("Resolve Selected Change(s)")
         resolve_change_btn.setEnabled(False)
         details_layout.addWidget(resolve_change_btn)
 
