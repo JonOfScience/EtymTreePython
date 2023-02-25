@@ -1,10 +1,8 @@
 """Project screen showing project overview"""
 from typing import Sequence
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QBrush, QColor
 from PyQt5.QtWidgets import (
-    QAbstractItemView,
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
@@ -58,6 +56,7 @@ class ProjectUIController:
     @staticmethod
     def update_component_mapping(mapping: dict, component_id: str, components: Sequence[str]):
         """Updates component mapping with split component data.
+        
         Components are in order.
         Component values are True if the component word exists in the mapping."""
         mapping[component_id] = components
