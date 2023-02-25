@@ -1,8 +1,10 @@
 """Project screen showing project overview"""
 from typing import Sequence
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QBrush, QColor
 from PyQt5.QtWidgets import (
+    QAbstractItemView,
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
@@ -281,6 +283,7 @@ class ProjectWindow(QWidget):
 
         # Get View, Model and Root - Clear Model, Set Header to Hidden
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
+        _scroll_position = _tree_overview.verticalScrollBar().value()
         _tree_model: QStandardItemModel = _tree_overview.model()
         _tree_model.clear()
         _tree_overview.setHeaderHidden(True)
@@ -314,6 +317,7 @@ class ProjectWindow(QWidget):
             root.appendRow(new_item)
         _tree_overview.expandAll()
         _tree_model.sort(0)
+        _tree_overview.verticalScrollBar().setValue(_scroll_position)
 
     def _word_details_table_update(self):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
