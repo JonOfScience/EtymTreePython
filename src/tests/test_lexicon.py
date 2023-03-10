@@ -83,18 +83,6 @@ class TestModifyingWordFieldsShould:
         assert status_after != status_before
         assert status_after
 
-    # def test__setting_a_field_unsuccessfully_does_not_change_the_word_flag(self):
-    #     """Flag value is true and has changed after being successfully set"""
-    #     new_lexicon = Lexicon()
-    #     new_word = Word()
-    #     new_lexicon.add_entry(new_word)
-    #     status_before = new_word.has_unresolved_modification
-    #     with pytest.raises(Exception) as e_info:
-    #         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu!da|")
-    #     status_after = new_word.has_unresolved_modification
-    #     assert status_after == status_before
-    #     assert e_info.type == ValueError
-
     def test__setting_a_field_successfully_adds_to_the_version_history(self):
         """Version History is longer after a field is successfully set"""
         new_lexicon = Lexicon()
@@ -104,18 +92,6 @@ class TestModifyingWordFieldsShould:
         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu|da|")
         history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
         assert len(history_before) < len(history_after)
-
-    # def test__setting_a_field_unsuccessfully_does_not_add_to_the_version_history(self):
-    #     """Version History is the same length after a field is unsuccessfully set"""
-    #     new_lexicon = Lexicon()
-    #     new_word = Word()
-    #     new_lexicon.add_entry(new_word)
-    #     history_before = new_word.find_data_on(WordField.VERSIONHISTORY)
-    #     with pytest.raises(Exception) as e_info:
-    #         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|abu!da|")
-    #     history_after = new_word.find_data_on(WordField.VERSIONHISTORY)
-    #     assert history_before == history_after
-    #     assert e_info.type == ValueError
 
 
 class TestRetrievingWordChildrenShould:
@@ -208,8 +184,8 @@ class TestAPopulatedLexiconShould:
     def test__lex_mio_00__passes_data_from_selected_words(self, mocker):
         """Placeholder: Behaviour Test"""
         mock_service = mocker.patch(
-            "services.lexicon_io_service.LexiconIOService.store_to",
-            return_value=True)
+             "services.io_service_api.IOServiceAPI.store_to",
+             return_value=True)
         new_lexicon = Lexicon()
         first_new_word = Word()
         second_new_word = Word()
@@ -292,26 +268,6 @@ class TestAPopulatedLexiconShould:
         new_lexicon.add_entry(new_word)
         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|ino|mu|")
         assert new_lexicon.get_field_for_word("Etymological Symbology", new_word) == "|ino|mu|"
-
-    # def test__not_change_etymological_symbology_for_word_with_invalidly_structured_input(self):
-    #     """An input of valid characters with invalid structure will not change the field value"""
-    #     new_lexicon = Lexicon()
-    #     new_word = Word({"etymological_symbology": "|aba|et|"})
-    #     new_lexicon.add_entry(new_word)
-    #     with pytest.raises(Exception) as e_info:
-    #         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|inomu|")
-    #     assert new_lexicon.get_field_for_word("Etymological Symbology", new_word) == "|aba|et|"
-    #     assert e_info.type == ValueError
-
-    # def test__not_change_etymological_symbology_for_word_input_with_invalid_characters(self):
-    #     """An input of invalid characters with valid structure will not change the field value"""
-    #     new_lexicon = Lexicon()
-    #     new_word = Word({"etymological_symbology": "|aba|et|"})
-    #     new_lexicon.add_entry(new_word)
-    #     with pytest.raises(Exception) as e_info:
-    #         new_lexicon.set_field_to_value("Etymological Symbology", new_word, "|ino!mu|")
-    #     assert new_lexicon.get_field_for_word("Etymological Symbology", new_word) == "|aba|et|"
-    #     assert e_info.type == ValueError
 
 
 class TestResolvingChangesOnAWordShould:
