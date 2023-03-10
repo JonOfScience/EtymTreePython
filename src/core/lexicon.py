@@ -5,8 +5,7 @@ import re
 from typing import Any, Union
 from collections.abc import Sequence
 from services.io_service import IOService
-from services.lexicon_io_service import LexiconIOService
-# from services.io_service_api import IOServiceAPI
+from services.io_service_api import IOServiceAPI
 from core.core import DataFormat, WordField, split_string_into_groups
 from core.word import Word
 from core.change_history import LexiconChangeHistory
@@ -206,19 +205,14 @@ class Lexicon:
 
     def store_to(self, filename: str):
         """Serialise and store Word entries locally"""
-        storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
+        storage_service: IOServiceAPI = IOServiceAPI("LEX", IOService(DataFormat.JSON))
         output_dicts = self.retrieve_export_data_for()
         storage_service.store_to(filename + ".json", output_dicts)
-        # ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
-        # ruleset_io_service.store_to(filename + ".json", self._rulesets)
 
     def load_from(self, filename: str):
         """Read and deserialise Word entries from local store"""
-        storage_service: LexiconIOService = LexiconIOService(IOService(DataFormat.JSON))
+        storage_service: IOServiceAPI = IOServiceAPI("LEX", IOService(DataFormat.JSON))
         input_data = storage_service.load_from(filename + ".json")
         self.uuid = filename
         for word_data in input_data:
             self.add_entry(Word(word_data))
-        # ruleset_io_service: IOServiceAPI = IOServiceAPI("LSR", IOService(DataFormat.JSON))
-        # ruleset_data = ruleset_io_service.load_from(filename + ".json")
-        # self._rulesets = ruleset_data
