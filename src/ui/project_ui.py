@@ -241,6 +241,7 @@ class ProjectWindow(QWidget):
 
         self._word_details_table_update()
         self._tree_overview_update()
+        self._tree_overview_scroll_to(associated_word)
         self._changehistory_table_populate()
 
     def _new_word_clicked(self):
