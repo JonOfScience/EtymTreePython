@@ -1,6 +1,6 @@
 """Project screen showing project overview"""
 from typing import Sequence
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QBrush, QColor
 from PyQt5.QtWidgets import (
     QGroupBox,
@@ -17,7 +17,7 @@ from core.core import ProjectStatus
 from core.project import Project, ProjectBuilder
 from core.change_history import LexiconChangeHistory
 from core.lexicon import Lexicon
-from core.word import Word
+from core.word import Word, WordField
 # Replace this with an interface
 from configuration.settings import Settings
 from ui.interfaces import Controls
@@ -244,9 +244,10 @@ class ProjectWindow(QWidget):
         self._changehistory_table_populate()
 
     def _new_word_clicked(self):
-        self.current_lexicon.create_entry()
+        new_entry = self.current_lexicon.create_entry()
         self._build_translated_component_mappings()
         self._window_update()
+        self._tree_overview_scroll_to(new_entry)
 
     def _get_item_status_colour(self, palette_name: str, colour_key):
         return self.options.find_by_id(palette_name).get(colour_key)
@@ -317,6 +318,14 @@ class ProjectWindow(QWidget):
         _tree_overview.expandAll()
         _tree_model.sort(0)
         _tree_overview.verticalScrollBar().setValue(_scroll_position)
+
+    def _tree_overview_scroll_to(self, target_word: Word):
+        _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
+        _tree_model: QStandardItemModel = _tree_overview.model()
+        all_items = _tree_model.findItems(target_word.find_data_on(WordField.TRANSLATEDWORD), QtCore.Qt.MatchFlag.MatchContains)
+        if all_items:
+            found_index = _tree_model.indexFromItem(all_items[0])
+            _tree_overview.scrollTo(found_index)
 
     def _word_details_table_update(self):
         word_details_table: QTableView = self.controls.control_from_id("WordDetailsTable")
