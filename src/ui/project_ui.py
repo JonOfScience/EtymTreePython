@@ -249,6 +249,8 @@ class ProjectWindow(QWidget):
         self._build_translated_component_mappings()
         self._window_update()
         self._tree_overview_scroll_to(new_entry)
+        this_project: Project = self.options.find_by_id("CurrentProject")
+        this_project.store()
 
     def _get_item_status_colour(self, palette_name: str, colour_key):
         return self.options.find_by_id(palette_name).get(colour_key)
