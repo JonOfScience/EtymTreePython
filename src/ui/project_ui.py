@@ -322,7 +322,8 @@ class ProjectWindow(QWidget):
     def _tree_overview_scroll_to(self, target_word: Word):
         _tree_overview: QTreeView = self.controls.control_from_id("LexiconOverview")
         _tree_model: QStandardItemModel = _tree_overview.model()
-        all_items = _tree_model.findItems(target_word.find_data_on(WordField.TRANSLATEDWORD), QtCore.Qt.MatchFlag.MatchContains)
+        all_items = _tree_model.findItems(
+            target_word.find_data_on(WordField.TRANSLATEDWORD), QtCore.Qt.MatchFlag.MatchContains)
         if all_items:
             found_index = _tree_model.indexFromItem(all_items[0])
             _tree_overview.scrollTo(found_index)
