@@ -62,6 +62,11 @@ class ProjectUIController:
         mapping[component_id] = components
         return mapping
 
+    @staticmethod
+    def store_project(project: Project):
+        """Stores the specified Project"""
+        project.store()
+
 
 class ProjectWindow(QWidget):
     """Window to display project overview and controls to the user"""
@@ -205,8 +210,9 @@ class ProjectWindow(QWidget):
                 self.current_lexicon.resolve_change_for(change_node, self._selected_node)
             self._tree_overview_update()
             self._changehistory_table_populate()
-            this_project: Project = self.options.find_by_id("CurrentProject")
-            this_project.store()
+            # this_project: Project = self.options.find_by_id("CurrentProject")
+            # this_project.store()
+            ProjectUIController.store_project(self.options.find_by_id("CurrentProject"))
             self.controls.control_from_id("ResolveChangeBtn").setEnabled(False)
 
     def _details_model_data_changed(self, item: QStandardItem):
@@ -214,7 +220,6 @@ class ProjectWindow(QWidget):
         details_model: QStandardItemModel = details_table.model()
         field_label: QStandardItem = details_model.verticalHeaderItem(item.row()).text()
         associated_word: Word = item.data()
-        this_project: Project = self.options.find_by_id("CurrentProject")
         this_lexicon = self.current_lexicon
         this_changehistory: LexiconChangeHistory = self.options.find_by_id("CurrentChangeHistory")
         new_value = item.text()
@@ -227,7 +232,10 @@ class ProjectWindow(QWidget):
             associated_word,
             new_value)
         this_changehistory.add_item(change_history_item)
-        this_project.store()
+
+        # this_project: Project = self.options.find_by_id("CurrentProject")
+        # this_project.store()
+        ProjectUIController.store_project(self.options.find_by_id("CurrentProject"))
 
         if field_label == "Translated Word":
             self._build_translated_component_mappings()
@@ -249,8 +257,9 @@ class ProjectWindow(QWidget):
         self._build_translated_component_mappings()
         self._window_update()
         self._tree_overview_scroll_to(new_entry)
-        this_project: Project = self.options.find_by_id("CurrentProject")
-        this_project.store()
+        # this_project: Project = self.options.find_by_id("CurrentProject")
+        # this_project.store()
+        ProjectUIController.store_project(self.options.find_by_id("CurrentProject"))
 
     def _get_item_status_colour(self, palette_name: str, colour_key):
         return self.options.find_by_id(palette_name).get(colour_key)
