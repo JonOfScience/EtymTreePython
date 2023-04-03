@@ -210,8 +210,6 @@ class ProjectWindow(QWidget):
                 self.current_lexicon.resolve_change_for(change_node, self._selected_node)
             self._tree_overview_update()
             self._changehistory_table_populate()
-            # this_project: Project = self.options.find_by_id("CurrentProject")
-            # this_project.store()
             ProjectUIController.store_project(self.options.find_by_id("CurrentProject"))
             self.controls.control_from_id("ResolveChangeBtn").setEnabled(False)
 
@@ -233,8 +231,6 @@ class ProjectWindow(QWidget):
             new_value)
         this_changehistory.add_item(change_history_item)
 
-        # this_project: Project = self.options.find_by_id("CurrentProject")
-        # this_project.store()
         ProjectUIController.store_project(self.options.find_by_id("CurrentProject"))
 
         if field_label == "Translated Word":
@@ -257,8 +253,6 @@ class ProjectWindow(QWidget):
         self._build_translated_component_mappings()
         self._window_update()
         self._tree_overview_scroll_to(new_entry)
-        # this_project: Project = self.options.find_by_id("CurrentProject")
-        # this_project.store()
         ProjectUIController.store_project(self.options.find_by_id("CurrentProject"))
 
     def _get_item_status_colour(self, palette_name: str, colour_key):
